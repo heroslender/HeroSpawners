@@ -1,0 +1,56 @@
+# |=================================================
+# | Usar MySql?
+# |-------------------------------------------------
+# | TRUE
+# | Se estiver true vai usar MySql e os dados para ligar
+# | a base de dados em baixo.
+# |
+# | FALSE
+# | Se estiver false vai usar SQLite para guardar os dados
+# | e nao precisa de preencher os dados de conexao
+# |-------------------------------------------------
+MySql:
+  usar: false
+  host: localhost
+  port: 3306
+  database: HeroSpawners
+  user: root
+  pass: ''
+spawner:
+  holograma: '&7%quantidade%x &e%tipo%'
+juntar:
+  raio: 5
+  maximo: 0
+mobs:
+  CREEPER: Creeper
+  SKELETON: Esqueleto
+  SPIDER: Aranha
+  GIANT: Gigante
+  ZOMBIE: Zombie
+  SLIME: Slime
+  GHAST: Ghast
+  PIG_ZOMBIE: PigZombie
+  ENDERMAN: Enderman
+  CAVE_SPIDER: Aranha da Caverma
+  SILVERFISH: Silverfish
+  BLAZE: Blaze
+  MAGMA_CUBE: Lava Slime
+  ENDER_DRAGON: Dragao
+  WITHER: Wither
+  BAT: Bat
+  WITCH: Bruxa
+  ENDERMITE: Endermite
+  GUARDIAN: Guardian
+  PIG: Porco
+  SHEEP: Ovelha
+  COW: Vaca
+  CHICKEN: Galinha
+  SQUID: Polvo
+  WOLF: Lobo
+  MUSHROOM_COW: Cogu Vaca
+  SNOWMAN: SnowMan
+  OCELOT: Ocelot
+  IRON_GOLEM: Iron Golem
+  HORSE: Cavalo
+  RABBIT: Coelho
+  VILLAGER: Villager
