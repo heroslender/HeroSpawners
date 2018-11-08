@@ -1,7 +1,7 @@
 package com.heroslender.HeroSpawners.MobStackerSuport;
 
 import com.heroslender.HeroSpawners.Spawner.ISpawner;
-import me.stackevento.API;
+import me.tintastack.api.MobsAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 
@@ -16,7 +16,7 @@ public class TintaStack implements MobStackerSuport {
 
     @Override
     public boolean createOrAddStack(ISpawner spawner, Entity entity, int quantidade) {
-        API.criarStackEntidade(entity, quantidade);
+        MobsAPI.criarStackEntidade(entity, quantidade);
         return false;
     }
 }
