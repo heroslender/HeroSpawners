@@ -95,6 +95,13 @@
             <systemPath>${project.basedir}/Libs/TintaStack.jar</systemPath>
         </dependency>
         <dependency>
+            <groupId>JH_StackMobs</groupId>
+            <artifactId>JH_StackMobs</artifactId>
+            <version>1.0.1</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/Libs/JH_StackMobs.jar</systemPath>
+        </dependency>
+        <dependency>
             <groupId>de.dustplanet</groupId>
             <artifactId>SilkSpawners</artifactId>
             <version>5.0.1-SNAPSHOT</version>

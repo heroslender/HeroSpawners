@@ -46,6 +46,8 @@ public class HeroSpawners extends JavaPlugin {
             mobStackerSuport = new StackMob();
         else if (Bukkit.getServer().getPluginManager().getPlugin("TintaStack") != null)
             mobStackerSuport = new TintaStack();
+        else if (Bukkit.getServer().getPluginManager().getPlugin("JH_StackMobs") != null)
+            mobStackerSuport = new JhMobStacker();
         else if (Bukkit.getServer().getPluginManager().getPlugin("ObyStack") != null)
             mobStackerSuport = new ObyStack();
         else
