@@ -49,7 +49,6 @@ public class PlaceEvent implements Listener {
 
                 Spawner spawner = new Spawner(colocado.getLocation(), 1);
                 spawner.save();
-                HeroSpawners.getInstance().getStorage().saveSpawnerCache(spawner);
             });
         }
     }

@@ -62,5 +62,6 @@ public class Spawner implements ISpawner {
 
     public void save(){
         HeroSpawners.getInstance().getStorage().saveSpawner(spawnerLocation, getQuatidade());
+        HeroSpawners.getInstance().getStorage().saveSpawnerCache(this);
     }
 }

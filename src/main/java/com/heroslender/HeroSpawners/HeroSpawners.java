@@ -8,7 +8,7 @@ import com.heroslender.HeroSpawners.Utils.Config;
 import com.heroslender.HeroSpawners.Utils.Metrics;
 import com.heroslender.HeroSpawners.events.BreakEvent;
 import com.heroslender.HeroSpawners.events.PlaceEvent;
-import com.heroslender.HeroSpawners.events.SilkSpawnersBreakEvent;
+import com.heroslender.HeroSpawners.events.SilkSpawnersListener;
 import com.heroslender.HeroSpawners.events.SpawnerEvent;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -55,11 +55,12 @@ public class HeroSpawners extends JavaPlugin {
 
         // Eventos
         getServer().getPluginManager().registerEvents(new SpawnerEvent(), this);
-        getServer().getPluginManager().registerEvents(new PlaceEvent(), this);
         if (getServer().getPluginManager().getPlugin("SilkSpawners") != null)
-            getServer().getPluginManager().registerEvents(new SilkSpawnersBreakEvent(), this);
-        else
+            getServer().getPluginManager().registerEvents(new SilkSpawnersListener(), this);
+        else {
             getServer().getPluginManager().registerEvents(new BreakEvent(), this);
+            getServer().getPluginManager().registerEvents(new PlaceEvent(), this);
+        }
 
         // Metrics - https://bstats.org/plugin/bukkit/HeroSpawners
         new Metrics(this).submitData();
