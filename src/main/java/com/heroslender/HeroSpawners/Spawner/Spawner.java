@@ -1,7 +1,7 @@
-package com.heroslender.HeroSpawners.Spawner;
+package com.heroslender.herospawners.spawner;
 
-import com.heroslender.HeroSpawners.HeroSpawners;
-import com.heroslender.HeroSpawners.Utils.Config;
+import com.heroslender.herospawners.HeroSpawners;
+import com.heroslender.herospawners.utils.Config;
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import lombok.Getter;

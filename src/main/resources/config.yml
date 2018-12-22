@@ -13,7 +13,7 @@ MySql:
   usar: false
   host: localhost
   port: 3306
-  database: HeroSpawners
+  database: herospawners
   user: root
   pass: ''
 spawner:

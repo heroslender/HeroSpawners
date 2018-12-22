@@ -1,15 +1,15 @@
-package com.heroslender.HeroSpawners;
+package com.heroslender.herospawners;
 
-import com.heroslender.HeroSpawners.MobStackerSuport.*;
-import com.heroslender.HeroSpawners.Storage.Storage;
-import com.heroslender.HeroSpawners.Storage.StorageMySql;
-import com.heroslender.HeroSpawners.Storage.StorageSqlLite;
-import com.heroslender.HeroSpawners.Utils.Config;
-import com.heroslender.HeroSpawners.Utils.Metrics;
-import com.heroslender.HeroSpawners.events.BreakEvent;
-import com.heroslender.HeroSpawners.events.PlaceEvent;
-import com.heroslender.HeroSpawners.events.SilkSpawnersListener;
-import com.heroslender.HeroSpawners.events.SpawnerEvent;
+import com.heroslender.herospawners.mobstacker.*;
+import com.heroslender.herospawners.storage.Storage;
+import com.heroslender.herospawners.storage.StorageMySql;
+import com.heroslender.herospawners.storage.StorageSqlLite;
+import com.heroslender.herospawners.utils.Config;
+import com.heroslender.herospawners.utils.Metrics;
+import com.heroslender.herospawners.events.BreakEvent;
+import com.heroslender.herospawners.events.PlaceEvent;
+import com.heroslender.herospawners.events.SilkSpawnersListener;
+import com.heroslender.herospawners.events.SpawnerEvent;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

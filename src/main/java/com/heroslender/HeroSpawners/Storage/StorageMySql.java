@@ -1,8 +1,8 @@
-package com.heroslender.HeroSpawners.Storage;
+package com.heroslender.herospawners.storage;
 
-import com.heroslender.HeroSpawners.HeroSpawners;
-import com.heroslender.HeroSpawners.Spawner.Spawner;
-import com.heroslender.HeroSpawners.Utils.Utilities;
+import com.heroslender.herospawners.HeroSpawners;
+import com.heroslender.herospawners.spawner.Spawner;
+import com.heroslender.herospawners.utils.Utilities;
 import com.zaxxer.hikari.HikariDataSource;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -21,7 +21,7 @@ public class StorageMySql extends StorageCache {
         FileConfiguration config = HeroSpawners.getInstance().getConfig();
         hikariDataSource = new HikariDataSource();
         hikariDataSource.setMaximumPoolSize(10);
-        hikariDataSource.setJdbcUrl("jdbc:mysql://" + config.getString("MySql.host", "localhost") + ":" + config.getString("MySql.port", "3306") + "/" + config.getString("MySql.database", "HeroSpawners"));
+        hikariDataSource.setJdbcUrl("jdbc:mysql://" + config.getString("MySql.host", "localhost") + ":" + config.getString("MySql.port", "3306") + "/" + config.getString("MySql.database", "herospawners"));
         hikariDataSource.setUsername(config.getString("MySql.user", "root"));
         hikariDataSource.setPassword(config.getString("MySql.pass", ""));
         hikariDataSource.addDataSourceProperty("autoReconnect", "true");
@@ -29,6 +29,7 @@ public class StorageMySql extends StorageCache {
         createDatabase();
 
         loadSpawners();
+        log(Level.INFO, "Foram carregados " + spawners.size() + " spawners!");
     }
 
     private void loadSpawners() {
@@ -69,8 +70,7 @@ public class StorageMySql extends StorageCache {
             }
         } catch (Exception e) {
             log(Level.SEVERE, "Ocurreu um erro ao guardar o " +
-                    "spawner(loc=\"" + Utilities.loc2str(location) + "\", quantidade=\"" + quantidade + "\").");
-            e.printStackTrace();
+                    "spawner(loc=\"" + Utilities.loc2str(location) + "\", quantidade=\"" + quantidade + "\").", e);
         }
     }
 
@@ -82,8 +82,7 @@ public class StorageMySql extends StorageCache {
                 ps.executeUpdate();
             }
         } catch (Exception e) {
-            log(Level.SEVERE, "Ocurreu um erro ao apagar o spawner(loc=\"" + Utilities.loc2str(location) + "\").");
-            e.printStackTrace();
+            log(Level.SEVERE, "Ocurreu um erro ao apagar o spawner(loc=\"" + Utilities.loc2str(location) + "\").", e);
         }
     }
 
@@ -93,13 +92,16 @@ public class StorageMySql extends StorageCache {
                 ps.executeUpdate();
             }
         } catch (Exception e) {
-            log(Level.SEVERE, "Ocurreu um erro ao criar a tabela.");
-            e.printStackTrace();
+            log(Level.SEVERE, "Ocurreu um erro ao criar a tabela.", e);
         }
     }
 
     private void log(Level level, String message) {
         HeroSpawners.getInstance().getLogger().log(level, "[MySql] " + message);
+    }
+
+    private void log(Level level, String message, Throwable thrown) {
+        HeroSpawners.getInstance().getLogger().log(level, "[MySql] " + message, thrown);
     }
 
     @Override

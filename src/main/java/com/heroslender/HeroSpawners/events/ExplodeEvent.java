@@ -1,4 +1,4 @@
-package com.heroslender.HeroSpawners.events;
+package com.heroslender.herospawners.events;
 
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;

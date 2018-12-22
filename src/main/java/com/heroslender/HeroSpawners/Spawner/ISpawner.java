@@ -1,4 +1,4 @@
-package com.heroslender.HeroSpawners.Spawner;
+package com.heroslender.herospawners.spawner;
 
 public interface ISpawner {
 

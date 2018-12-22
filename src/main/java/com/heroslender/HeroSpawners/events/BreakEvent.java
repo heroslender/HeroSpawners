@@ -1,7 +1,7 @@
-package com.heroslender.HeroSpawners.events;
+package com.heroslender.herospawners.events;
 
-import com.heroslender.HeroSpawners.HeroSpawners;
-import com.heroslender.HeroSpawners.Spawner.ISpawner;
+import com.heroslender.herospawners.HeroSpawners;
+import com.heroslender.herospawners.spawner.ISpawner;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.CreatureSpawner;
@@ -10,9 +10,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 
 public class BreakEvent implements org.bukkit.event.Listener {
-//    private HeroSpawners ss;
+//    private herospawners ss;
 
-//    public BreakEvent(HeroSpawners ss) {
+//    public BreakEvent(herospawners ss) {
 //        this.ss = ss;
 //    }
 

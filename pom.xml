@@ -104,7 +104,7 @@
         <dependency>
             <groupId>de.dustplanet</groupId>
             <artifactId>SilkSpawners</artifactId>
-            <version>5.0.1-SNAPSHOT</version>
+            <version>5.1.0</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
@@ -151,12 +151,12 @@
                         <relocation>
                             <pattern>com.zaxxer.hikari</pattern>
                             <shadedPattern>com.zaxxer.hikari</shadedPattern>
-                            <!--<shadedPattern>cf.heroslender.HeroSpawners.Libs.zaxxer.hikari</shadedPattern>-->
+                            <!--<shadedPattern>cf.heroslender.herospawners.Libs.zaxxer.hikari</shadedPattern>-->
                         </relocation>
                         <relocation>
                             <pattern>org.slf4j</pattern>
                             <shadedPattern>org.slf4j</shadedPattern>
-                            <!--<shadedPattern>cf.heroslender.HeroSpawners.Libs.slf4j.slf4j</shadedPattern>-->
+                            <!--<shadedPattern>cf.heroslender.herospawners.Libs.slf4j.slf4j</shadedPattern>-->
                         </relocation>
                     </relocations>
                 </configuration>

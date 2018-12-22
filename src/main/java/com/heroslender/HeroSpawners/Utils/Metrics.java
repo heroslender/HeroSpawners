@@ -1,4 +1,4 @@
-package com.heroslender.HeroSpawners.Utils;
+package com.heroslender.herospawners.utils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;

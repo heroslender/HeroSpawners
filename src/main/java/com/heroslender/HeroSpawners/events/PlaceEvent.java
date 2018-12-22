@@ -1,10 +1,10 @@
-package com.heroslender.HeroSpawners.events;
+package com.heroslender.herospawners.events;
 
-import com.heroslender.HeroSpawners.HeroSpawners;
-import com.heroslender.HeroSpawners.Spawner.ISpawner;
-import com.heroslender.HeroSpawners.Spawner.Spawner;
-import com.heroslender.HeroSpawners.Utils.Config;
-import com.heroslender.HeroSpawners.Utils.Utilities;
+import com.heroslender.herospawners.HeroSpawners;
+import com.heroslender.herospawners.spawner.ISpawner;
+import com.heroslender.herospawners.spawner.Spawner;
+import com.heroslender.herospawners.utils.Config;
+import com.heroslender.herospawners.utils.Utilities;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Material;

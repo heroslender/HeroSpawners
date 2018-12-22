@@ -1,6 +1,6 @@
-package com.heroslender.HeroSpawners.Utils;
+package com.heroslender.herospawners.utils;
 
-import com.heroslender.HeroSpawners.HeroSpawners;
+import com.heroslender.herospawners.HeroSpawners;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;

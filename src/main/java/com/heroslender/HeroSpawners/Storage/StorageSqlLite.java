@@ -1,9 +1,8 @@
-package com.heroslender.HeroSpawners.Storage;
+package com.heroslender.herospawners.storage;
 
-import com.heroslender.HeroSpawners.HeroSpawners;
-import com.heroslender.HeroSpawners.Spawner.Spawner;
-import com.heroslender.HeroSpawners.Utils.Utilities;
-import org.bukkit.Bukkit;
+import com.heroslender.herospawners.HeroSpawners;
+import com.heroslender.herospawners.spawner.Spawner;
+import com.heroslender.herospawners.utils.Utilities;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.sqlite.SQLiteDataSource;
@@ -12,7 +11,7 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.logging.Level;
 
 public class StorageSqlLite extends StorageCache {
 
@@ -25,158 +24,75 @@ public class StorageSqlLite extends StorageCache {
         createDatabase();
 
         loadSpawners();
+        log(Level.INFO, "Foram carregados " + spawners.size() + " spawners!");
     }
 
     private void loadSpawners() {
-        Connection connection = null;
-        PreparedStatement preparedStatement = null;
-        ResultSet resultSet = null;
-
-        try {
-            connection = dataSource.getConnection();
-            preparedStatement = connection.prepareStatement("SELECT * FROM " + SPAWNERS + ";");
-            resultSet = preparedStatement.executeQuery();
-//            Map<Location, Integer> spawners = new HashMap<>();
-            int failed = 0;
-            while (resultSet.next()) {
-                Location location = Utilities.str2loc(resultSet.getString(SPAWNERS_LOC));
-                if (location.getWorld() == null || location.getBlock().getType() != Material.MOB_SPAWNER) {
-                    failed++;
-                    continue;
+        try (Connection c = dataSource.getConnection()) {
+            try (PreparedStatement ps = c.prepareStatement("SELECT * FROM " + SPAWNERS + ";")) {
+                try (ResultSet rs = ps.executeQuery()) {
+                    spawners.clear();
+                    int failed = 0;
+                    while (rs.next()) {
+                        Location location = Utilities.str2loc(rs.getString(SPAWNERS_LOC));
+                        if (location.getWorld() == null || location.getBlock().getType() != Material.MOB_SPAWNER) {
+                            failed++;
+                            continue;
+                        }
+                        spawners.put(location, new Spawner(location, rs.getInt(SPAWNERS_QUANT)));
+                    }
+                    if (failed != 0)
+                        log(Level.WARNING, "Nao foi possivel carregar " + failed + " spawners!");
                 }
-                spawners.put(location, new Spawner(location, resultSet.getInt(SPAWNERS_QUANT)));
-//                spawners.put(location, resultSet.getInt(SpawnersDatabase.SPAWNERS_QUANT));
-//                HeroSpawners.getInstance().util.atualizaHolograma(location, resultSet.getInt(SpawnersDatabase.SPAWNERS_QUANT));
             }
-            if (failed != 0)
-                Bukkit.getLogger().warning("[HeroSpawners] Failed to load " + failed + " spawners!");
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            if (resultSet != null) {
-                try {
-                    resultSet.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if (preparedStatement != null) {
-                try {
-                    preparedStatement.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 
     @Override
     public void saveSpawner(Location location, int quantidade) {
-        Connection connection = null;
-        PreparedStatement preparedStatement = null;
-
-        try {
-            connection = dataSource.getConnection();
-            preparedStatement = connection.prepareStatement("INSERT OR REPLACE INTO " + SPAWNERS + " (" +
-                    SPAWNERS_LOC + "," +
-                    SPAWNERS_QUANT + ") VALUES('" + Utilities.loc2str(location) + "', '" + quantidade + "')");
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            Bukkit.getLogger().warning("[HeroSpawners] Ocurreu um erro ao guardar o spawner.");
-            e.printStackTrace();
-        } finally {
-            if (preparedStatement != null) {
-                try {
-                    preparedStatement.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
+        try (Connection c = dataSource.getConnection()) {
+            try (PreparedStatement ps = c.prepareStatement("INSERT OR REPLACE INTO " + SPAWNERS + " (" +
+                    SPAWNERS_LOC + "," + SPAWNERS_QUANT + ") " +
+                    "VALUES(?, ?)")) {
+                ps.setString(1, Utilities.loc2str(location));
+                ps.setInt(2, quantidade);
+                ps.executeUpdate();
             }
-
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+        } catch (Exception e) {
+            log(Level.SEVERE, "Ocurreu um erro ao guardar o " +
+                    "spawner(loc=\"" + Utilities.loc2str(location) + "\", quantidade=\"" + quantidade + "\").", e);
         }
     }
 
     @Override
     public void delSpawner(Location location) {
-        Connection connection = null;
-        PreparedStatement preparedStatement = null;
-
-        try {
-            connection = dataSource.getConnection();
-            preparedStatement = connection.prepareStatement("DELETE FROM " + SPAWNERS + " WHERE " + SPAWNERS_LOC + " = ?;");
-            preparedStatement.setString(1, Utilities.loc2str(location));
-            preparedStatement.executeUpdate();
-
-            spawners.remove(location);
-        } catch (SQLException e) {
-            Bukkit.getLogger().warning("[HeroSpawners] Ocurreu um erro ao apagar o spawner.");
-            e.printStackTrace();
-        } finally {
-            if (preparedStatement != null) {
-                try {
-                    preparedStatement.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
+        try (Connection c = dataSource.getConnection()) {
+            try (PreparedStatement ps = c.prepareStatement("DELETE FROM " + SPAWNERS + " WHERE " + SPAWNERS_LOC + " = ?;")) {
+                ps.setString(1, Utilities.loc2str(location));
+                ps.executeUpdate();
             }
-
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+        } catch (Exception e) {
+            log(Level.SEVERE, "Ocurreu um erro ao apagar o spawner(loc=\"" + Utilities.loc2str(location) + "\").", e);
         }
     }
 
-    public void createDatabase() {
-        try {
-            Connection connection = null;
-            PreparedStatement preparedStatement = null;
-            try {
-                connection = dataSource.getConnection();
-
-                preparedStatement = connection.prepareStatement(TABLE_CREATE);
-                preparedStatement.executeUpdate();
-            } catch (SQLException e) {
-                e.printStackTrace();
-                Bukkit.getLogger().info("[HeroSpawners] SQL - Ocurreu um erro ao criar a tabela.");
-            } finally {
-                if (preparedStatement != null) {
-                    try {
-                        preparedStatement.close();
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                if (connection != null) {
-                    try {
-                        connection.close();
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                }
+    private void createDatabase() {
+        try (Connection c = dataSource.getConnection()) {
+            try (PreparedStatement ps = c.prepareStatement(TABLE_CREATE)) {
+                ps.executeUpdate();
             }
         } catch (Exception e) {
-            Bukkit.getLogger().info("SQLException in Database.java class.");
+            log(Level.SEVERE, "Ocurreu um erro ao criar a tabela.", e);
         }
+    }
+
+    private void log(Level level, String message) {
+        HeroSpawners.getInstance().getLogger().log(level, "[SqlLite] " + message);
+    }
+
+    private void log(Level level, String message, Throwable thrown) {
+        HeroSpawners.getInstance().getLogger().log(level, "[SqlLite] " + message, thrown);
     }
 }

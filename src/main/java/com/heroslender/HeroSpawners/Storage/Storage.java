@@ -1,7 +1,7 @@
-package com.heroslender.HeroSpawners.Storage;
+package com.heroslender.herospawners.storage;
 
-import com.heroslender.HeroSpawners.Spawner.ISpawner;
-import com.heroslender.HeroSpawners.Spawner.Spawner;
+import com.heroslender.herospawners.spawner.ISpawner;
+import com.heroslender.herospawners.spawner.Spawner;
 import org.bukkit.Location;
 
 import java.util.Map;

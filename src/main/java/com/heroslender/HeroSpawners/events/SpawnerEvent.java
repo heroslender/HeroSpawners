@@ -1,7 +1,7 @@
-package com.heroslender.HeroSpawners.events;
+package com.heroslender.herospawners.events;
 
-import com.heroslender.HeroSpawners.HeroSpawners;
-import com.heroslender.HeroSpawners.Spawner.ISpawner;
+import com.heroslender.herospawners.HeroSpawners;
+import com.heroslender.herospawners.spawner.ISpawner;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
