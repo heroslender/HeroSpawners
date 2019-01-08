@@ -30,8 +30,7 @@ public abstract class StorageCache implements Storage {
 
     @Override
     public ISpawner getSpawner(Location location) {
-        if (spawners.containsKey(location)) return spawners.get(location);
-        return null;
+        return spawners.get(location);
     }
 
     @Override

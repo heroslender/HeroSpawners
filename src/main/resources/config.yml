@@ -16,8 +16,9 @@ MySql:
   database: herospawners
   user: root
   pass: ''
-spawner:
-  holograma: '&7%quantidade%x &e%tipo%'
+holograma:
+  distancia: 5
+  texto: '&7%quantidade%x &e%tipo%'
 juntar:
   raio: 5
   maximo: 0

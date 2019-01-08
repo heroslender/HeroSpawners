@@ -72,6 +72,7 @@ public class StorageSqlLite extends StorageCache {
             try (PreparedStatement ps = c.prepareStatement("DELETE FROM " + SPAWNERS + " WHERE " + SPAWNERS_LOC + " = ?;")) {
                 ps.setString(1, Utilities.loc2str(location));
                 ps.executeUpdate();
+                spawners.remove(location);
             }
         } catch (Exception e) {
             log(Level.SEVERE, "Ocurreu um erro ao apagar o spawner(loc=\"" + Utilities.loc2str(location) + "\").", e);

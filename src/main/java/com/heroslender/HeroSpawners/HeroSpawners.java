@@ -1,26 +1,31 @@
 package com.heroslender.herospawners;
 
+import com.heroslender.herospawners.events.*;
 import com.heroslender.herospawners.mobstacker.*;
 import com.heroslender.herospawners.storage.Storage;
 import com.heroslender.herospawners.storage.StorageMySql;
 import com.heroslender.herospawners.storage.StorageSqlLite;
 import com.heroslender.herospawners.utils.Config;
 import com.heroslender.herospawners.utils.Metrics;
-import com.heroslender.herospawners.events.BreakEvent;
-import com.heroslender.herospawners.events.PlaceEvent;
-import com.heroslender.herospawners.events.SilkSpawnersListener;
-import com.heroslender.herospawners.events.SpawnerEvent;
 import lombok.Getter;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.core.filter.AbstractFilter;
+import org.apache.logging.log4j.message.Message;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashSet;
+import java.util.Set;
 
 public class HeroSpawners extends JavaPlugin {
     @Getter private static HeroSpawners instance;
 
-    @Getter public HashSet<Location> newSpawner = new HashSet<>();
+    @Getter public Set<Location> newSpawner = new HashSet<>();
     @Getter private MobStackerSuport mobStackerSuport;
     @Getter private boolean shutingDown = true;
 
@@ -32,6 +37,9 @@ public class HeroSpawners extends JavaPlugin {
 
         // Inicializar a config
         Config.init();
+
+        getLogger().info("Hologramas ativados apenas ao passar o mouse!");
+        getServer().getPluginManager().registerEvents(new HologramListener(), this);
 
         // Base de dados
         if (getConfig().getBoolean("MySql.usar", false))
@@ -67,6 +75,16 @@ public class HeroSpawners extends JavaPlugin {
 
         // Colocar o server como ligado(Prevenir dups em reinicios)
         getServer().getScheduler().scheduleSyncDelayedTask(this, () -> shutingDown = false);
+
+        ((Logger) LogManager.getRootLogger()).addFilter(new AbstractFilter() {
+            @Override
+            public Result filter(LogEvent event) {
+                if (event != null && event.getMessage() != null && event.getMessage().getFormattedMessage().contains("Skipping BlockEntity with id")) {
+                    return Result.DENY;
+                }
+                return Result.NEUTRAL;
+            }
+        });
 
         getLogger().info("Plugin carregado!");
     }
