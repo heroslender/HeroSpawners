@@ -25,14 +25,19 @@ public class HologramListener implements Listener {
         if (e.isCancelled() || viewers.contains(e.getPlayer()))
             return;
 
-        val target = e.getPlayer().getTargetBlock(Collections.singleton(Material.AIR), Config.SPAWNER_HOLOGRAM_VIEW_DISTANCE);
+        try {
+            val target = e.getPlayer().getTargetBlock(Collections.singleton(Material.AIR), Config.SPAWNER_HOLOGRAM_VIEW_DISTANCE);
 
-        if (target.getType() == Material.MOB_SPAWNER) {
-            val spawner = (Spawner) HeroSpawners.getInstance().getStorage().getSpawner(target.getLocation());
+            if (target.getType() == Material.MOB_SPAWNER) {
+                val spawner = (Spawner) HeroSpawners.getInstance().getStorage().getSpawner(target.getLocation());
 
-            if (spawner != null) {
-                setSpawnerHologram(e.getPlayer(), spawner);
+                if (spawner != null) {
+                    setSpawnerHologram(e.getPlayer(), spawner);
+                }
             }
+        } catch (IllegalStateException ignore) {
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 
