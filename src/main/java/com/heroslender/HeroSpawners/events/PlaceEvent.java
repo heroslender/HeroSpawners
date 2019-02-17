@@ -18,7 +18,7 @@ public class PlaceEvent implements Listener {
 
     @EventHandler
     public void onBlockPlace(final BlockPlaceEvent e) {
-        if (!e.isCancelled() && e.getBlock().getType() == Material.MOB_SPAWNER && e.getPlayer().hasPermission("herospawners.stack")) {
+        if (!e.isCancelled() && e.getBlock().getType() == Material.MOB_SPAWNER) {
             if (HeroSpawners.getInstance().isShutingDown()) {
                 e.setCancelled(true);
                 e.getPlayer().sendMessage("§cNão é possivel colocar spawners quando o servidor esta a ligar/desligar.");
