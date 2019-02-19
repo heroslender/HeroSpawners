@@ -79,7 +79,10 @@ public class HeroSpawners extends JavaPlugin {
         ((Logger) LogManager.getRootLogger()).addFilter(new AbstractFilter() {
             @Override
             public Result filter(LogEvent event) {
-                if (event != null && event.getMessage() != null && event.getMessage().getFormattedMessage().contains("Skipping BlockEntity with id")) {
+                if (event != null
+                        && event.getMessage() != null
+                        && event.getMessage().getFormattedMessage() != null
+                        && event.getMessage().getFormattedMessage().contains("Skipping BlockEntity with id")) {
                     return Result.DENY;
                 }
                 return Result.NEUTRAL;
