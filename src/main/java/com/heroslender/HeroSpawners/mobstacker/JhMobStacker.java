@@ -1,7 +1,7 @@
 package com.heroslender.herospawners.mobstacker;
 
 import JH_StackMobs.Main;
-import com.heroslender.herospawners.spawner.ISpawner;
+import com.heroslender.herospawners.models.ISpawner;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.metadata.FixedMetadataValue;

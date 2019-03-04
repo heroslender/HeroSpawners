@@ -1,20 +1,18 @@
 package com.heroslender.herospawners;
 
-import com.heroslender.herospawners.events.*;
+import com.heroslender.herospawners.controllers.StorageController;
+import com.heroslender.herospawners.listeners.*;
 import com.heroslender.herospawners.mobstacker.*;
-import com.heroslender.herospawners.storage.Storage;
-import com.heroslender.herospawners.storage.StorageMySql;
-import com.heroslender.herospawners.storage.StorageSqlLite;
+import com.heroslender.herospawners.services.StorageService;
+import com.heroslender.herospawners.services.StorageServiceMySqlImpl;
+import com.heroslender.herospawners.services.StorageServiceSQLiteImpl;
 import com.heroslender.herospawners.utils.Config;
 import com.heroslender.herospawners.utils.Metrics;
 import lombok.Getter;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.filter.AbstractFilter;
-import org.apache.logging.log4j.message.Message;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -29,7 +27,18 @@ public class HeroSpawners extends JavaPlugin {
     @Getter private MobStackerSuport mobStackerSuport;
     @Getter private boolean shutingDown = true;
 
-    @Getter private Storage storage;
+    @Getter private final StorageController storageController;
+
+    public HeroSpawners() {
+        super();
+
+        StorageService storageService;
+        if (getConfig().getBoolean("MySql.usar", false))
+            storageService = new StorageServiceMySqlImpl();
+        else
+            storageService = new StorageServiceSQLiteImpl();
+        storageController = new StorageController(storageService);
+    }
 
     public void onEnable() {
         instance = this;
@@ -42,10 +51,7 @@ public class HeroSpawners extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new HologramListener(), this);
 
         // Base de dados
-        if (getConfig().getBoolean("MySql.usar", false))
-            storage = new StorageMySql();
-        else
-            storage = new StorageSqlLite();
+        storageController.init();
 
         // StackMobs
         if (Bukkit.getServer().getPluginManager().getPlugin("MobStacker2") != null)
@@ -61,13 +67,12 @@ public class HeroSpawners extends JavaPlugin {
         else
             mobStackerSuport = new SemMobStacker();
 
-        // Eventos
-        getServer().getPluginManager().registerEvents(new SpawnerEvent(), this);
+        // listeners
+        getServer().getPluginManager().registerEvents(new SpawnerSpawnListener(), this);
         if (getServer().getPluginManager().getPlugin("SilkSpawners") != null)
-            getServer().getPluginManager().registerEvents(new SilkSpawnersListener(), this);
+            getServer().getPluginManager().registerEvents(new SilkSpawnersListener(storageController), this);
         else {
-            getServer().getPluginManager().registerEvents(new BreakEvent(), this);
-            getServer().getPluginManager().registerEvents(new PlaceEvent(), this);
+            getServer().getPluginManager().registerEvents(new SpawnerListener(storageController), this);
         }
 
         // Metrics - https://bstats.org/plugin/bukkit/HeroSpawners
@@ -94,7 +99,7 @@ public class HeroSpawners extends JavaPlugin {
 
     public void onDisable() {
         shutingDown = true;
-        if (storage != null) storage.onDisable();
+        storageController.stop();
     }
 }
 

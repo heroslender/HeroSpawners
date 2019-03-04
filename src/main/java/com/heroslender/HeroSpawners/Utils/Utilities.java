@@ -1,13 +1,16 @@
 package com.heroslender.herospawners.utils;
 
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SplittableRandom;
 
 public class Utilities {
+    @Getter private static final SplittableRandom random = new SplittableRandom();
 
     public static List<Block> getBlocks(Block start, int radius) {
         List<Block> blocks = new ArrayList<>();

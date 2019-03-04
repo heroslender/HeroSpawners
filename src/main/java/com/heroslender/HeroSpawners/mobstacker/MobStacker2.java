@@ -1,7 +1,7 @@
 package com.heroslender.herospawners.mobstacker;
 
 import com.heroslender.herospawners.HeroSpawners;
-import com.heroslender.herospawners.spawner.ISpawner;
+import com.heroslender.herospawners.models.ISpawner;
 import com.kiwifisher.mobstacker2.io.Settings;
 import com.kiwifisher.mobstacker2.metadata.MetaTags;
 import com.kiwifisher.mobstacker2.util.Util;

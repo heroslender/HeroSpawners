@@ -1,6 +1,6 @@
 package com.heroslender.herospawners.mobstacker;
 
-import com.heroslender.herospawners.spawner.ISpawner;
+import com.heroslender.herospawners.models.ISpawner;
 import me.leo.stack.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -29,7 +29,7 @@ public class ObyStack implements MobStackerSuport {
                 }
             }
         }
-        entity.setMetadata("spawner_qnt", new FixedMetadataValue(Main.pl, spawner.getQuatidade()));
+        entity.setMetadata("spawner_qnt", new FixedMetadataValue(Main.pl, spawner.getAmount()));
 
         entity.setMetadata("qnt", new FixedMetadataValue(Main.pl, quantidade));
         entity.setCustomName("§a" + entity.getName() + " x" + quantidade);

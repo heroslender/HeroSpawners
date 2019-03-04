@@ -1,8 +1,8 @@
-package com.heroslender.herospawners.events;
+package com.heroslender.herospawners.listeners;
 
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import com.heroslender.herospawners.HeroSpawners;
-import com.heroslender.herospawners.spawner.Spawner;
+import com.heroslender.herospawners.models.Spawner;
 import com.heroslender.herospawners.utils.Config;
 import lombok.val;
 import org.bukkit.Material;
@@ -29,7 +29,7 @@ public class HologramListener implements Listener {
             val target = e.getPlayer().getTargetBlock(Collections.singleton(Material.AIR), Config.SPAWNER_HOLOGRAM_VIEW_DISTANCE);
 
             if (target.getType() == Material.MOB_SPAWNER) {
-                val spawner = (Spawner) HeroSpawners.getInstance().getStorage().getSpawner(target.getLocation());
+                val spawner = (Spawner) HeroSpawners.getInstance().getStorageController().getSpawner(target.getLocation());
 
                 if (spawner != null) {
                     setSpawnerHologram(e.getPlayer(), spawner);
@@ -42,17 +42,17 @@ public class HologramListener implements Listener {
     }
 
     private void setSpawnerHologram(final Player player, final Spawner spawner) {
-        val blockState = spawner.getSpawnerLocation().getBlock().getState();
+        val blockState = spawner.getLocation().getBlock().getState();
         if (!(blockState instanceof CreatureSpawner))
             return;
 
-        val hologramInfo = HologramsAPI.createHologram(HeroSpawners.getInstance(), spawner.getSpawnerLocation().add(0.5, 1.4, 0.5));
+        val hologramInfo = HologramsAPI.createHologram(HeroSpawners.getInstance(), spawner.getLocation().add(0.5, 1.4, 0.5));
         hologramInfo.getVisibilityManager().setVisibleByDefault(false);
         hologramInfo.getVisibilityManager().showTo(player);
 
         val nomeEntidade = Config.getNomeEntidade(((CreatureSpawner) blockState).getSpawnedType());
         val linha = hologramInfo.appendTextLine(Config.TEXTO_HOLOGRAMA
-                .replace("%quantidade%", spawner.getQuatidade() + "")
+                .replace("%quantidade%", spawner.getAmount() + "")
                 .replace("%tipo%", nomeEntidade));
         viewers.add(player);
 
@@ -61,8 +61,8 @@ public class HologramListener implements Listener {
             public void run() {
                 if (!player.isOnline()
                         || !viewers.contains(player)
-                        || spawner.getQuatidade() < 0
-                        || !spawner.getSpawnerLocation().equals(player.getTargetBlock(Collections.singleton(Material.AIR), Config.SPAWNER_HOLOGRAM_VIEW_DISTANCE).getLocation())) {
+                        || spawner.getAmount() < 0
+                        || !spawner.getLocation().equals(player.getTargetBlock(Collections.singleton(Material.AIR), Config.SPAWNER_HOLOGRAM_VIEW_DISTANCE).getLocation())) {
                     cancel();
                     hologramInfo.delete();
                     viewers.remove(player);
@@ -70,7 +70,7 @@ public class HologramListener implements Listener {
                 }
 
                 val novaLinha = Config.TEXTO_HOLOGRAMA
-                        .replace("%quantidade%", spawner.getQuatidade() + "")
+                        .replace("%quantidade%", spawner.getAmount() + "")
                         .replace("%tipo%", nomeEntidade);
                 if (!novaLinha.equals(linha.getText())) {
                     linha.setText(novaLinha);

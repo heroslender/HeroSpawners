@@ -1,6 +1,6 @@
 package com.heroslender.herospawners.mobstacker;
 
-import com.heroslender.herospawners.spawner.ISpawner;
+import com.heroslender.herospawners.models.ISpawner;
 import org.bukkit.entity.Entity;
 
 /**
