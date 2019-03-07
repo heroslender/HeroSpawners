@@ -1,7 +1,10 @@
 package com.heroslender.herospawners;
 
 import com.heroslender.herospawners.controllers.StorageController;
-import com.heroslender.herospawners.listeners.*;
+import com.heroslender.herospawners.listeners.HologramListener;
+import com.heroslender.herospawners.listeners.SilkSpawnersListener;
+import com.heroslender.herospawners.listeners.SpawnerListener;
+import com.heroslender.herospawners.listeners.SpawnerSpawnListener;
 import com.heroslender.herospawners.mobstacker.*;
 import com.heroslender.herospawners.services.StorageService;
 import com.heroslender.herospawners.services.StorageServiceMySqlImpl;
@@ -19,15 +22,17 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ForkJoinPool;
 
 public class HeroSpawners extends JavaPlugin {
     @Getter private static HeroSpawners instance;
 
+    @Getter private final Executor executor = ForkJoinPool.commonPool();
+    @Getter private final StorageController storageController;
     @Getter public Set<Location> newSpawner = new HashSet<>();
     @Getter private MobStackerSuport mobStackerSuport;
     @Getter private boolean shutingDown = true;
-
-    @Getter private final StorageController storageController;
 
     public HeroSpawners() {
         super();
