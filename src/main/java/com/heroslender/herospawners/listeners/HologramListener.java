@@ -11,6 +11,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
@@ -46,14 +48,22 @@ public class HologramListener implements Listener {
         if (!(blockState instanceof CreatureSpawner))
             return;
 
-        val hologramInfo = HologramsAPI.createHologram(HeroSpawners.getInstance(), spawner.getLocation().add(0.5, 1.4, 0.5));
+        val hologramHeight = Config.showHeadHologram ? 1.9 : 1.4;
+        val hologramInfo = HologramsAPI.createHologram(HeroSpawners.getInstance(), spawner.getLocation().add(0.5, hologramHeight, 0.5));
         hologramInfo.getVisibilityManager().setVisibleByDefault(false);
         hologramInfo.getVisibilityManager().showTo(player);
-
-        val nomeEntidade = Config.getNomeEntidade(((CreatureSpawner) blockState).getSpawnedType());
+        val entityType = ((CreatureSpawner) blockState).getSpawnedType();
+        val nomeEntidade = Config.getNomeEntidade(entityType);
         val linha = hologramInfo.appendTextLine(Config.TEXTO_HOLOGRAMA
                 .replace("%quantidade%", spawner.getAmount() + "")
                 .replace("%tipo%", nomeEntidade));
+        if (Config.showHeadHologram) {
+            ItemStack head = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+            val skullMeta = (SkullMeta) head.getItemMeta();
+            skullMeta.setOwner(Config.getHeadEntidade(entityType));
+            head.setItemMeta(skullMeta);
+            hologramInfo.appendItemLine(head);
+        }
         viewers.add(player);
 
         new BukkitRunnable() {
