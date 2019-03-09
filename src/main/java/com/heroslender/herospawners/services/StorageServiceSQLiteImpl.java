@@ -18,12 +18,16 @@ import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
 public class StorageServiceSQLiteImpl implements StorageServiceSql {
-    private SQLiteDataSource dataSource;
+    private final SQLiteDataSource dataSource;
 
     public StorageServiceSQLiteImpl() {
         dataSource = new SQLiteDataSource();
-        dataSource.setUrl("jdbc:sqlite:" + new File(HeroSpawners.getInstance().getDataFolder(), "BaseDeDados.db"));
 
+        dataSource.setUrl("jdbc:sqlite:" + new File(HeroSpawners.getInstance().getDataFolder(), "BaseDeDados.db"));
+    }
+
+    @Override
+    public void init() {
         createDatabase();
     }
 
@@ -108,7 +112,7 @@ public class StorageServiceSQLiteImpl implements StorageServiceSql {
     }
 
     @Override
-    public void onDisable() {
+    public void stop() {
 
     }
 

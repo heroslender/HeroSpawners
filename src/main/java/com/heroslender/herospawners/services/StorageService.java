@@ -6,7 +6,7 @@ import org.bukkit.Location;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-public interface StorageService {
+public interface StorageService extends Service {
 
     CompletableFuture<Map<Location, ISpawner>> getSpawners();
 
@@ -15,6 +15,4 @@ public interface StorageService {
     CompletableFuture<Void> update(final ISpawner spawner);
 
     CompletableFuture<Void> delete(final ISpawner spawner);
-
-    void onDisable();
 }

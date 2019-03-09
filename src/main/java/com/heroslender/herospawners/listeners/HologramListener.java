@@ -2,8 +2,10 @@ package com.heroslender.herospawners.listeners;
 
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import com.heroslender.herospawners.HeroSpawners;
+import com.heroslender.herospawners.controllers.ConfigurationController;
+import com.heroslender.herospawners.models.ISpawner;
 import com.heroslender.herospawners.models.Spawner;
-import com.heroslender.herospawners.utils.Config;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.bukkit.Material;
 import org.bukkit.block.CreatureSpawner;
@@ -19,7 +21,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@RequiredArgsConstructor
 public class HologramListener implements Listener {
+    private final ConfigurationController config;
     private final List<Player> viewers = new ArrayList<>();
 
     @EventHandler
@@ -28,7 +32,7 @@ public class HologramListener implements Listener {
             return;
 
         try {
-            val target = e.getPlayer().getTargetBlock(Collections.singleton(Material.AIR), Config.SPAWNER_HOLOGRAM_VIEW_DISTANCE);
+            val target = e.getPlayer().getTargetBlock(Collections.singleton(Material.AIR), config.getHologramViewDistance());
 
             if (target.getType() == Material.MOB_SPAWNER) {
                 val spawner = (Spawner) HeroSpawners.getInstance().getStorageController().getSpawner(target.getLocation());
@@ -43,24 +47,24 @@ public class HologramListener implements Listener {
         }
     }
 
-    private void setSpawnerHologram(final Player player, final Spawner spawner) {
+    private void setSpawnerHologram(final Player player, final ISpawner spawner) {
         val blockState = spawner.getLocation().getBlock().getState();
         if (!(blockState instanceof CreatureSpawner))
             return;
 
-        val hologramHeight = Config.showHeadHologram ? 1.9 : 1.4;
+        val hologramHeight = config.isHologramShowHead() ? 1.9 : 1.4;
         val hologramInfo = HologramsAPI.createHologram(HeroSpawners.getInstance(), spawner.getLocation().add(0.5, hologramHeight, 0.5));
         hologramInfo.getVisibilityManager().setVisibleByDefault(false);
         hologramInfo.getVisibilityManager().showTo(player);
         val entityType = ((CreatureSpawner) blockState).getSpawnedType();
-        val nomeEntidade = Config.getNomeEntidade(entityType);
-        val linha = hologramInfo.appendTextLine(Config.TEXTO_HOLOGRAMA
+        val entityProperties = config.getProperties(entityType);
+        val linha = hologramInfo.appendTextLine(config.getHologramText()
                 .replace("%quantidade%", spawner.getAmount() + "")
-                .replace("%tipo%", nomeEntidade));
-        if (Config.showHeadHologram) {
+                .replace("%tipo%", entityProperties.getDisplayName()));
+        if (config.isHologramShowHead()) {
             ItemStack head = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
             val skullMeta = (SkullMeta) head.getItemMeta();
-            skullMeta.setOwner(Config.getHeadEntidade(entityType));
+            skullMeta.setOwner(entityProperties.getSkullSkinName());
             head.setItemMeta(skullMeta);
             hologramInfo.appendItemLine(head);
         }
@@ -72,16 +76,16 @@ public class HologramListener implements Listener {
                 if (!player.isOnline()
                         || !viewers.contains(player)
                         || spawner.getAmount() < 0
-                        || !spawner.getLocation().equals(player.getTargetBlock(Collections.singleton(Material.AIR), Config.SPAWNER_HOLOGRAM_VIEW_DISTANCE).getLocation())) {
+                        || !spawner.getLocation().equals(player.getTargetBlock(Collections.singleton(Material.AIR), config.getHologramViewDistance()).getLocation())) {
                     cancel();
                     hologramInfo.delete();
                     viewers.remove(player);
                     return;
                 }
 
-                val novaLinha = Config.TEXTO_HOLOGRAMA
+                val novaLinha = config.getHologramText()
                         .replace("%quantidade%", spawner.getAmount() + "")
-                        .replace("%tipo%", nomeEntidade);
+                        .replace("%tipo%", entityProperties.getDisplayName());
                 if (!novaLinha.equals(linha.getText())) {
                     linha.setText(novaLinha);
                 }

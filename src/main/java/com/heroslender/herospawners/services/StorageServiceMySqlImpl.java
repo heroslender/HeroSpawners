@@ -34,6 +34,14 @@ public class StorageServiceMySqlImpl implements StorageServiceSql {
     }
 
     @Override
+    public void init() {
+        FileConfiguration config = HeroSpawners.getInstance().getConfig();
+        hikariDataSource.setJdbcUrl("jdbc:mysql://" + config.getString("MySql.host", "localhost") + ":" + config.getString("MySql.port", "3306") + "/" + config.getString("MySql.database", "herospawners"));
+        hikariDataSource.setUsername(config.getString("MySql.user", "root"));
+        hikariDataSource.setPassword(config.getString("MySql.pass", ""));
+    }
+
+    @Override
     public CompletableFuture<Map<Location, ISpawner>> getSpawners() {
         return CompletableFuture.supplyAsync(() -> {
             Map<Location, ISpawner> spawners = new HashMap<>();
@@ -130,7 +138,7 @@ public class StorageServiceMySqlImpl implements StorageServiceSql {
     }
 
     @Override
-    public void onDisable() {
+    public void stop() {
         hikariDataSource.close();
     }
 }

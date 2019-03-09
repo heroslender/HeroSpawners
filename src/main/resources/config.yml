@@ -16,42 +16,107 @@ MySql:
   database: herospawners
   user: root
   pass: ''
-holograma:
-  distancia: 5
-  texto: '&7%quantidade%x &e%tipo%'
 juntar:
   raio: 5
   maximo: 0
+holograma:
+  distancia: 5
+  texto: '&7%quantidade%x &e%tipo%'
+  mostrar-cabeca: true
 mobs:
-  CREEPER: Creeper
-  SKELETON: Esqueleto
-  SPIDER: Aranha
-  GIANT: Gigante
-  ZOMBIE: Zombie
-  SLIME: Slime
-  GHAST: Ghast
-  PIG_ZOMBIE: PigZombie
-  ENDERMAN: Enderman
-  CAVE_SPIDER: Aranha da Caverma
-  SILVERFISH: Silverfish
-  BLAZE: Blaze
-  MAGMA_CUBE: Lava Slime
-  ENDER_DRAGON: Dragao
-  WITHER: Wither
-  BAT: Bat
-  WITCH: Bruxa
-  ENDERMITE: Endermite
-  GUARDIAN: Guardian
-  PIG: Porco
-  SHEEP: Ovelha
-  COW: Vaca
-  CHICKEN: Galinha
-  SQUID: Polvo
-  WOLF: Lobo
-  MUSHROOM_COW: Cogu Vaca
-  SNOWMAN: SnowMan
-  OCELOT: Ocelot
-  IRON_GOLEM: Iron Golem
-  HORSE: Cavalo
-  RABBIT: Coelho
-  VILLAGER: Villager
+  CREEPER:
+    name: Creeper
+    head: MHF_Creeper
+  SKELETON:
+    name: Esqueleto
+    head: MHF_Skeleton
+  SPIDER:
+    name: Aranha
+    head: MHF_Spider
+  GIANT:
+    name: Gigante
+    head: MHF_Giant
+  ZOMBIE:
+    name: Zombie
+    head: MHF_Zombie
+  SLIME:
+    name: Slime
+    head: MHF_Slime
+  GHAST:
+    name: Ghast
+    head: MHF_Ghast
+  PIG_ZOMBIE:
+    name: PigZombie
+    head: MHF_PigZombie
+  ENDERMAN:
+    name: Enderman
+    head: MHF_Enderman
+  CAVE_SPIDER:
+    name: Aranha da Caverma
+    head: MHF_CaveSpider
+  SILVERFISH:
+    name: Silverfish
+    head: MHF_Silverfish
+  BLAZE:
+    name: Blaze
+    head: MHF_Blaze
+  MAGMA_CUBE:
+    name: Lava Slime
+    head: MHF_LavaSlime
+  ENDER_DRAGON:
+    name: Dragao
+    head: MHF_EnderDragon
+  WITHER:
+    name: Wither
+    head: MHF_WitherBoss
+  BAT:
+    name: Bat
+    head: MHF_Bat
+  WITCH:
+    name: Bruxa
+    head: MHF_Witch
+  ENDERMITE:
+    name: Endermite
+    head: MHF_Endermite
+  GUARDIAN:
+    name: Guardian
+    head: MHF_Guardian
+  PIG:
+    name: Porco
+    head: MHF_Pig
+  SHEEP:
+    name: Ovelha
+    head: MHF_Sheep
+  COW:
+    name: Vaca
+    head: MHF_Cow
+  CHICKEN:
+    name: Galinha
+    head: MHF_Chicken
+  SQUID:
+    name: Polvo
+    head: MHF_Squid
+  WOLF:
+    name: Lobo
+    head: MHF_Wolf
+  MUSHROOM_COW:
+    name: Cogu Vaca
+    head: MHF_MushroomCow
+  SNOWMAN:
+    name: SnowMan
+    head: MHF_SnowMan
+  OCELOT:
+    name: Ocelot
+    head: MHF_Ozelot
+  IRON_GOLEM:
+    name: Iron Golem
+    head: MHF_VillagerGolem
+  HORSE:
+    name: Cavalo
+    head: MHF_EntityHorse
+  RABBIT:
+    name: Coelho
+    head: MHF_Rabbit
+  VILLAGER:
+    name: Villager
+    head: MHF_Villager

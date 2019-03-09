@@ -1,15 +1,14 @@
 package com.heroslender.herospawners;
 
+import com.heroslender.herospawners.commands.HeroSpawnersCommand;
+import com.heroslender.herospawners.controllers.ConfigurationController;
 import com.heroslender.herospawners.controllers.StorageController;
 import com.heroslender.herospawners.listeners.HologramListener;
 import com.heroslender.herospawners.listeners.SilkSpawnersListener;
 import com.heroslender.herospawners.listeners.SpawnerListener;
 import com.heroslender.herospawners.listeners.SpawnerSpawnListener;
 import com.heroslender.herospawners.mobstacker.*;
-import com.heroslender.herospawners.services.StorageService;
-import com.heroslender.herospawners.services.StorageServiceMySqlImpl;
-import com.heroslender.herospawners.services.StorageServiceSQLiteImpl;
-import com.heroslender.herospawners.utils.Config;
+import com.heroslender.herospawners.services.*;
 import com.heroslender.herospawners.utils.Metrics;
 import lombok.Getter;
 import org.apache.logging.log4j.LogManager;
@@ -30,6 +29,7 @@ public class HeroSpawners extends JavaPlugin {
 
     @Getter private final Executor executor = ForkJoinPool.commonPool();
     @Getter private final StorageController storageController;
+    @Getter private final ConfigurationController configurationController;
     @Getter public Set<Location> newSpawner = new HashSet<>();
     @Getter private MobStackerSuport mobStackerSuport;
     @Getter private boolean shutingDown = true;
@@ -45,17 +45,17 @@ public class HeroSpawners extends JavaPlugin {
         else
             storageService = new StorageServiceSQLiteImpl();
         storageController = new StorageController(storageService);
+
+        ConfigurationService configurationService = new ConfigurationServiceImpl();
+        configurationController = new ConfigurationController(configurationService);
     }
 
     public void onEnable() {
-        // Inicializar a config
-        Config.init();
+        configurationController.init();
+        storageController.init();
 
         getLogger().info("Hologramas ativados apenas ao passar o mouse!");
-        getServer().getPluginManager().registerEvents(new HologramListener(), this);
-
-        // Base de dados
-        storageController.init();
+        getServer().getPluginManager().registerEvents(new HologramListener(configurationController), this);
 
         // StackMobs
         if (Bukkit.getServer().getPluginManager().getPlugin("MobStacker2") != null)
@@ -74,9 +74,9 @@ public class HeroSpawners extends JavaPlugin {
         // listeners
         getServer().getPluginManager().registerEvents(new SpawnerSpawnListener(), this);
         if (getServer().getPluginManager().getPlugin("SilkSpawners") != null)
-            getServer().getPluginManager().registerEvents(new SilkSpawnersListener(storageController), this);
+            getServer().getPluginManager().registerEvents(new SilkSpawnersListener(configurationController, storageController), this);
         else {
-            getServer().getPluginManager().registerEvents(new SpawnerListener(storageController), this);
+            getServer().getPluginManager().registerEvents(new SpawnerListener(configurationController, storageController), this);
         }
 
         // Metrics - https://bstats.org/plugin/bukkit/HeroSpawners
@@ -98,12 +98,15 @@ public class HeroSpawners extends JavaPlugin {
             }
         });
 
+        getCommand("herospawners").setExecutor(new HeroSpawnersCommand());
+
         getLogger().info("Plugin carregado!");
     }
 
     public void onDisable() {
         shutingDown = true;
         storageController.stop();
+        configurationController.stop();
     }
 }
 

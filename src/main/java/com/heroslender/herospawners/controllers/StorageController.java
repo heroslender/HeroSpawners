@@ -15,6 +15,7 @@ public class StorageController implements Controller {
 
     @Override
     public void init() {
+        storageService.init();
         cachedSpawners.clear();
         cachedSpawners.putAll(storageService.getSpawners().join());
     }
@@ -38,7 +39,7 @@ public class StorageController implements Controller {
 
     @Override
     public void stop() {
-        storageService.onDisable();
         cachedSpawners.clear();
+        storageService.stop();
     }
 }

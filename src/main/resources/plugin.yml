@@ -4,3 +4,7 @@ version: ${project.version}
 author: Heroslender
 softdepend: [HolographicDisplays, MobStacker2, SilkSpawners, ObyStack, Multiverse-Core]
 load: POSTWORLD
+
+commands:
+  herospawners:
+    description: Main command
