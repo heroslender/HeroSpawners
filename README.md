@@ -2,10 +2,11 @@
 
 # HeroSpawners
 
-![GitHub contributors][contributors-shield]
-![Stars][stars-shield]
+[![GitHub stars](https://img.shields.io/github/stars/heroslender/HeroSpawners.svg)](https://github.com/heroslender/HeroSpawners/stargazers)
+[![GitHub All Releases](https://img.shields.io/github/downloads/heroslender/HeroSpawners/total.svg?logoColor=fff)](https://github.com/heroslender/HeroSpawners/releases/latest)
+[![GitHub issues](https://img.shields.io/github/issues-raw/heroslender/HeroSpawners.svg?label=issues)](https://github.com/heroslender/HeroSpawners/issues)
+[![GitHub last commit](https://img.shields.io/github/last-commit/heroslender/HeroSpawners.svg)](https://github.com/heroslender/HeroSpawners/commit)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/218d46cbc31345f2ac94e204641e91ff)](https://app.codacy.com/app/heroslender/HeroSpawners?utm_source=github.com&utm_medium=referral&utm_content=heroslender/HeroSpawners&utm_campaign=Badge_Grade_Dashboard)
-[![HitCount](http://hits.dwyl.com/heroslender/HeroSpawners.svg)](http://hits.dwyl.com/heroslender/HeroSpawners)
 [![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/)
 
 O HeroSpawners permite que os spawners do seu servidor agrupem, reduzindo assim o lag no cliente e no servidor.
