@@ -1,6 +1,8 @@
 package com.heroslender.herospawners.models;
 
 import org.bukkit.Location;
+import org.bukkit.block.CreatureSpawner;
+import org.bukkit.entity.EntityType;
 
 public interface ISpawner {
 
@@ -31,4 +33,18 @@ public interface ISpawner {
      * @return The spawners owner
      */
     String getOwner();
+
+    /**
+     * Get the state of the spawner
+     *
+     * @return The spawner state
+     */
+    CreatureSpawner getState();
+
+    /**
+     * Get the type of entity the spawner is spawning
+     *
+     * @return The entity type
+     */
+    EntityType getType();
 }

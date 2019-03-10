@@ -4,6 +4,8 @@ import com.heroslender.herospawners.HeroSpawners;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.Location;
+import org.bukkit.block.CreatureSpawner;
+import org.bukkit.entity.EntityType;
 
 @AllArgsConstructor
 public class Spawner implements ISpawner {
@@ -18,5 +20,15 @@ public class Spawner implements ISpawner {
 
     public Location getLocation() {
         return location.clone();
+    }
+
+    @Override
+    public CreatureSpawner getState() {
+        return (CreatureSpawner) getLocation().getBlock().getState();
+    }
+
+    @Override
+    public EntityType getType() {
+        return getState().getSpawnedType();
     }
 }
