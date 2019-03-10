@@ -9,7 +9,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 @RequiredArgsConstructor
@@ -34,7 +34,7 @@ public class ConfigurationController implements Controller {
         hologramViewDistance = configurationService.getConfig().getInt("holograma.distancia", 0);
         hologramShowHead = configurationService.getConfig().getBoolean("holograma.mostrar-cabeca", true);
 
-        entityProperties = new HashMap<>();
+        entityProperties = new EnumMap<>(EntityType.class);
         for (EntityType e : EntityType.values()) {
             if (e.getEntityClass() != null
                     && e.getName() != null
