@@ -2,20 +2,24 @@
 
 # HeroSpawners
 
+![GitHub contributors][contributors-shield]
+![Stars][stars-shield]
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/218d46cbc31345f2ac94e204641e91ff)](https://app.codacy.com/app/heroslender/HeroSpawners?utm_source=github.com&utm_medium=referral&utm_content=heroslender/HeroSpawners&utm_campaign=Badge_Grade_Dashboard)
+[![HitCount](http://hits.dwyl.com/heroslender/HeroSpawners.svg)](http://hits.dwyl.com/heroslender/HeroSpawners)
+[![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/)
 
 O HeroSpawners permite que os spawners do seu servidor agrupem, reduzindo assim o lag no cliente e no servidor.
 
 ![Preview](https://github.com/heroslender/HeroSpawners/raw/develop/assets/preview_hologram.gif)
 ![Preview](https://github.com/heroslender/HeroSpawners/raw/develop/assets/preview.gif)
 
-## Commands
+## Comandos
 - `/herospawners reload` - Comando para recarregar a configuração do plugin.
 
-## Permissions
+## Permissões
 - `herospawners.admin` - Permissão para usar o comando de recarregar a configuração.
 
-## Configuration
+## Configuração
 ```yaml
 MySql:
   // Usar MySql? Se sim alterar para true
