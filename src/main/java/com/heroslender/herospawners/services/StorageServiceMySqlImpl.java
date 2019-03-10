@@ -12,6 +12,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -29,8 +30,6 @@ public class StorageServiceMySqlImpl implements StorageServiceSql {
         hikariDataSource.setUsername(config.getString("MySql.user", "root"));
         hikariDataSource.setPassword(config.getString("MySql.pass", ""));
         hikariDataSource.addDataSourceProperty("autoReconnect", "true");
-
-        createDatabase();
     }
 
     @Override
@@ -39,6 +38,9 @@ public class StorageServiceMySqlImpl implements StorageServiceSql {
         hikariDataSource.setJdbcUrl("jdbc:mysql://" + config.getString("MySql.host", "localhost") + ":" + config.getString("MySql.port", "3306") + "/" + config.getString("MySql.database", "herospawners"));
         hikariDataSource.setUsername(config.getString("MySql.user", "root"));
         hikariDataSource.setPassword(config.getString("MySql.pass", ""));
+
+        createDatabase();
+        addOwnerColumn();
     }
 
     @Override
@@ -62,7 +64,7 @@ public class StorageServiceMySqlImpl implements StorageServiceSql {
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                log("Ocurreu um erro ao pegar os spawners todos.", e);
             }
             return spawners;
         }, HeroSpawners.getInstance().getExecutor());
@@ -81,7 +83,7 @@ public class StorageServiceMySqlImpl implements StorageServiceSql {
                     ps.executeUpdate();
                 }
             } catch (Exception e) {
-                log(Level.SEVERE, "Ocurreu um erro ao guardar o " +
+                log( "Ocurreu um erro ao guardar o " +
                         "models(loc=\"" + Utilities.loc2str(spawner.getLocation()) + "\", quantidade=\"" + spawner.getAmount() + "\").", e);
             }
         }, HeroSpawners.getInstance().getExecutor());
@@ -99,7 +101,7 @@ public class StorageServiceMySqlImpl implements StorageServiceSql {
                     ps.executeUpdate();
                 }
             } catch (Exception e) {
-                log(Level.SEVERE, "Ocurreu um erro ao guardar o " +
+                log( "Ocurreu um erro ao guardar o " +
                         "models(loc=\"" + Utilities.loc2str(spawner.getLocation()) + "\", quantidade=\"" + spawner.getAmount() + "\").", e);
             }
         }, HeroSpawners.getInstance().getExecutor());
@@ -114,7 +116,7 @@ public class StorageServiceMySqlImpl implements StorageServiceSql {
                     ps.executeUpdate();
                 }
             } catch (Exception e) {
-                log(Level.SEVERE, "Ocurreu um erro ao apagar o models(loc=\"" + Utilities.loc2str(spawner.getLocation()) + "\").", e);
+                log( "Ocurreu um erro ao apagar o models(loc=\"" + Utilities.loc2str(spawner.getLocation()) + "\").", e);
             }
         }, HeroSpawners.getInstance().getExecutor());
     }
@@ -125,7 +127,19 @@ public class StorageServiceMySqlImpl implements StorageServiceSql {
                 ps.executeUpdate();
             }
         } catch (Exception e) {
-            log(Level.SEVERE, "Ocurreu um erro ao criar a tabela.", e);
+            log( "Ocurreu um erro ao criar a tabela.", e);
+        }
+    }
+
+    private void addOwnerColumn() {
+        try (Connection c = hikariDataSource.getConnection()) {
+            try (PreparedStatement ps = c.prepareStatement(TABLE_ADD_OWNER_COLUMN)) {
+                ps.executeUpdate();
+            }
+        } catch (SQLException ignore) {
+            // Column already presend in the database
+        } catch (Exception e) {
+            log("Ocurreu um erro ao adicionar os novos campos a tabela.", e);
         }
     }
 
@@ -133,8 +147,8 @@ public class StorageServiceMySqlImpl implements StorageServiceSql {
         HeroSpawners.getInstance().getLogger().log(level, "[MySql] " + message);
     }
 
-    private void log(Level level, String message, Throwable thrown) {
-        HeroSpawners.getInstance().getLogger().log(level, "[MySql] " + message, thrown);
+    private void log(String message, Throwable thrown) {
+        HeroSpawners.getInstance().getLogger().log(Level.SEVERE, "[MySql] " + message, thrown);
     }
 
     @Override
