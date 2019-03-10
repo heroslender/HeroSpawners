@@ -28,7 +28,6 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         for (EntityType e : EntityType.values()) {
             if (e.getEntityClass() != null
                     && LivingEntity.class.isAssignableFrom(e.getEntityClass())) {
-                System.out.println(e.name());
                 if (!configuration.contains("mobs." + e.name() + ".name")) {
                     configuration.set("mobs." + e.name() + ".name", e.getName());
                 }
