@@ -1,4 +1,141 @@
+<img src="https://avatars1.githubusercontent.com/u/16785313?s=96&v=4" alt="Heroslender" title="Heroslender" align="right" height="96" width="96"/>
+
+# HeroSpawners
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/218d46cbc31345f2ac94e204641e91ff)](https://app.codacy.com/app/heroslender/HeroSpawners?utm_source=github.com&utm_medium=referral&utm_content=heroslender/HeroSpawners&utm_campaign=Badge_Grade_Dashboard)
 
-HeroSpawners
+O HeroSpawners permite que os spawners do seu servidor agrupem, reduzindo assim o lag no cliente e no servidor.
+
+![Preview](https://github.com/heroslender/HeroSpawners/raw/develop/assets/preview_hologram.gif)
+![Preview](https://github.com/heroslender/HeroSpawners/raw/develop/assets/preview.gif)
+
+## Commands
+- `/herospawners reload` - Comando para recarregar a configuração do plugin.
+
+## Permissions
+- `herospawners.admin` - Permissão para usar o comando de recarregar a configuração.
+
+## Configuration
+```yaml
+MySql:
+  // Usar MySql? Se sim alterar para true
+  usar: false
+  host: localhost
+  port: 3306
+  database: herospawners
+  user: root
+  pass: ''
+juntar:
+  // Raio para procurar spawners para agrupar ao colocar
+  raio: 5
+  // Limite de spawners por stack
+  maximo: 0
+holograma:
+  // Distância a que o holograma do spawner fica visivel
+  distancia: 5
+  // Texto do holograma
+  texto: '&7%quantidade%x &e%tipo%'
+  // Mostrar a cabeça do mob junto com o holograma?
+  mostrar-cabeca: true
+// Configuração de cada mob
+mobs:
+  CREEPER:
+    // Nome a aparecer no holograma do spawner
+    name: Creeper
+    // Nome da skin da cabeça a mostrar junto com o holograma
+    head: MHF_Creeper
+  SKELETON:
+    name: Esqueleto
+    head: MHF_Skeleton
+  SPIDER:
+    name: Aranha
+    head: MHF_Spider
+  GIANT:
+    name: Gigante
+    head: MHF_Giant
+  ZOMBIE:
+    name: Zombie
+    head: MHF_Zombie
+  SLIME:
+    name: Slime
+    head: MHF_Slime
+  GHAST:
+    name: Ghast
+    head: MHF_Ghast
+  PIG_ZOMBIE:
+    name: PigZombie
+    head: MHF_PigZombie
+  ENDERMAN:
+    name: Enderman
+    head: MHF_Enderman
+  CAVE_SPIDER:
+    name: Aranha da Caverma
+    head: MHF_CaveSpider
+  SILVERFISH:
+    name: Silverfish
+    head: MHF_Silverfish
+  BLAZE:
+    name: Blaze
+    head: MHF_Blaze
+  MAGMA_CUBE:
+    name: Lava Slime
+    head: MHF_LavaSlime
+  ENDER_DRAGON:
+    name: Dragao
+    head: MHF_EnderDragon
+  WITHER:
+    name: Wither
+    head: MHF_WitherBoss
+  BAT:
+    name: Bat
+    head: MHF_Bat
+  WITCH:
+    name: Bruxa
+    head: MHF_Witch
+  ENDERMITE:
+    name: Endermite
+    head: MHF_Endermite
+  GUARDIAN:
+    name: Guardian
+    head: MHF_Guardian
+  PIG:
+    name: Porco
+    head: MHF_Pig
+  SHEEP:
+    name: Ovelha
+    head: MHF_Sheep
+  COW:
+    name: Vaca
+    head: MHF_Cow
+  CHICKEN:
+    name: Galinha
+    head: MHF_Chicken
+  SQUID:
+    name: Polvo
+    head: MHF_Squid
+  WOLF:
+    name: Lobo
+    head: MHF_Wolf
+  MUSHROOM_COW:
+    name: Cogu Vaca
+    head: MHF_MushroomCow
+  SNOWMAN:
+    name: SnowMan
+    head: MHF_SnowMan
+  OCELOT:
+    name: Ocelot
+    head: MHF_Ozelot
+  IRON_GOLEM:
+    name: Iron Golem
+    head: MHF_VillagerGolem
+  HORSE:
+    name: Cavalo
+    head: MHF_EntityHorse
+  RABBIT:
+    name: Coelho
+    head: MHF_Rabbit
+  VILLAGER:
+    name: Vilager
+    head: MHF_Villager
+
+```
