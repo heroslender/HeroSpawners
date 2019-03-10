@@ -3,6 +3,7 @@
 # HeroSpawners
 
 [![GitHub stars](https://img.shields.io/github/stars/heroslender/HeroSpawners.svg)](https://github.com/heroslender/HeroSpawners/stargazers)
+[![bStats Servers](https://img.shields.io/bstats/servers/2088.svg?color=1bcc1b)](https://bstats.org/plugin/bukkit/HeroSpawners)
 [![GitHub All Releases](https://img.shields.io/github/downloads/heroslender/HeroSpawners/total.svg?logoColor=fff)](https://github.com/heroslender/HeroSpawners/releases/latest)
 [![GitHub issues](https://img.shields.io/github/issues-raw/heroslender/HeroSpawners.svg?label=issues)](https://github.com/heroslender/HeroSpawners/issues)
 [![GitHub last commit](https://img.shields.io/github/last-commit/heroslender/HeroSpawners.svg)](https://github.com/heroslender/HeroSpawners/commit)
