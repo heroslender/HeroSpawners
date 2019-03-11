@@ -29,9 +29,6 @@ public class SpawnerSpawnListener implements Listener {
         }
         preventMultiple.put(location, System.currentTimeMillis());
 
-        if (HeroSpawners.getInstance().getNewSpawner().remove(location))
-            e.getSpawner().setDelay(-1);
-
         e.setCancelled(HeroSpawners.getInstance().getMobStackerSuport().createOrAddStack(spawner, e.getEntity(),
                 (int) Math.round((0.5D + Utilities.getRandom().nextDouble()) * spawner.getAmount())));
 

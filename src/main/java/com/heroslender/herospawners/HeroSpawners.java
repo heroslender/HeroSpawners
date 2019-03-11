@@ -16,11 +16,8 @@ import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.filter.AbstractFilter;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
 
@@ -30,7 +27,6 @@ public class HeroSpawners extends JavaPlugin {
     @Getter private final Executor executor = ForkJoinPool.commonPool();
     @Getter private final StorageController storageController;
     @Getter private final ConfigurationController configurationController;
-    @Getter public Set<Location> newSpawner = new HashSet<>();
     @Getter private MobStackerSuport mobStackerSuport;
     @Getter private boolean shutingDown = true;
 

@@ -62,11 +62,8 @@ public class SilkSpawnersListener implements Listener {
                 event.getBlock().setType(Material.MOB_SPAWNER);
                 CreatureSpawner creatureSpawner = ((CreatureSpawner) event.getBlock().getState());
                 creatureSpawner.setSpawnedType(et);
-                creatureSpawner.setDelay(200);
-                creatureSpawner.update();
 
                 spawner.setAmount(spawner.getAmount() - finalQuantidade);
-                HeroSpawners.getInstance().newSpawner.add(event.getBlock().getLocation());
             }, 1L);
         } else {
             storageController.deleteSpawner(spawner);

@@ -40,9 +40,6 @@ public class SpawnerListener implements Listener {
                     CreatureSpawner cs = (CreatureSpawner) block.getState();
                     if (cs.getSpawnedType() != colocado.getSpawnedType()) continue;
 
-                    colocado.setDelay(200);
-                    colocado.update();
-
                     ISpawner spawner = storageController.getSpawner(block.getLocation());
                     if (spawner == null) continue;
                     if (spawner.getAmount() < config.getStackLimit() || config.getStackLimit() == 0) {
@@ -78,11 +75,8 @@ public class SpawnerListener implements Listener {
                 Bukkit.getScheduler().runTaskLater(HeroSpawners.getInstance(), () -> {
                     e.getBlock().setType(Material.MOB_SPAWNER);
                     ((CreatureSpawner) e.getBlock().getState()).setSpawnedType(et);
-                    ((CreatureSpawner) e.getBlock().getState()).setDelay(200);
-                    e.getBlock().getState().update();
 
                     spawner.setAmount(spawner.getAmount() - 1);
-                    HeroSpawners.getInstance().newSpawner.add(e.getBlock().getLocation());
                 }, 1L);
             } else {
                 storageController.deleteSpawner(spawner);
