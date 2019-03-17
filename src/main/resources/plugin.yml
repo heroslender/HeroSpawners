@@ -1,5 +1,5 @@
 name: ${project.artifactId}
-main: ${project.groupId}.${project.artifactId}
+main: com.heroslender.herospawners.${project.artifactId}
 version: ${project.version}
 author: Heroslender
 softdepend: [HolographicDisplays, MobStacker2, SilkSpawners, ObyStack, Multiverse-Core]
