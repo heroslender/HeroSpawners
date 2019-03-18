@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.heroslender.herospawners</groupId>
+    <groupId>com.heroslender</groupId>
     <artifactId>HeroSpawners</artifactId>
     <version>3.0.0-BETA</version>
 
@@ -116,7 +116,6 @@
     </dependencies>
 
     <build>
-        <finalName>HeroSpawners-V${project.version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
