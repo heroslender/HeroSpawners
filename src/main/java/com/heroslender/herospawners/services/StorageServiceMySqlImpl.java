@@ -19,7 +19,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
 public class StorageServiceMySqlImpl implements StorageServiceSql {
-
     private final HikariDataSource hikariDataSource;
 
     public StorageServiceMySqlImpl() {
@@ -84,7 +83,7 @@ public class StorageServiceMySqlImpl implements StorageServiceSql {
                 }
             } catch (Exception e) {
                 log( "Ocurreu um erro ao guardar o " +
-                        "models(loc=\"" + Utilities.loc2str(spawner.getLocation()) + "\", quantidade=\"" + spawner.getAmount() + "\").", e);
+                        "spawner(loc=\"" + Utilities.loc2str(spawner.getLocation()) + "\", quantidade=\"" + spawner.getAmount() + "\").", e);
             }
         }, HeroSpawners.getInstance().getExecutor());
     }
@@ -102,7 +101,7 @@ public class StorageServiceMySqlImpl implements StorageServiceSql {
                 }
             } catch (Exception e) {
                 log( "Ocurreu um erro ao guardar o " +
-                        "models(loc=\"" + Utilities.loc2str(spawner.getLocation()) + "\", quantidade=\"" + spawner.getAmount() + "\").", e);
+                        "spawner(loc=\"" + Utilities.loc2str(spawner.getLocation()) + "\", quantidade=\"" + spawner.getAmount() + "\").", e);
             }
         }, HeroSpawners.getInstance().getExecutor());
     }
@@ -116,7 +115,7 @@ public class StorageServiceMySqlImpl implements StorageServiceSql {
                     ps.executeUpdate();
                 }
             } catch (Exception e) {
-                log( "Ocurreu um erro ao apagar o models(loc=\"" + Utilities.loc2str(spawner.getLocation()) + "\").", e);
+                log( "Ocurreu um erro ao apagar o spawner(loc=\"" + Utilities.loc2str(spawner.getLocation()) + "\").", e);
             }
         }, HeroSpawners.getInstance().getExecutor());
     }
