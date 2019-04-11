@@ -38,12 +38,6 @@
             <artifactId>HikariCP</artifactId>
             <version>2.6.3</version>
             <scope>compile</scope>
-            <exclusions>
-                <exclusion>
-                    <artifactId>slf4j-api</artifactId>
-                    <groupId>org.slf4j</groupId>
-                </exclusion>
-            </exclusions>
             <optional>true</optional>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
@@ -51,7 +45,7 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
             <version>2.11.1</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -130,7 +124,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.2.1</version>
                 <executions>
                     <!-- Run shade goal on package phase -->
                     <execution>
@@ -148,14 +142,9 @@
                     -->
                     <relocations>
                         <relocation>
-                            <pattern>com.zaxxer.hikari</pattern>
-                            <shadedPattern>com.zaxxer.hikari</shadedPattern>
-                            <!--<shadedPattern>cf.heroslender.herospawners.Libs.zaxxer.hikari</shadedPattern>-->
-                        </relocation>
-                        <relocation>
+                            <!-- Change package for slf4j from HikariCP to prevent version conflict with bukkits version -->
                             <pattern>org.slf4j</pattern>
-                            <shadedPattern>org.slf4j</shadedPattern>
-                            <!--<shadedPattern>cf.heroslender.herospawners.Libs.slf4j.slf4j</shadedPattern>-->
+                            <shadedPattern>com.heroslender.herospawners.libs.slf4j</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>
