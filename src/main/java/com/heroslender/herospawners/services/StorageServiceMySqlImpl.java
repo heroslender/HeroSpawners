@@ -100,7 +100,7 @@ public class StorageServiceMySqlImpl implements StorageServiceSql {
                     ps.executeUpdate();
                 }
             } catch (Exception e) {
-                log( "Ocurreu um erro ao guardar o " +
+                log( "Ocurreu um erro ao atualizar o " +
                         "spawner(loc=\"" + Utilities.loc2str(spawner.getLocation()) + "\", quantidade=\"" + spawner.getAmount() + "\").", e);
             }
         }, HeroSpawners.getInstance().getExecutor());
