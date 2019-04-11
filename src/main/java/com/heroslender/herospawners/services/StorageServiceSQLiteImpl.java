@@ -75,8 +75,7 @@ public class StorageServiceSQLiteImpl implements StorageServiceSql {
                     ps.executeUpdate();
                 }
             } catch (Exception e) {
-                log("Ocurreu um erro ao guardar o " +
-                        "spawner(loc=\"" + Utilities.loc2str(spawner.getLocation()) + "\", quantidade=\"" + spawner.getAmount() + "\").", e);
+                log("Ocurreu um erro ao guardar o " + spawner + ".", e);
             }
         }, HeroSpawners.getInstance().getExecutor());
     }
@@ -93,8 +92,7 @@ public class StorageServiceSQLiteImpl implements StorageServiceSql {
                     ps.executeUpdate();
                 }
             } catch (Exception e) {
-                log("Ocurreu um erro ao guardar o " +
-                        "spawner(loc=\"" + Utilities.loc2str(spawner.getLocation()) + "\", quantidade=\"" + spawner.getAmount() + "\").", e);
+                log("Ocurreu um erro ao guardar o " + spawner + ".", e);
             }
         }, HeroSpawners.getInstance().getExecutor());
     }
@@ -108,7 +106,7 @@ public class StorageServiceSQLiteImpl implements StorageServiceSql {
                     ps.executeUpdate();
                 }
             } catch (Exception e) {
-                log("Ocurreu um erro ao apagar o spawner(loc=\"" + Utilities.loc2str(spawner.getLocation()) + "\").", e);
+                log("Ocurreu um erro ao apagar o " + spawner + ".", e);
             }
         }, HeroSpawners.getInstance().getExecutor());
     }

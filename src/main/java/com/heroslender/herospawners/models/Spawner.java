@@ -1,6 +1,7 @@
 package com.heroslender.herospawners.models;
 
 import com.heroslender.herospawners.HeroSpawners;
+import com.heroslender.herospawners.utils.Utilities;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.Location;
@@ -30,5 +31,10 @@ public class Spawner implements ISpawner {
     @Override
     public EntityType getType() {
         return getState().getSpawnedType();
+    }
+
+    @Override
+    public String toString() {
+        return "Spawner(location=\"" + Utilities.loc2str(getLocation()) + "\", quantidade=\"" + getAmount() + "\")";
     }
 }
