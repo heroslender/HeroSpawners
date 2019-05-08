@@ -6,7 +6,7 @@
 
     <groupId>com.heroslender</groupId>
     <artifactId>HeroSpawners</artifactId>
-    <version>3.0.0-BETA</version>
+    <version>3.1.0</version>
 
     <repositories>
         <repository>
