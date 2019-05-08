@@ -9,8 +9,11 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class ConfigurationController implements Controller {
@@ -18,7 +21,7 @@ public class ConfigurationController implements Controller {
 
     @Getter private int stackRadious;
     @Getter private int stackLimit;
-    @Getter private String hologramText;
+    @Getter private List<String> hologramText;
     @Getter private int hologramViewDistance;
     @Getter private boolean hologramShowHead;
     private Map<EntityType, EntityProperties> entityProperties;
@@ -30,7 +33,13 @@ public class ConfigurationController implements Controller {
         stackRadious = configurationService.getConfig().getInt("juntar.raio", 5);
         stackLimit = configurationService.getConfig().getInt("juntar.maximo", 0);
 
-        hologramText = parseColors(configurationService.getConfig().getString("holograma.texto", "&7%quantidade%x &e%tipo%"));
+        if (configurationService.getConfig().isList("holograma.texto")) {
+            hologramText = parseColors(configurationService.getConfig().getStringList("holograma.texto"));
+        } else {
+            hologramText = new ArrayList<>();
+            hologramText.add(parseColors(configurationService.getConfig().getString("holograma.texto", "&7%quantidade%x &e%tipo%")));
+        }
+
         hologramViewDistance = configurationService.getConfig().getInt("holograma.distancia", 0);
         hologramShowHead = configurationService.getConfig().getBoolean("holograma.mostrar-cabeca", true);
 
@@ -50,6 +59,10 @@ public class ConfigurationController implements Controller {
 
     private String parseColors(final String string) {
         return ChatColor.translateAlternateColorCodes('&', string);
+    }
+
+    private List<String> parseColors(final List<String> strings) {
+        return strings.stream().map(this::parseColors).collect(Collectors.toList());
     }
 
     @Override

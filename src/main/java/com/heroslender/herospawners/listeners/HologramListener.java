@@ -2,6 +2,8 @@ package com.heroslender.herospawners.listeners;
 
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
+import com.gmail.filoghost.holographicdisplays.api.line.HologramLine;
+import com.gmail.filoghost.holographicdisplays.api.line.TextLine;
 import com.heroslender.herospawners.HeroSpawners;
 import com.heroslender.herospawners.controllers.ConfigurationController;
 import com.heroslender.herospawners.models.ISpawner;
@@ -22,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class HologramListener implements Listener {
@@ -57,11 +60,12 @@ public class HologramListener implements Listener {
         }
         val hologram = createHologramFor(player, loc);
 
+        val linhas = new ArrayList<HologramLine>();
+        for (String linha : getHologramTextFor(spawner)) {
+            linhas.add(hologram.appendTextLine(linha));
+        }
+
         val entityProperties = config.getProperties(spawner.getType());
-        val linha = hologram.appendTextLine(config.getHologramText()
-                .replace("%dono%", spawner.getOwner())
-                .replace("%quantidade%", Integer.toString(spawner.getAmount()))
-                .replace("%tipo%", entityProperties.getDisplayName()));
         if (config.isHologramShowHead()) {
             hologram.appendItemLine(getSkull(entityProperties.getSkullSkinName()));
         }
@@ -80,12 +84,18 @@ public class HologramListener implements Listener {
                     return;
                 }
 
-                val novaLinha = config.getHologramText()
-                        .replace("%dono%", spawner.getOwner())
-                        .replace("%quantidade%", Integer.toString(spawner.getAmount()))
-                        .replace("%tipo%", entityProperties.getDisplayName());
-                if (!novaLinha.equals(linha.getText())) {
-                    linha.setText(novaLinha);
+                // Update the hologram if needed
+                val newLines = getHologramTextFor(spawner);
+                for (int i = 0; i < newLines.size(); i++) {
+                    val currentLine = linhas.get(i);
+                    if (currentLine instanceof TextLine) {
+                        TextLine textLine = (TextLine) currentLine;
+                        String newValue = newLines.get(i);
+
+                        if (!textLine.getText().equals(newValue)){
+                            textLine.setText(newValue);
+                        }
+                    }
                 }
             }
         }.runTaskTimer(HeroSpawners.getInstance(), 5L, 5L);
@@ -96,6 +106,18 @@ public class HologramListener implements Listener {
         hologram.getVisibilityManager().setVisibleByDefault(false);
         hologram.getVisibilityManager().showTo(player);
         return hologram;
+    }
+
+    private List<String> getHologramTextFor(final ISpawner spawner) {
+        val entityProperties = config.getProperties(spawner.getType());
+
+        return config.getHologramText()
+                .stream()
+                .map(h -> h
+                        .replace("%dono%", spawner.getOwner())
+                        .replace("%quantidade%", Integer.toString(spawner.getAmount()))
+                        .replace("%tipo%", entityProperties.getDisplayName()))
+                .collect(Collectors.toList());
     }
 
     private ItemStack getSkull(final String owner) {
