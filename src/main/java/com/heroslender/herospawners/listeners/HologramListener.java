@@ -29,6 +29,22 @@ import java.util.logging.Level;
 public class HologramListener implements Listener {
     private final ConfigurationController config;
     private final List<Player> viewers = new ArrayList<>();
+    private final double hologramOffset;
+
+    public HologramListener(ConfigurationController config) {
+        this.config = config;
+        this.hologramOffset = config.getHologramText()
+                .stream()
+                .mapToDouble(line -> {
+                    if (line.equalsIgnoreCase(":skull:")) {
+                        // Offset for items
+                        return 0.7;
+                    } else {
+                        // Offset for text lines
+                        return 0.23;
+                    }
+                }).sum();
+    }
 
     @EventHandler
     private void onPlayerMove(final PlayerMoveEvent e) {
@@ -53,21 +69,19 @@ public class HologramListener implements Listener {
     }
 
     private void setSpawnerHologram(final Player player, final ISpawner spawner) {
-        val loc = spawner.getLocation().add(0.5, 1.4, 0.5);
-        if (config.isHologramShowHead()) {
-            loc.add(0, .5, 0);
-        }
+        val loc = spawner.getLocation().add(0.5, 1.17, 0.5);
+        loc.add(0, hologramOffset, 0);
         val hologram = createHologramFor(player, loc);
 
         val linhas = new ArrayList<HologramLine>();
         for (String linha : spawner.getHologramText()) {
+            if (linha.equalsIgnoreCase(":skull:")) {
+                String spawnerSkullName = spawner.getEntityProperties().getSkullSkinName();
+                linhas.add(hologram.appendItemLine(getSkull(spawnerSkullName)));
+            }
             linhas.add(hologram.appendTextLine(linha));
         }
 
-        if (config.isHologramShowHead()) {
-            String spawnerSkullName = spawner.getEntityProperties().getSkullSkinName();
-            hologram.appendItemLine(getSkull(spawnerSkullName));
-        }
         viewers.add(player);
 
         new BukkitRunnable() {

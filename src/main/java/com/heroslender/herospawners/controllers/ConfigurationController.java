@@ -23,7 +23,6 @@ public class ConfigurationController implements Controller {
     @Getter private int stackLimit;
     @Getter private List<String> hologramText;
     @Getter private int hologramViewDistance;
-    @Getter private boolean hologramShowHead;
     private Map<EntityType, EntityProperties> entityProperties;
 
     @Override
@@ -41,7 +40,6 @@ public class ConfigurationController implements Controller {
         }
 
         hologramViewDistance = configurationService.getConfig().getInt("holograma.distancia", 0);
-        hologramShowHead = configurationService.getConfig().getBoolean("holograma.mostrar-cabeca", true);
 
         entityProperties = new EnumMap<>(EntityType.class);
         for (EntityType e : EntityType.values()) {
