@@ -11,4 +11,5 @@ public interface StorageServiceSql extends StorageService {
             "`" + SPAWNERS_QUANT + "` varchar(32) NOT NULL," +
             "PRIMARY KEY (`" + SPAWNERS_LOC + "`)" +
             ");";
+    String TABLE_ADD_OWNER_COLUMN = "ALTER TABLE `" + SPAWNERS + "` ADD `" + SPAWNERS_OWNER + "` varchar(64) NOT NULL default 'Ninguem';";
 }

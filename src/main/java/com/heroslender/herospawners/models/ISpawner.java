@@ -1,6 +1,10 @@
 package com.heroslender.herospawners.models;
 
 import org.bukkit.Location;
+import org.bukkit.block.CreatureSpawner;
+import org.bukkit.entity.EntityType;
+
+import java.util.List;
 
 public interface ISpawner {
 
@@ -31,4 +35,32 @@ public interface ISpawner {
      * @return The spawners owner
      */
     String getOwner();
+
+    /**
+     * Get the state of the spawner
+     *
+     * @return The spawner state
+     */
+    CreatureSpawner getState();
+
+    /**
+     * Get the type of entity the spawner is spawning
+     *
+     * @return The entity type
+     */
+    EntityType getType();
+
+    /**
+     * Get the entity properties for the spawner's
+     * spawning entity
+     *
+     * @return The entity properties
+     */
+    EntityProperties getEntityProperties();
+
+    /**
+     * Get line values for the hologram.
+     * @return The line values
+     */
+    List<String> getHologramText();
 }

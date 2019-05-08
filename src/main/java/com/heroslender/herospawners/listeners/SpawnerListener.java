@@ -1,10 +1,10 @@
 package com.heroslender.herospawners.listeners;
 
 import com.heroslender.herospawners.HeroSpawners;
+import com.heroslender.herospawners.controllers.ConfigurationController;
 import com.heroslender.herospawners.controllers.StorageController;
 import com.heroslender.herospawners.models.ISpawner;
 import com.heroslender.herospawners.models.Spawner;
-import com.heroslender.herospawners.utils.Config;
 import com.heroslender.herospawners.utils.Utilities;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
@@ -21,6 +21,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 
 @RequiredArgsConstructor
 public class SpawnerListener implements Listener {
+    private final ConfigurationController config;
     private final StorageController storageController;
 
     @EventHandler
@@ -34,17 +35,14 @@ public class SpawnerListener implements Listener {
 
             Bukkit.getScheduler().scheduleSyncDelayedTask(HeroSpawners.getInstance(), () -> {
                 CreatureSpawner colocado = (CreatureSpawner) e.getBlock().getState();
-                for (Block block : Utilities.getBlocks(e.getBlock(), Config.JUNTAR_RAIO)) {
+                for (Block block : Utilities.getBlocks(e.getBlock(), config.getStackRadious())) {
                     if (block.getType() != Material.MOB_SPAWNER) continue;
                     CreatureSpawner cs = (CreatureSpawner) block.getState();
                     if (cs.getSpawnedType() != colocado.getSpawnedType()) continue;
 
-                    colocado.setDelay(200);
-                    colocado.update();
-
                     ISpawner spawner = storageController.getSpawner(block.getLocation());
                     if (spawner == null) continue;
-                    if (spawner.getAmount() < Config.JUNTAR_MAX || Config.JUNTAR_MAX == 0) {
+                    if (spawner.getAmount() < config.getStackLimit() || config.getStackLimit() == 0) {
                         spawner.setAmount(spawner.getAmount() + 1);
                         e.getBlock().setType(Material.AIR);
                         block.getWorld().spigot().playEffect(block.getLocation(), Effect.WITCH_MAGIC, 1, 0, 1.0F, 1.0F, 1.0F, 1.0F, 200, 10);
@@ -77,11 +75,8 @@ public class SpawnerListener implements Listener {
                 Bukkit.getScheduler().runTaskLater(HeroSpawners.getInstance(), () -> {
                     e.getBlock().setType(Material.MOB_SPAWNER);
                     ((CreatureSpawner) e.getBlock().getState()).setSpawnedType(et);
-                    ((CreatureSpawner) e.getBlock().getState()).setDelay(200);
-                    e.getBlock().getState().update();
 
                     spawner.setAmount(spawner.getAmount() - 1);
-                    HeroSpawners.getInstance().newSpawner.add(e.getBlock().getLocation());
                 }, 1L);
             } else {
                 storageController.deleteSpawner(spawner);

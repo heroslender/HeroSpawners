@@ -4,16 +4,15 @@ import com.heroslender.herospawners.models.ISpawner;
 import org.bukkit.Location;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
-public interface StorageService {
+public interface StorageService extends Service {
 
-    Map<Location, ISpawner> getSpawners();
+    CompletableFuture<Map<Location, ISpawner>> getSpawners();
 
-    void save(final ISpawner spawner);
+    CompletableFuture<Void> save(final ISpawner spawner);
 
-    void update(final ISpawner spawner);
+    CompletableFuture<Void> update(final ISpawner spawner);
 
-    void delete(final ISpawner spawner);
-
-    void onDisable();
+    CompletableFuture<Void> delete(final ISpawner spawner);
 }

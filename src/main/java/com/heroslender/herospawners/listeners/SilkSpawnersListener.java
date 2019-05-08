@@ -1,10 +1,10 @@
 package com.heroslender.herospawners.listeners;
 
 import com.heroslender.herospawners.HeroSpawners;
+import com.heroslender.herospawners.controllers.ConfigurationController;
 import com.heroslender.herospawners.controllers.StorageController;
 import com.heroslender.herospawners.models.ISpawner;
 import com.heroslender.herospawners.models.Spawner;
-import com.heroslender.herospawners.utils.Config;
 import com.heroslender.herospawners.utils.Utilities;
 import de.dustplanet.silkspawners.events.SilkSpawnersSpawnerBreakEvent;
 import de.dustplanet.silkspawners.events.SilkSpawnersSpawnerPlaceEvent;
@@ -23,12 +23,14 @@ import org.bukkit.event.Listener;
  * Created by Heroslender.
  */
 public class SilkSpawnersListener implements Listener {
+    private final ConfigurationController config;
     private final StorageController storageController;
     private final SilkUtil su;
 
-    public SilkSpawnersListener(StorageController storageController) {
+    public SilkSpawnersListener(ConfigurationController configurationController, StorageController storageController) {
         Bukkit.getLogger().info("[herospawners] SilkSpawners foi encontrado!");
 
+        this.config = configurationController;
         this.storageController = storageController;
         su = SilkUtil.hookIntoSilkSpanwers();
     }
@@ -60,11 +62,8 @@ public class SilkSpawnersListener implements Listener {
                 event.getBlock().setType(Material.MOB_SPAWNER);
                 CreatureSpawner creatureSpawner = ((CreatureSpawner) event.getBlock().getState());
                 creatureSpawner.setSpawnedType(et);
-                creatureSpawner.setDelay(200);
-                creatureSpawner.update();
 
                 spawner.setAmount(spawner.getAmount() - finalQuantidade);
-                HeroSpawners.getInstance().newSpawner.add(event.getBlock().getLocation());
             }, 1L);
         } else {
             storageController.deleteSpawner(spawner);
@@ -80,7 +79,7 @@ public class SilkSpawnersListener implements Listener {
                 return;
             }
 
-            for (val block : Utilities.getBlocks(e.getBlock(), Config.JUNTAR_RAIO)) {
+            for (val block : Utilities.getBlocks(e.getBlock(), config.getStackRadious())) {
                 if (block.getType() != Material.MOB_SPAWNER) continue;
 
                 val cs = (CreatureSpawner) block.getState();
@@ -90,7 +89,7 @@ public class SilkSpawnersListener implements Listener {
                 ISpawner spawner = storageController.getSpawner(block.getLocation());
                 if (spawner == null) continue;
 
-                if (spawner.getAmount() < Config.JUNTAR_MAX || Config.JUNTAR_MAX <= 0) {
+                if (spawner.getAmount() < config.getStackLimit() || config.getStackLimit() <= 0) {
                     int quantidade = 1;
                     val itemInHand = e.getPlayer().getItemInHand();
 
@@ -102,10 +101,10 @@ public class SilkSpawnersListener implements Listener {
                         }
 
                         if (e.getEntityID() == entityID) {
-                            if (Config.JUNTAR_MAX <= 0) {
+                            if (config.getStackLimit() <= 0) {
                                 quantidade = itemInHand.getAmount();
                             } else {
-                                val maxQuantAllowed = Config.JUNTAR_MAX - spawner.getAmount();
+                                val maxQuantAllowed = config.getStackLimit() - spawner.getAmount();
                                 quantidade = maxQuantAllowed > itemInHand.getAmount() ? itemInHand.getAmount() : maxQuantAllowed;
                             }
                         }
