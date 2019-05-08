@@ -2,6 +2,8 @@ package com.heroslender.herospawners.listeners;
 
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
+import com.gmail.filoghost.holographicdisplays.api.line.HologramLine;
+import com.gmail.filoghost.holographicdisplays.api.line.TextLine;
 import com.heroslender.herospawners.HeroSpawners;
 import com.heroslender.herospawners.controllers.ConfigurationController;
 import com.heroslender.herospawners.models.ISpawner;
@@ -27,6 +29,31 @@ import java.util.logging.Level;
 public class HologramListener implements Listener {
     private final ConfigurationController config;
     private final List<Player> viewers = new ArrayList<>();
+    private final double hologramOffset;
+
+    public HologramListener(ConfigurationController config) {
+        this.config = config;
+
+        val holoLines = config.getHologramText();
+        double hologramOffset = holoLines
+                .stream()
+                .mapToDouble(line -> {
+                    if (line.equalsIgnoreCase("%skull%")) {
+                        // Offset for items
+                        return 0.7;
+                    } else {
+                        // Offset for text lines
+                        return 0.23;
+                    }
+                }).sum();
+
+        if (holoLines.get(holoLines.size() - 1).equalsIgnoreCase("%skull%")) {
+            // Last line is an item, place hologram lower
+            hologramOffset -= 0.2;
+        }
+
+        this.hologramOffset = hologramOffset;
+    }
 
     @EventHandler
     private void onPlayerMove(final PlayerMoveEvent e) {
@@ -51,20 +78,20 @@ public class HologramListener implements Listener {
     }
 
     private void setSpawnerHologram(final Player player, final ISpawner spawner) {
-        val loc = spawner.getLocation().add(0.5, 1.4, 0.5);
-        if (config.isHologramShowHead()) {
-            loc.add(0, .5, 0);
-        }
+        val loc = spawner.getLocation().add(0.5, 1.17, 0.5);
+        loc.add(0, hologramOffset, 0);
         val hologram = createHologramFor(player, loc);
 
-        val entityProperties = config.getProperties(spawner.getType());
-        val linha = hologram.appendTextLine(config.getHologramText()
-                .replace("%dono%", spawner.getOwner())
-                .replace("%quantidade%", Integer.toString(spawner.getAmount()))
-                .replace("%tipo%", entityProperties.getDisplayName()));
-        if (config.isHologramShowHead()) {
-            hologram.appendItemLine(getSkull(entityProperties.getSkullSkinName()));
+        val linhas = new ArrayList<HologramLine>();
+        for (String linha : spawner.getHologramText()) {
+            if (linha.equalsIgnoreCase("%skull%")) {
+                String spawnerSkullName = spawner.getEntityProperties().getSkullSkinName();
+                linhas.add(hologram.appendItemLine(getSkull(spawnerSkullName)));
+            } else {
+                linhas.add(hologram.appendTextLine(linha));
+            }
         }
+
         viewers.add(player);
 
         new BukkitRunnable() {
@@ -80,12 +107,18 @@ public class HologramListener implements Listener {
                     return;
                 }
 
-                val novaLinha = config.getHologramText()
-                        .replace("%dono%", spawner.getOwner())
-                        .replace("%quantidade%", Integer.toString(spawner.getAmount()))
-                        .replace("%tipo%", entityProperties.getDisplayName());
-                if (!novaLinha.equals(linha.getText())) {
-                    linha.setText(novaLinha);
+                // Update the hologram if needed
+                val newLines = spawner.getHologramText();
+                for (int i = 0; i < newLines.size(); i++) {
+                    val currentLine = linhas.get(i);
+                    if (currentLine instanceof TextLine) {
+                        TextLine textLine = (TextLine) currentLine;
+                        String newValue = newLines.get(i);
+
+                        if (!textLine.getText().equals(newValue)) {
+                            textLine.setText(newValue);
+                        }
+                    }
                 }
             }
         }.runTaskTimer(HeroSpawners.getInstance(), 5L, 5L);
