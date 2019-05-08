@@ -33,7 +33,9 @@ public class HologramListener implements Listener {
 
     public HologramListener(ConfigurationController config) {
         this.config = config;
-        this.hologramOffset = config.getHologramText()
+
+        val holoLines = config.getHologramText();
+        double hologramOffset = holoLines
                 .stream()
                 .mapToDouble(line -> {
                     if (line.equalsIgnoreCase("%skull%")) {
@@ -44,6 +46,13 @@ public class HologramListener implements Listener {
                         return 0.23;
                     }
                 }).sum();
+
+        if (holoLines.get(holoLines.size() - 1).equalsIgnoreCase("%skull%")) {
+            // Last line is an item, place hologram lower
+            hologramOffset -= 0.2;
+        }
+
+        this.hologramOffset = hologramOffset;
     }
 
     @EventHandler
@@ -78,8 +87,9 @@ public class HologramListener implements Listener {
             if (linha.equalsIgnoreCase("%skull%")) {
                 String spawnerSkullName = spawner.getEntityProperties().getSkullSkinName();
                 linhas.add(hologram.appendItemLine(getSkull(spawnerSkullName)));
+            } else {
+                linhas.add(hologram.appendTextLine(linha));
             }
-            linhas.add(hologram.appendTextLine(linha));
         }
 
         viewers.add(player);
