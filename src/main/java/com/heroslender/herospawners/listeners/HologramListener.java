@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class HologramListener implements Listener {
@@ -61,13 +60,13 @@ public class HologramListener implements Listener {
         val hologram = createHologramFor(player, loc);
 
         val linhas = new ArrayList<HologramLine>();
-        for (String linha : getHologramTextFor(spawner)) {
+        for (String linha : spawner.getHologramText()) {
             linhas.add(hologram.appendTextLine(linha));
         }
 
-        val entityProperties = config.getProperties(spawner.getType());
         if (config.isHologramShowHead()) {
-            hologram.appendItemLine(getSkull(entityProperties.getSkullSkinName()));
+            String spawnerSkullName = spawner.getEntityProperties().getSkullSkinName();
+            hologram.appendItemLine(getSkull(spawnerSkullName));
         }
         viewers.add(player);
 
@@ -85,14 +84,14 @@ public class HologramListener implements Listener {
                 }
 
                 // Update the hologram if needed
-                val newLines = getHologramTextFor(spawner);
+                val newLines = spawner.getHologramText();
                 for (int i = 0; i < newLines.size(); i++) {
                     val currentLine = linhas.get(i);
                     if (currentLine instanceof TextLine) {
                         TextLine textLine = (TextLine) currentLine;
                         String newValue = newLines.get(i);
 
-                        if (!textLine.getText().equals(newValue)){
+                        if (!textLine.getText().equals(newValue)) {
                             textLine.setText(newValue);
                         }
                     }
@@ -106,18 +105,6 @@ public class HologramListener implements Listener {
         hologram.getVisibilityManager().setVisibleByDefault(false);
         hologram.getVisibilityManager().showTo(player);
         return hologram;
-    }
-
-    private List<String> getHologramTextFor(final ISpawner spawner) {
-        val entityProperties = config.getProperties(spawner.getType());
-
-        return config.getHologramText()
-                .stream()
-                .map(h -> h
-                        .replace("%dono%", spawner.getOwner())
-                        .replace("%quantidade%", Integer.toString(spawner.getAmount()))
-                        .replace("%tipo%", entityProperties.getDisplayName()))
-                .collect(Collectors.toList());
     }
 
     private ItemStack getSkull(final String owner) {
