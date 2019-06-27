@@ -34,32 +34,30 @@ public class StorageServiceSQLiteImpl implements StorageServiceSql {
     }
 
     @Override
-    public CompletableFuture<Map<Location, ISpawner>> getSpawners() {
-        return CompletableFuture.supplyAsync(() -> {
-            Map<Location, ISpawner> spawners = new HashMap<>();
-            try (Connection c = dataSource.getConnection()) {
-                try (PreparedStatement ps = c.prepareStatement("SELECT * FROM " + SPAWNERS + ";")) {
-                    try (ResultSet rs = ps.executeQuery()) {
-                        int failed = 0;
-                        while (rs.next()) {
-                            Location location = Utilities.str2loc(rs.getString(SPAWNERS_LOC));
-                            if (location.getWorld() == null || location.getBlock().getType() != Material.MOB_SPAWNER) {
-                                failed++;
-                                continue;
-                            }
-                            spawners.put(location, new Spawner(rs.getString(SPAWNERS_OWNER), location, rs.getInt(SPAWNERS_QUANT)));
+    public Map<Location, ISpawner> getSpawners() {
+        Map<Location, ISpawner> spawners = new HashMap<>();
+        try (Connection c = dataSource.getConnection()) {
+            try (PreparedStatement ps = c.prepareStatement("SELECT * FROM " + SPAWNERS + ";")) {
+                try (ResultSet rs = ps.executeQuery()) {
+                    int failed = 0;
+                    while (rs.next()) {
+                        Location location = Utilities.str2loc(rs.getString(SPAWNERS_LOC));
+                        if (location.getWorld() == null || location.getBlock().getType() != Material.MOB_SPAWNER) {
+                            failed++;
+                            continue;
                         }
+                        spawners.put(location, new Spawner(rs.getString(SPAWNERS_OWNER), location, rs.getInt(SPAWNERS_QUANT)));
+                    }
 
-                        if (failed != 0) {
-                            log(Level.WARNING, "Nao foi possivel carregar " + failed + " spawners!");
-                        }
+                    if (failed != 0) {
+                        log(Level.WARNING, "Nao foi possivel carregar " + failed + " spawners!");
                     }
                 }
-            } catch (Exception e) {
-                log("Ocurreu um erro ao pegar os spawners todos.", e);
             }
-            return spawners;
-        }, HeroSpawners.getInstance().getExecutor());
+        } catch (Exception e) {
+            log("Ocurreu um erro ao pegar os spawners todos.", e);
+        }
+        return spawners;
     }
 
     @Override

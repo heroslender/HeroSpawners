@@ -8,7 +8,7 @@ import java.util.concurrent.CompletableFuture;
 
 public interface StorageService extends Service {
 
-    CompletableFuture<Map<Location, ISpawner>> getSpawners();
+    Map<Location, ISpawner> getSpawners();
 
     CompletableFuture<Void> save(final ISpawner spawner);
 
