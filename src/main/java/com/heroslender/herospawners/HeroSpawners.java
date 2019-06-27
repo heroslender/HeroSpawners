@@ -50,7 +50,6 @@ public class HeroSpawners extends JavaPlugin {
         configurationController.init();
         storageController.init();
 
-        getLogger().info("Hologramas ativados apenas ao passar o mouse!");
         getServer().getPluginManager().registerEvents(new HologramListener(configurationController), this);
 
         // StackMobs

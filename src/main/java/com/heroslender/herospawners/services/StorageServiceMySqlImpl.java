@@ -43,30 +43,28 @@ public class StorageServiceMySqlImpl implements StorageServiceSql {
     }
 
     @Override
-    public CompletableFuture<Map<Location, ISpawner>> getSpawners() {
-        return CompletableFuture.supplyAsync(() -> {
-            Map<Location, ISpawner> spawners = new HashMap<>();
-            try (Connection c = hikariDataSource.getConnection()) {
-                try (PreparedStatement ps = c.prepareStatement("SELECT * FROM " + SPAWNERS + ";")) {
-                    try (ResultSet rs = ps.executeQuery()) {
-                        int failed = 0;
-                        while (rs.next()) {
-                            Location location = Utilities.str2loc(rs.getString(SPAWNERS_LOC));
-                            if (location.getWorld() == null || location.getBlock().getType() != Material.MOB_SPAWNER) {
-                                failed++;
-                                continue;
-                            }
-                            spawners.put(location, new Spawner(rs.getString(SPAWNERS_OWNER), location, rs.getInt(SPAWNERS_QUANT)));
+    public Map<Location, ISpawner> getSpawners() {
+        Map<Location, ISpawner> spawners = new HashMap<>();
+        try (Connection c = hikariDataSource.getConnection()) {
+            try (PreparedStatement ps = c.prepareStatement("SELECT * FROM " + SPAWNERS + ";")) {
+                try (ResultSet rs = ps.executeQuery()) {
+                    int failed = 0;
+                    while (rs.next()) {
+                        Location location = Utilities.str2loc(rs.getString(SPAWNERS_LOC));
+                        if (location.getWorld() == null || location.getBlock().getType() != Material.MOB_SPAWNER) {
+                            failed++;
+                            continue;
                         }
-                        if (failed != 0)
-                            log(Level.WARNING, "Nao foi possivel carregar " + failed + " spawners!");
+                        spawners.put(location, new Spawner(rs.getString(SPAWNERS_OWNER), location, rs.getInt(SPAWNERS_QUANT)));
                     }
+                    if (failed != 0)
+                        log(Level.WARNING, "Nao foi possivel carregar " + failed + " spawners!");
                 }
-            } catch (Exception e) {
-                log("Ocurreu um erro ao pegar os spawners todos.", e);
             }
-            return spawners;
-        }, HeroSpawners.getInstance().getExecutor());
+        } catch (Exception e) {
+            log("Ocurreu um erro ao pegar os spawners todos.", e);
+        }
+        return spawners;
     }
 
     @Override
@@ -74,7 +72,7 @@ public class StorageServiceMySqlImpl implements StorageServiceSql {
         return CompletableFuture.runAsync(() -> {
             try (Connection c = hikariDataSource.getConnection()) {
                 try (PreparedStatement ps = c.prepareStatement("INSERT INTO " + SPAWNERS +
-                        " (" + SPAWNERS_OWNER + ","  + SPAWNERS_LOC + "," + SPAWNERS_QUANT + ")" +
+                        " (" + SPAWNERS_OWNER + "," + SPAWNERS_LOC + "," + SPAWNERS_QUANT + ")" +
                         " VALUES(?, ?, ?)")) {
                     ps.setString(1, spawner.getOwner());
                     ps.setString(2, Utilities.loc2str(spawner.getLocation()));
@@ -82,7 +80,7 @@ public class StorageServiceMySqlImpl implements StorageServiceSql {
                     ps.executeUpdate();
                 }
             } catch (Exception e) {
-                log( "Ocurreu um erro ao guardar o " + spawner + ".", e);
+                log("Ocurreu um erro ao guardar o " + spawner + ".", e);
             }
         }, HeroSpawners.getInstance().getExecutor());
     }
@@ -99,7 +97,7 @@ public class StorageServiceMySqlImpl implements StorageServiceSql {
                     ps.executeUpdate();
                 }
             } catch (Exception e) {
-                log( "Ocurreu um erro ao atualizar o " + spawner + ".", e);
+                log("Ocurreu um erro ao atualizar o " + spawner + ".", e);
             }
         }, HeroSpawners.getInstance().getExecutor());
     }
@@ -113,7 +111,7 @@ public class StorageServiceMySqlImpl implements StorageServiceSql {
                     ps.executeUpdate();
                 }
             } catch (Exception e) {
-                log( "Ocurreu um erro ao apagar o " + spawner + ".", e);
+                log("Ocurreu um erro ao apagar o " + spawner + ".", e);
             }
         }, HeroSpawners.getInstance().getExecutor());
     }
@@ -124,7 +122,7 @@ public class StorageServiceMySqlImpl implements StorageServiceSql {
                 ps.executeUpdate();
             }
         } catch (Exception e) {
-            log( "Ocurreu um erro ao criar a tabela.", e);
+            log("Ocurreu um erro ao criar a tabela.", e);
         }
     }
 

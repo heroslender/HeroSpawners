@@ -1,5 +1,6 @@
 package com.heroslender.herospawners.controllers;
 
+import com.heroslender.herospawners.HeroSpawners;
 import com.heroslender.herospawners.services.StorageService;
 import com.heroslender.herospawners.models.ISpawner;
 import lombok.RequiredArgsConstructor;
@@ -7,6 +8,7 @@ import org.bukkit.Location;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 
 @RequiredArgsConstructor
 public class StorageController implements Controller {
@@ -17,7 +19,11 @@ public class StorageController implements Controller {
     public void init() {
         storageService.init();
         cachedSpawners.clear();
-        cachedSpawners.putAll(storageService.getSpawners().join());
+
+        Map<Location, ISpawner> spawners = storageService.getSpawners();
+        HeroSpawners.getInstance().getLogger().log(Level.INFO, "[Storage] Foram carregados {0} spawners da base de dados.", spawners.size());
+
+        cachedSpawners.putAll(spawners);
     }
 
     public void saveSpawner(ISpawner spawner) {
