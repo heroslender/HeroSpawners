@@ -16,12 +16,15 @@ O HeroSpawners permite que os spawners do seu servidor agrupem, reduzindo assim 
 ![Preview](https://github.com/heroslender/HeroSpawners/raw/develop/assets/preview.gif)
 
 ## Comandos
+
 - `/herospawners reload` - Comando para recarregar a configuração do plugin.
 
 ## Permissões
+
 - `herospawners.admin` - Permissão para usar o comando de recarregar a configuração.
 
 ## Configuração
+
 ```yaml
 MySql:
   // Usar MySql? Se sim alterar para true
@@ -34,15 +37,21 @@ MySql:
 juntar:
   // Raio para procurar spawners para agrupar ao colocar
   raio: 5
-  // Limite de spawners por stack
+  // Limite de spawners por stack, 0 = infinito
   maximo: 0
 holograma:
   // Distância a que o holograma do spawner fica visivel
   distancia: 5
   // Texto do holograma
-  texto: '&7%quantidade%x &e%tipo%'
-  // Mostrar a cabeça do mob junto com o holograma?
-  mostrar-cabeca: true
+  // Placeholders disponiveis
+  //  > %quantidade% -> Quantidade de spawners no stack
+  //  > %tipo% -> Nome do mob que spawna
+  //  > %dono% -> Dono do spawner/quem o colocou
+  //  > %skull% -> Cabeça do mob, tem que ser uma linha dedicada
+  texto:
+    - '&7%quantidade%x &e%tipo%'
+    - '&eDono: &7%dono%'
+    - '%skull%'
 // Configuração de cada mob
 mobs:
   CREEPER:
