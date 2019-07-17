@@ -23,10 +23,14 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 
 @RequiredArgsConstructor
 public class HologramListener implements Listener {
+    private static final String SKULL_PLACEHOLDER = "%skull%";
+    private static final Set<Material> transparentBlocks = Collections.singleton(Material.AIR);
+
     private final ConfigurationController config;
     private final List<Player> viewers = new ArrayList<>();
     private final double hologramOffset;
@@ -38,7 +42,7 @@ public class HologramListener implements Listener {
         double hologramOffset = holoLines
                 .stream()
                 .mapToDouble(line -> {
-                    if (line.equalsIgnoreCase("%skull%")) {
+                    if (line.equalsIgnoreCase(SKULL_PLACEHOLDER)) {
                         // Offset for items
                         return 0.7;
                     } else {
@@ -47,7 +51,7 @@ public class HologramListener implements Listener {
                     }
                 }).sum();
 
-        if (holoLines.get(holoLines.size() - 1).equalsIgnoreCase("%skull%")) {
+        if (holoLines.get(holoLines.size() - 1).equalsIgnoreCase(SKULL_PLACEHOLDER)) {
             // Last line is an item, place hologram lower
             hologramOffset -= 0.2;
         }
@@ -61,10 +65,10 @@ public class HologramListener implements Listener {
             return;
 
         try {
-            val target = e.getPlayer().getTargetBlock(Collections.singleton(Material.AIR), config.getHologramViewDistance());
+            val target = e.getPlayer().getTargetBlock(transparentBlocks, config.getHologramViewDistance());
 
             if (target.getType() == Material.MOB_SPAWNER) {
-                val spawner = (Spawner) HeroSpawners.getInstance().getStorageController().getSpawner(target.getLocation());
+                val spawner = HeroSpawners.getInstance().getStorageController().getSpawner(target.getLocation());
 
                 if (spawner != null) {
                     setSpawnerHologram(e.getPlayer(), spawner);
@@ -78,13 +82,12 @@ public class HologramListener implements Listener {
     }
 
     private void setSpawnerHologram(final Player player, final ISpawner spawner) {
-        val loc = spawner.getLocation().add(0.5, 1.17, 0.5);
-        loc.add(0, hologramOffset, 0);
+        val loc = spawner.getLocation().add(0.5, 1.17 + hologramOffset, 0.5);
         val hologram = createHologramFor(player, loc);
 
         val linhas = new ArrayList<HologramLine>();
         for (String linha : spawner.getHologramText()) {
-            if (linha.equalsIgnoreCase("%skull%")) {
+            if (linha.equalsIgnoreCase(SKULL_PLACEHOLDER)) {
                 String spawnerSkullName = spawner.getEntityProperties().getSkullSkinName();
                 linhas.add(hologram.appendItemLine(getSkull(spawnerSkullName)));
             } else {
@@ -100,7 +103,7 @@ public class HologramListener implements Listener {
                 if (!player.isOnline()
                         || !viewers.contains(player)
                         || spawner.getAmount() < 0
-                        || !spawner.getLocation().equals(player.getTargetBlock(Collections.singleton(Material.AIR), config.getHologramViewDistance()).getLocation())) {
+                        || !spawner.getLocation().equals(player.getTargetBlock(transparentBlocks, config.getHologramViewDistance()).getLocation())) {
                     cancel();
                     hologram.delete();
                     viewers.remove(player);
