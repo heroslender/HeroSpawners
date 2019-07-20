@@ -154,3 +154,22 @@ mobs:
     head: MHF_Villager
 
 ```
+
+## API
+Hook to HeroSpawners using it's API
+
+### Events
+- SpawnerSpawnStackEvent - Called when a stacked spawner spawns an entity stack.
+```Java
+@EventHandler
+private void onSpawnStack(SpawnerSpawnStackEvent e) {
+    // You have access to the spawner object containing,
+    // for example, the spawner owner.
+    ISpawner spawner = e.getSpawner();
+    Bukkit.broadcastMessage(spawner.getOwner() + "'s spawner spawned " + e.getStackSize() + "x of" + spawner.getEntityProperties().getDisplayName());
+
+    yourPlugin.createStack(e.getEntityType(), e.getStackSize());
+    // Don't forget to cancell the spawn event if you created the stack :)
+    e.setCancelled(true);
+}
+```

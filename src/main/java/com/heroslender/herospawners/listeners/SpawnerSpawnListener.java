@@ -1,8 +1,10 @@
 package com.heroslender.herospawners.listeners;
 
 import com.heroslender.herospawners.HeroSpawners;
+import com.heroslender.herospawners.api.events.SpawnerSpawnStackEvent;
 import com.heroslender.herospawners.models.ISpawner;
 import com.heroslender.herospawners.utils.Utilities;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -29,8 +31,18 @@ public class SpawnerSpawnListener implements Listener {
         }
         preventMultiple.put(location, System.currentTimeMillis());
 
-        e.setCancelled(HeroSpawners.getInstance().getMobStackerSuport().createOrAddStack(spawner, e.getEntity(),
-                (int) Math.round((0.5D + Utilities.getRandom().nextDouble()) * spawner.getAmount())));
+        int stackSize = (int) Math.round((0.5D + Utilities.getRandom().nextDouble()) * spawner.getAmount());
 
+        SpawnerSpawnStackEvent spawnerSpawnStackEvent = new SpawnerSpawnStackEvent(
+                spawner,
+                e.getEntityType(),
+                stackSize
+        );
+        Bukkit.getPluginManager().callEvent(spawnerSpawnStackEvent);
+
+        if (!spawnerSpawnStackEvent.isCancelled()) {
+            e.setCancelled(HeroSpawners.getInstance().getMobStackerSuport().createOrAddStack(spawner, e.getEntity(),
+                    stackSize));
+        }
     }
 }
