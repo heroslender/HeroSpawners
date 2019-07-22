@@ -41,7 +41,7 @@ public class SpawnerSpawnListener implements Listener {
         Bukkit.getPluginManager().callEvent(spawnerSpawnStackEvent);
 
         if (!spawnerSpawnStackEvent.isCancelled()) {
-            e.setCancelled(HeroSpawners.getInstance().getMobStackerSuport().createOrAddStack(spawner, e.getEntity(),
+            e.setCancelled(HeroSpawners.getInstance().getMobStackerSupport().createOrAddStack(spawner, e.getEntity(),
                     stackSize));
         }
     }

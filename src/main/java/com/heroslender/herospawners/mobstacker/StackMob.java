@@ -8,7 +8,7 @@ import uk.antiperson.stackmob.api.EntityManager;
 /**
  * Created by Heroslender.
  */
-public class StackMob implements MobStackerSuport {
+public class StackMob implements MobStackerSupport {
     EntityManager em;
 
     public StackMob() {

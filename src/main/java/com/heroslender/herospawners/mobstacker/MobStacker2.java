@@ -14,7 +14,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 /**
  * Created by Heroslender.
  */
-public class MobStacker2 implements MobStackerSuport {
+public class MobStacker2 implements MobStackerSupport {
 
     public MobStacker2() {
         Bukkit.getLogger().info("[herospawners] MobStacker foi encontrado!");

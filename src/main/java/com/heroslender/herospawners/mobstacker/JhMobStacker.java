@@ -6,7 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.metadata.FixedMetadataValue;
 
-public class JhMobStacker implements MobStackerSuport {
+public class JhMobStacker implements MobStackerSupport {
     private static final String META_NAME = "JH_StackMobs";
 
     public JhMobStacker() {

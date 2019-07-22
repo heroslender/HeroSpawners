@@ -27,7 +27,7 @@ public class HeroSpawners extends JavaPlugin {
     @Getter private final Executor executor = ForkJoinPool.commonPool();
     @Getter private final StorageController storageController;
     @Getter private final ConfigurationController configurationController;
-    @Getter private MobStackerSuport mobStackerSuport;
+    @Getter private MobStackerSupport mobStackerSupport;
     @Getter private boolean shutingDown = true;
 
     public HeroSpawners() {
@@ -54,17 +54,17 @@ public class HeroSpawners extends JavaPlugin {
 
         // StackMobs
         if (Bukkit.getServer().getPluginManager().getPlugin("MobStacker2") != null)
-            mobStackerSuport = new MobStacker2();
+            mobStackerSupport = new MobStacker2();
         else if (Bukkit.getServer().getPluginManager().getPlugin("StackMob") != null)
-            mobStackerSuport = new StackMob();
+            mobStackerSupport = new StackMob();
         else if (Bukkit.getServer().getPluginManager().getPlugin("TintaStack") != null)
-            mobStackerSuport = new TintaStack();
+            mobStackerSupport = new TintaStack();
         else if (Bukkit.getServer().getPluginManager().getPlugin("JH_StackMobs") != null)
-            mobStackerSuport = new JhMobStacker();
+            mobStackerSupport = new JhMobStacker();
         else if (Bukkit.getServer().getPluginManager().getPlugin("ObyStack") != null)
-            mobStackerSuport = new ObyStack();
+            mobStackerSupport = new ObyStack();
         else
-            mobStackerSuport = new SemMobStacker();
+            mobStackerSupport = new SemMobStacker();
 
         // listeners
         getServer().getPluginManager().registerEvents(new SpawnerSpawnListener(), this);
