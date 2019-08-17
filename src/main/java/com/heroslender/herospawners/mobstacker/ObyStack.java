@@ -9,7 +9,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 /**
  * Plugin do LeoRamos111
  */
-public class ObyStack implements MobStackerSuport {
+public class ObyStack implements MobStackerSupport {
 
     public ObyStack() {
         Bukkit.getLogger().info("[herospawners] ObyStack foi encontrado!");

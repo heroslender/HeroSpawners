@@ -73,10 +73,12 @@ public class StorageServiceMySqlImpl implements StorageServiceSql {
             try (Connection c = hikariDataSource.getConnection()) {
                 try (PreparedStatement ps = c.prepareStatement("INSERT INTO " + SPAWNERS +
                         " (" + SPAWNERS_OWNER + "," + SPAWNERS_LOC + "," + SPAWNERS_QUANT + ")" +
-                        " VALUES(?, ?, ?)")) {
+                        " VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE " + SPAWNERS_QUANT + "=?, " + SPAWNERS_OWNER + "=?")) {
                     ps.setString(1, spawner.getOwner());
                     ps.setString(2, Utilities.loc2str(spawner.getLocation()));
                     ps.setInt(3, spawner.getAmount());
+                    ps.setInt(4, spawner.getAmount());
+                    ps.setString(5, spawner.getOwner());
                     ps.executeUpdate();
                 }
             } catch (Exception e) {

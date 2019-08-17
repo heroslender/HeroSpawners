@@ -8,7 +8,7 @@ import org.bukkit.entity.Entity;
 /**
  * Created by Heroslender.
  */
-public class TintaStack implements MobStackerSuport {
+public class TintaStack implements MobStackerSupport {
 
     public TintaStack() {
         Bukkit.getLogger().info("[herospawners] TintaStack foi encontrado!");

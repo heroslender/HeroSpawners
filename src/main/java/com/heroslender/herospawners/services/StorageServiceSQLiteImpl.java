@@ -64,7 +64,7 @@ public class StorageServiceSQLiteImpl implements StorageServiceSql {
     public CompletableFuture<Void> save(final ISpawner spawner) {
         return CompletableFuture.runAsync(() -> {
             try (Connection c = dataSource.getConnection()) {
-                try (PreparedStatement ps = c.prepareStatement("INSERT INTO " + SPAWNERS +
+                try (PreparedStatement ps = c.prepareStatement("INSERT OR REPLACE INTO " + SPAWNERS +
                         " (" + SPAWNERS_OWNER + "," + SPAWNERS_LOC + "," + SPAWNERS_QUANT + ") " +
                         "VALUES(?, ?, ?)")) {
                     ps.setString(1, spawner.getOwner());

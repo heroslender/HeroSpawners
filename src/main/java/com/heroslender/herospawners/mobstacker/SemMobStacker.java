@@ -7,7 +7,7 @@ import org.bukkit.entity.Entity;
 /**
  * Created by Heroslender.
  */
-public class SemMobStacker implements MobStackerSuport {
+public class SemMobStacker implements MobStackerSupport {
 
     public SemMobStacker() {
         Bukkit.getLogger().info("[herospawners] Nao foi encontrado um plugin de MobStacker, a usar o metodo padrao.");
