@@ -21,6 +21,11 @@
             <id>SilkSpawners-Repo</id>
             <url>https://ci.dustplanet.de/plugin/repository/everything/</url>
         </repository>
+        <repository>
+            <name>Holographic Displays Repo</name>
+            <id>codemc-repo</id>
+            <url>https://repo.codemc.org/repository/maven-public/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -54,7 +59,13 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.16.18</version>
+            <version>1.18.10</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.gmail.filoghost.holographicdisplays</groupId>
+            <artifactId>holographicdisplays-api</artifactId>
+            <version>2.4.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -77,13 +88,6 @@
             <version>1.6.2</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/Libs/MobStacker2.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>com.gmail.filoghost.holographicdisplays</groupId>
-            <artifactId>HolographicDisplays</artifactId>
-            <version>2.2.6</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/Libs/HolographicDisplays.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>me</groupId>
