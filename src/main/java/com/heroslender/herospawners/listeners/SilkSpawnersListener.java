@@ -15,9 +15,9 @@ import org.bukkit.Effect;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.CreatureSpawner;
-import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * Created by Heroslender.
@@ -48,24 +48,21 @@ public class SilkSpawnersListener implements Listener {
             return;
         }
 
-        int quantidade = 1;
-        if (event.getPlayer().isSneaking()) {
-            quantidade = (spawner.getAmount() > 64 ? 64 : spawner.getAmount());
-            event.setDrop(su.newSpawnerItem(event.getEntityID(), su.getCustomSpawnerName(su.eid2MobID.get(event.getEntityID())), quantidade, false));
-        }
+        int amount = event.getPlayer().isSneaking() ? Math.min(spawner.getAmount(), 64) : 1;
+        ItemStack spawnerItemStack = su.newSpawnerItem(event.getEntityID(), su.getCustomSpawnerName(su.eid2MobID.get(event.getEntityID())), amount, false);
 
-        if (spawner.getAmount() > quantidade) {
-            final EntityType et = event.getSpawner().getSpawnedType();
+        if (spawner.getAmount() > amount) {
+            event.setCancelled(true);
+            event.getPlayer().getInventory().addItem(spawnerItemStack)
+                    .values()
+                    .forEach(itemStack ->
+                            spawner.getLocation().getWorld().dropItemNaturally(spawner.getLocation(), itemStack)
+                    );
 
-            int finalQuantidade = quantidade;
-            Bukkit.getScheduler().runTaskLater(HeroSpawners.getInstance(), () -> {
-                event.getBlock().setType(Material.MOB_SPAWNER);
-                CreatureSpawner creatureSpawner = ((CreatureSpawner) event.getBlock().getState());
-                creatureSpawner.setSpawnedType(et);
-
-                spawner.setAmount(spawner.getAmount() - finalQuantidade);
-            }, 1L);
+            spawner.setAmount(spawner.getAmount() - amount);
         } else {
+            event.setDrop(spawnerItemStack);
+
             storageController.deleteSpawner(spawner);
         }
     }
