@@ -36,6 +36,7 @@ public class StorageController implements Controller {
     }
 
     public void deleteSpawner(final ISpawner spawner) {
+        cachedSpawners.remove(spawner.getLocation());
         storageService.delete(spawner).join();
     }
 
