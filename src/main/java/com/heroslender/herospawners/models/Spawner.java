@@ -1,21 +1,20 @@
 package com.heroslender.herospawners.models;
 
+import com.google.common.collect.Lists;
 import com.heroslender.herospawners.HeroSpawners;
 import com.heroslender.herospawners.utils.Utilities;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Location;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntityType;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class Spawner implements ISpawner {
+    private static final String[] placeholders = new String[]{"%dono%", "%quantidade%", "%tipo%"};
     @Getter private final String owner;
     private final Location location;
     @Getter @Setter private boolean updateRequired = false;
@@ -53,13 +52,14 @@ public class Spawner implements ISpawner {
 
     @Override
     public List<String> getHologramText() {
-        return HeroSpawners.getInstance().getConfigurationController().getHologramText()
-                .stream()
-                .map(h -> h
-                        .replace("%dono%", getOwner())
-                        .replace("%quantidade%", Integer.toString(getAmount()))
-                        .replace("%tipo%", getEntityProperties().getDisplayName()))
-                .collect(Collectors.toList());
+        List<String> hologramLines = Lists.newArrayList();
+        val values = new String[]{getOwner(), Integer.toString(getAmount()), getEntityProperties().getDisplayName()};
+
+        for (String line : HeroSpawners.getInstance().getConfigurationController().getHologramText()) {
+            hologramLines.add(StringUtils.replaceEach(line, placeholders, values));
+        }
+
+        return hologramLines;
     }
 
     @Override
