@@ -15,7 +15,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
 public class StorageServiceSQLiteImpl implements StorageServiceSql {
@@ -34,7 +33,7 @@ public class StorageServiceSQLiteImpl implements StorageServiceSql {
     }
 
     @Override
-    public Map<Location, ISpawner> getSpawners() {
+    public synchronized Map<Location, ISpawner> getSpawners() {
         Map<Location, ISpawner> spawners = new HashMap<>();
         try (Connection c = dataSource.getConnection()) {
             try (PreparedStatement ps = c.prepareStatement("SELECT * FROM " + SPAWNERS + ";")) {
@@ -50,7 +49,8 @@ public class StorageServiceSQLiteImpl implements StorageServiceSql {
                     }
 
                     if (failed != 0) {
-                        log(Level.WARNING, "Nao foi possivel carregar " + failed + " spawners!");
+                        HeroSpawners.getInstance().getLogger()
+                                .log(Level.WARNING, "Nao foi possivel carregar {} spawners!", failed);
                     }
                 }
             }
@@ -61,52 +61,46 @@ public class StorageServiceSQLiteImpl implements StorageServiceSql {
     }
 
     @Override
-    public CompletableFuture<Void> save(final ISpawner spawner) {
-        return CompletableFuture.runAsync(() -> {
-            try (Connection c = dataSource.getConnection()) {
-                try (PreparedStatement ps = c.prepareStatement("INSERT OR REPLACE INTO " + SPAWNERS +
-                        " (" + SPAWNERS_OWNER + "," + SPAWNERS_LOC + "," + SPAWNERS_QUANT + ") " +
-                        "VALUES(?, ?, ?)")) {
-                    ps.setString(1, spawner.getOwner());
-                    ps.setString(2, Utilities.loc2str(spawner.getLocation()));
-                    ps.setInt(3, spawner.getAmount());
-                    ps.executeUpdate();
-                }
-            } catch (Exception e) {
-                log("Ocurreu um erro ao guardar o " + spawner + ".", e);
+    public synchronized void save(final ISpawner spawner) {
+        try (Connection c = dataSource.getConnection()) {
+            try (PreparedStatement ps = c.prepareStatement("INSERT OR REPLACE INTO " + SPAWNERS +
+                    " (" + SPAWNERS_OWNER + "," + SPAWNERS_LOC + "," + SPAWNERS_QUANT + ") " +
+                    "VALUES(?, ?, ?)")) {
+                ps.setString(1, spawner.getOwner());
+                ps.setString(2, Utilities.loc2str(spawner.getLocation()));
+                ps.setInt(3, spawner.getAmount());
+                ps.executeUpdate();
             }
-        }, HeroSpawners.getInstance().getExecutor());
+        } catch (Exception e) {
+            log("Ocurreu um erro ao guardar o " + spawner + ".", e);
+        }
     }
 
     @Override
-    public CompletableFuture<Void> update(ISpawner spawner) {
-        return CompletableFuture.runAsync(() -> {
-            try (Connection c = dataSource.getConnection()) {
-                try (PreparedStatement ps = c.prepareStatement("UPDATE " + SPAWNERS +
-                        " SET " + SPAWNERS_QUANT + "=?" +
-                        " WHERE " + SPAWNERS_LOC + "=?")) {
-                    ps.setInt(1, spawner.getAmount());
-                    ps.setString(2, Utilities.loc2str(spawner.getLocation()));
-                    ps.executeUpdate();
-                }
-            } catch (Exception e) {
-                log("Ocurreu um erro ao guardar o " + spawner + ".", e);
+    public synchronized void update(ISpawner spawner) {
+        try (Connection c = dataSource.getConnection()) {
+            try (PreparedStatement ps = c.prepareStatement("UPDATE " + SPAWNERS +
+                    " SET " + SPAWNERS_QUANT + "=?" +
+                    " WHERE " + SPAWNERS_LOC + "=?")) {
+                ps.setInt(1, spawner.getAmount());
+                ps.setString(2, Utilities.loc2str(spawner.getLocation()));
+                ps.executeUpdate();
             }
-        }, HeroSpawners.getInstance().getExecutor());
+        } catch (Exception e) {
+            log("Ocurreu um erro ao guardar o " + spawner + ".", e);
+        }
     }
 
     @Override
-    public CompletableFuture<Void> delete(final ISpawner spawner) {
-        return CompletableFuture.runAsync(() -> {
-            try (Connection c = dataSource.getConnection()) {
-                try (PreparedStatement ps = c.prepareStatement("DELETE FROM " + SPAWNERS + " WHERE " + SPAWNERS_LOC + " = ?;")) {
-                    ps.setString(1, Utilities.loc2str(spawner.getLocation()));
-                    ps.executeUpdate();
-                }
-            } catch (Exception e) {
-                log("Ocurreu um erro ao apagar o " + spawner + ".", e);
+    public synchronized void delete(final ISpawner spawner) {
+        try (Connection c = dataSource.getConnection()) {
+            try (PreparedStatement ps = c.prepareStatement("DELETE FROM " + SPAWNERS + " WHERE " + SPAWNERS_LOC + " = ?;")) {
+                ps.setString(1, Utilities.loc2str(spawner.getLocation()));
+                ps.executeUpdate();
             }
-        }, HeroSpawners.getInstance().getExecutor());
+        } catch (Exception e) {
+            log("Ocurreu um erro ao apagar o " + spawner + ".", e);
+        }
     }
 
     @Override
@@ -114,7 +108,7 @@ public class StorageServiceSQLiteImpl implements StorageServiceSql {
 
     }
 
-    private void createDatabase() {
+    private synchronized void createDatabase() {
         try (Connection c = dataSource.getConnection()) {
             try (PreparedStatement ps = c.prepareStatement(TABLE_CREATE)) {
                 ps.executeUpdate();
@@ -124,7 +118,7 @@ public class StorageServiceSQLiteImpl implements StorageServiceSql {
         }
     }
 
-    private void addOwnerColumn() {
+    private synchronized void addOwnerColumn() {
         try (Connection c = dataSource.getConnection()) {
             try (PreparedStatement ps = c.prepareStatement(TABLE_ADD_OWNER_COLUMN)) {
                 ps.executeUpdate();
@@ -134,10 +128,6 @@ public class StorageServiceSQLiteImpl implements StorageServiceSql {
         } catch (Exception e) {
             log("Ocurreu um erro ao adicionar os novos campos a tabela.", e);
         }
-    }
-
-    private void log(Level level, String message) {
-        HeroSpawners.getInstance().getLogger().log(level, "[SqlLite] " + message);
     }
 
     private void log(String message, Throwable thrown) {

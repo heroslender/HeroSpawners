@@ -40,7 +40,7 @@ public class HeroSpawners extends JavaPlugin {
             storageService = new StorageServiceMySqlImpl();
         else
             storageService = new StorageServiceSQLiteImpl();
-        storageController = new StorageController(storageService);
+        storageController = new StorageController(storageService, getExecutor());
 
         ConfigurationService configurationService = new ConfigurationServiceImpl();
         configurationController = new ConfigurationController(configurationService);

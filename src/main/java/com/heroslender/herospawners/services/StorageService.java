@@ -10,9 +10,9 @@ public interface StorageService extends Service {
 
     Map<Location, ISpawner> getSpawners();
 
-    CompletableFuture<Void> save(final ISpawner spawner);
+    void save(final ISpawner spawner);
 
-    CompletableFuture<Void> update(final ISpawner spawner);
+    void update(final ISpawner spawner);
 
-    CompletableFuture<Void> delete(final ISpawner spawner);
+    void delete(final ISpawner spawner);
 }

@@ -4,7 +4,8 @@ import com.heroslender.herospawners.HeroSpawners;
 import com.heroslender.herospawners.utils.Utilities;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.val;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntityType;
@@ -13,14 +14,22 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
+@RequiredArgsConstructor
 public class Spawner implements ISpawner {
     @Getter private final String owner;
     private final Location location;
+    @Getter @Setter private boolean updateRequired = false;
     @Getter private int amount;
+
+    public Spawner(String owner, Location location, int amount) {
+        this.owner = owner;
+        this.location = location;
+        this.amount = amount;
+    }
 
     public void setAmount(int amount) {
         this.amount = amount;
-        HeroSpawners.getInstance().getStorageController().updateSpawner(this);
+        this.updateRequired = true;
     }
 
     public Location getLocation() {

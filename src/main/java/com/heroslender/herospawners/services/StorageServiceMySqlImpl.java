@@ -5,6 +5,7 @@ import com.heroslender.herospawners.models.ISpawner;
 import com.heroslender.herospawners.models.Spawner;
 import com.heroslender.herospawners.utils.Utilities;
 import com.zaxxer.hikari.HikariDataSource;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -15,35 +16,27 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
+@RequiredArgsConstructor
 public class StorageServiceMySqlImpl implements StorageServiceSql {
-    private final HikariDataSource hikariDataSource;
+    private final HikariDataSource hikariDataSource = new HikariDataSource();
 
-    public StorageServiceMySqlImpl() {
+    @Override
+    public void init() {
         FileConfiguration config = HeroSpawners.getInstance().getConfig();
-        hikariDataSource = new HikariDataSource();
         hikariDataSource.setMaximumPoolSize(10);
         hikariDataSource.setJdbcUrl("jdbc:mysql://" + config.getString("MySql.host", "localhost") + ":" + config.getString("MySql.port", "3306") + "/" + config.getString("MySql.database", "herospawners"));
         hikariDataSource.setUsername(config.getString("MySql.user", "root"));
         hikariDataSource.setPassword(config.getString("MySql.pass", ""));
         hikariDataSource.addDataSourceProperty("autoReconnect", "true");
-    }
-
-    @Override
-    public void init() {
-        FileConfiguration config = HeroSpawners.getInstance().getConfig();
-        hikariDataSource.setJdbcUrl("jdbc:mysql://" + config.getString("MySql.host", "localhost") + ":" + config.getString("MySql.port", "3306") + "/" + config.getString("MySql.database", "herospawners"));
-        hikariDataSource.setUsername(config.getString("MySql.user", "root"));
-        hikariDataSource.setPassword(config.getString("MySql.pass", ""));
 
         createDatabase();
         addOwnerColumn();
     }
 
     @Override
-    public Map<Location, ISpawner> getSpawners() {
+    public synchronized Map<Location, ISpawner> getSpawners() {
         Map<Location, ISpawner> spawners = new HashMap<>();
         try (Connection c = hikariDataSource.getConnection()) {
             try (PreparedStatement ps = c.prepareStatement("SELECT * FROM " + SPAWNERS + ";")) {
@@ -68,57 +61,51 @@ public class StorageServiceMySqlImpl implements StorageServiceSql {
     }
 
     @Override
-    public CompletableFuture<Void> save(final ISpawner spawner) {
-        return CompletableFuture.runAsync(() -> {
-            try (Connection c = hikariDataSource.getConnection()) {
-                try (PreparedStatement ps = c.prepareStatement("INSERT INTO " + SPAWNERS +
-                        " (" + SPAWNERS_OWNER + "," + SPAWNERS_LOC + "," + SPAWNERS_QUANT + ")" +
-                        " VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE " + SPAWNERS_QUANT + "=?, " + SPAWNERS_OWNER + "=?")) {
-                    ps.setString(1, spawner.getOwner());
-                    ps.setString(2, Utilities.loc2str(spawner.getLocation()));
-                    ps.setInt(3, spawner.getAmount());
-                    ps.setInt(4, spawner.getAmount());
-                    ps.setString(5, spawner.getOwner());
-                    ps.executeUpdate();
-                }
-            } catch (Exception e) {
-                log("Ocurreu um erro ao guardar o " + spawner + ".", e);
+    public synchronized void save(final ISpawner spawner) {
+        try (Connection c = hikariDataSource.getConnection()) {
+            try (PreparedStatement ps = c.prepareStatement("INSERT INTO " + SPAWNERS +
+                    " (" + SPAWNERS_OWNER + "," + SPAWNERS_LOC + "," + SPAWNERS_QUANT + ")" +
+                    " VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE " + SPAWNERS_QUANT + "=?, " + SPAWNERS_OWNER + "=?")) {
+                ps.setString(1, spawner.getOwner());
+                ps.setString(2, Utilities.loc2str(spawner.getLocation()));
+                ps.setInt(3, spawner.getAmount());
+                ps.setInt(4, spawner.getAmount());
+                ps.setString(5, spawner.getOwner());
+                ps.executeUpdate();
             }
-        }, HeroSpawners.getInstance().getExecutor());
+        } catch (Exception e) {
+            log("Ocurreu um erro ao guardar o " + spawner + ".", e);
+        }
     }
 
     @Override
-    public CompletableFuture<Void> update(final ISpawner spawner) {
-        return CompletableFuture.runAsync(() -> {
-            try (Connection c = hikariDataSource.getConnection()) {
-                try (PreparedStatement ps = c.prepareStatement("UPDATE " + SPAWNERS +
-                        " SET " + SPAWNERS_QUANT + "=?" +
-                        " WHERE " + SPAWNERS_LOC + "=?")) {
-                    ps.setInt(1, spawner.getAmount());
-                    ps.setString(2, Utilities.loc2str(spawner.getLocation()));
-                    ps.executeUpdate();
-                }
-            } catch (Exception e) {
-                log("Ocurreu um erro ao atualizar o " + spawner + ".", e);
+    public synchronized void update(final ISpawner spawner) {
+        try (Connection c = hikariDataSource.getConnection()) {
+            try (PreparedStatement ps = c.prepareStatement("UPDATE " + SPAWNERS +
+                    " SET " + SPAWNERS_QUANT + "=?" +
+                    " WHERE " + SPAWNERS_LOC + "=?")) {
+                ps.setInt(1, spawner.getAmount());
+                ps.setString(2, Utilities.loc2str(spawner.getLocation()));
+                ps.executeUpdate();
             }
-        }, HeroSpawners.getInstance().getExecutor());
+        } catch (Exception e) {
+            log("Ocurreu um erro ao atualizar o " + spawner + ".", e);
+        }
     }
 
     @Override
-    public CompletableFuture<Void> delete(ISpawner spawner) {
-        return CompletableFuture.runAsync(() -> {
-            try (Connection c = hikariDataSource.getConnection()) {
-                try (PreparedStatement ps = c.prepareStatement("DELETE FROM " + SPAWNERS + " WHERE " + SPAWNERS_LOC + " = ?;")) {
-                    ps.setString(1, Utilities.loc2str(spawner.getLocation()));
-                    ps.executeUpdate();
-                }
-            } catch (Exception e) {
-                log("Ocurreu um erro ao apagar o " + spawner + ".", e);
+    public synchronized void delete(ISpawner spawner) {
+        try (Connection c = hikariDataSource.getConnection()) {
+            try (PreparedStatement ps = c.prepareStatement("DELETE FROM " + SPAWNERS + " WHERE " + SPAWNERS_LOC + " = ?;")) {
+                ps.setString(1, Utilities.loc2str(spawner.getLocation()));
+                ps.executeUpdate();
             }
-        }, HeroSpawners.getInstance().getExecutor());
+        } catch (Exception e) {
+            log("Ocurreu um erro ao apagar o " + spawner + ".", e);
+        }
     }
 
-    private void createDatabase() {
+    private synchronized void createDatabase() {
         try (Connection c = hikariDataSource.getConnection()) {
             try (PreparedStatement ps = c.prepareStatement(TABLE_CREATE)) {
                 ps.executeUpdate();
@@ -128,7 +115,7 @@ public class StorageServiceMySqlImpl implements StorageServiceSql {
         }
     }
 
-    private void addOwnerColumn() {
+    private synchronized void addOwnerColumn() {
         try (Connection c = hikariDataSource.getConnection()) {
             try (PreparedStatement ps = c.prepareStatement(TABLE_ADD_OWNER_COLUMN)) {
                 ps.executeUpdate();
@@ -149,7 +136,7 @@ public class StorageServiceMySqlImpl implements StorageServiceSql {
     }
 
     @Override
-    public void stop() {
+    public synchronized void stop() {
         hikariDataSource.close();
     }
 }
