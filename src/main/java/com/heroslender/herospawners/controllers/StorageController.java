@@ -1,9 +1,9 @@
 package com.heroslender.herospawners.controllers;
 
 import com.heroslender.herospawners.HeroSpawners;
+import com.heroslender.herospawners.models.ISpawner;
 import com.heroslender.herospawners.models.Spawner;
 import com.heroslender.herospawners.services.StorageService;
-import com.heroslender.herospawners.models.ISpawner;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -35,13 +35,11 @@ public class StorageController implements Controller {
     }
 
     public void save() {
-        executor.execute(() -> {
-            for (ISpawner spawner : cachedSpawners.values()) {
-                if (((Spawner) spawner).isUpdateRequired()) {
-                    updateSpawner(spawner);
-                }
+        for (ISpawner spawner : cachedSpawners.values()) {
+            if (((Spawner) spawner).isUpdateRequired()) {
+                updateSpawner(spawner);
             }
-        });
+        }
     }
 
     public void saveSpawner(ISpawner spawner) {
@@ -65,6 +63,7 @@ public class StorageController implements Controller {
 
     @Override
     public void stop() {
+        save();
         cachedSpawners.clear();
         storageService.stop();
     }
