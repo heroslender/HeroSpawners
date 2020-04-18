@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import com.heroslender.herospawners.HeroSpawners;
 import com.heroslender.herospawners.utils.Utilities;
 import lombok.*;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Location;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntityType;
