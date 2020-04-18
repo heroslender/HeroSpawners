@@ -37,7 +37,7 @@ mobs:
     head: MHF_Spider
   GIANT:
     name: Gigante
-    head: MHF_Giant
+    head: MHF_Zombie
   ZOMBIE:
     name: Zombie
     head: MHF_Zombie
@@ -67,7 +67,7 @@ mobs:
     head: MHF_LavaSlime
   ENDER_DRAGON:
     name: Dragao
-    head: MHF_EnderDragon
+    head: LandM
   WITHER:
     name: Wither
     head: MHF_WitherBoss
@@ -106,16 +106,16 @@ mobs:
     head: MHF_MushroomCow
   SNOWMAN:
     name: SnowMan
-    head: MHF_SnowMan
+    head: MHF_SnowGolem
   OCELOT:
     name: Ocelot
-    head: MHF_Ozelot
+    head: MHF_Ocelot
   IRON_GOLEM:
     name: Iron Golem
-    head: MHF_VillagerGolem
+    head: MHF_Golem
   HORSE:
     name: Cavalo
-    head: MHF_EntityHorse
+    head: MHF_Horse
   RABBIT:
     name: Coelho
     head: MHF_Rabbit
