@@ -8,3 +8,5 @@ load: POSTWORLD
 commands:
   herospawners:
     description: Main command
+  spawners:
+    description: give spawners command

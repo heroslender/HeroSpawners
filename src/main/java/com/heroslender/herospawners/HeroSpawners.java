@@ -9,8 +9,11 @@ import com.heroslender.herospawners.listeners.SpawnerListener;
 import com.heroslender.herospawners.listeners.SpawnerSpawnListener;
 import com.heroslender.herospawners.mobstacker.*;
 import com.heroslender.herospawners.services.*;
+import com.heroslender.herospawners.spawners.commands.SpawnerCommand;
+import com.heroslender.herospawners.spawners.listeners.SpawnerPlaceListener;
 import com.heroslender.herospawners.utils.Metrics;
 import lombok.Getter;
+import lombok.val;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.Logger;
@@ -71,7 +74,12 @@ public class HeroSpawners extends JavaPlugin {
         if (getServer().getPluginManager().getPlugin("SilkSpawners") != null)
             getServer().getPluginManager().registerEvents(new SilkSpawnersListener(configurationController, storageController), this);
         else {
-            getServer().getPluginManager().registerEvents(new SpawnerListener(configurationController, storageController), this);
+//            getServer().getPluginManager().registerEvents(new SpawnerListener(configurationController, storageController), this);
+            // TODO Temporary stuff for testing only
+            getServer().getPluginManager().registerEvents(new SpawnerPlaceListener(), this);
+            val spawnerCommand = new SpawnerCommand();
+            getCommand("spawners").setExecutor(spawnerCommand);
+            getCommand("spawners").setTabCompleter(spawnerCommand);
         }
 
         // Metrics - https://bstats.org/plugin/bukkit/HeroSpawners
