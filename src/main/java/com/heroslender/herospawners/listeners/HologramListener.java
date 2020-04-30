@@ -7,11 +7,11 @@ import com.gmail.filoghost.holographicdisplays.api.line.TextLine;
 import com.heroslender.herospawners.HeroSpawners;
 import com.heroslender.herospawners.controllers.ConfigurationController;
 import com.heroslender.herospawners.models.ISpawner;
-import com.heroslender.herospawners.models.Spawner;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -19,18 +19,15 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BlockIterator;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 
 @RequiredArgsConstructor
 public class HologramListener implements Listener {
     private static final String SKULL_PLACEHOLDER = "%skull%";
     private static final Set<Material> transparentBlocks = Collections.singleton(Material.AIR);
-
     private final ConfigurationController config;
     private final List<Player> viewers = new ArrayList<>();
     private final double hologramOffset;
@@ -61,24 +58,50 @@ public class HologramListener implements Listener {
 
     @EventHandler
     private void onPlayerMove(final PlayerMoveEvent e) {
-        if (e.isCancelled() || viewers.contains(e.getPlayer()))
+        if (e.isCancelled() || viewers.contains(e.getPlayer())) {
             return;
+        }
 
         try {
-            val target = e.getPlayer().getTargetBlock(transparentBlocks, config.getHologramViewDistance());
-
-            if (target.getType() == Material.MOB_SPAWNER) {
-                val spawner = HeroSpawners.getInstance().getStorageController().getSpawner(target.getLocation());
-
-                if (spawner != null) {
-                    setSpawnerHologram(e.getPlayer(), spawner);
-                }
+            val spawnerBlock = getTargetSpawner(e.getPlayer());
+            if (spawnerBlock == null) {
+                return;
             }
+
+            val spawner = HeroSpawners.getInstance().getStorageController().getSpawner(spawnerBlock.getLocation());
+            if (spawner == null) {
+                return;
+            }
+
+            setSpawnerHologram(e.getPlayer(), spawner);
         } catch (IllegalStateException ignore) {
             // Exception thrown by bukkit if the player looks at the void for example
         } catch (Exception ex) {
             HeroSpawners.getInstance().getLogger().log(Level.SEVERE, "Ocurreu um erro.", ex);
         }
+    }
+
+    private Block getTargetSpawner(final Player player) {
+        BlockIterator itr = new BlockIterator(player, config.getHologramViewDistance());
+
+        Block block = null;
+        try {
+            while (true) {
+                val nextBlock = itr.next();
+                if (nextBlock.getType() != Material.AIR) {
+                    block = nextBlock;
+                    break;
+                }
+            }
+        } catch (NoSuchElementException e) {
+            // BlockIterator has no more elements
+        }
+
+        if (block != null && block.getType() != Material.MOB_SPAWNER) {
+            return null;
+        }
+
+        return block;
     }
 
     private void setSpawnerHologram(final Player player, final ISpawner spawner) {
