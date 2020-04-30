@@ -3,9 +3,7 @@ package com.heroslender.herospawners.spawners.commands;
 import com.heroslender.herospawners.HeroSpawners;
 import com.heroslender.herospawners.spawners.SpawnerItemFactory;
 import lombok.val;
-import org.apache.commons.codec.Charsets;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -38,21 +36,21 @@ public class SpawnerCommand implements CommandExecutor, TabCompleter {
             try {
                 type = EntityType.valueOf(args[0].replace('-', '_').toUpperCase(Locale.ROOT));
             } catch (IllegalArgumentException e) {
-                sender.sendMessage(ChatColor.RED + "The entity type '" + args[0] + "' doesn't exist.");
+                sender.sendMessage(ChatColor.RED + "A entidade '§7" + args[0] + "§c' não existe.");
                 return true;
             }
         } else {
-            sender.sendMessage(ChatColor.YELLOW + "Entity type was not specified, defaulting to PIG.");
+            sender.sendMessage(ChatColor.YELLOW + "A entidade não foi especificada, utilizando PIG como padrão.");
         }
 
         val item = SpawnerItemFactory.newItemStack(type);
         if (item == null) {
-            sender.sendMessage("Failed to initialize a new spawner item");
+            sender.sendMessage(ChatColor.RED + "Ocurreu um erro ao inicializar o item.");
             return true;
         }
 
         ((Player) sender).getInventory().addItem(item);
-        sender.sendMessage("§aYou have received a" + ("AEIOU".indexOf(type.name().charAt(0)) != -1 ? "n" : "") + " §7" + getNameCapitalized(type, ' ') + " spawner§a!");
+        sender.sendMessage("§aRecebeste um spawner de §7" + getNameCapitalized(type, ' ') + "§a!");
         return true;
     }
 

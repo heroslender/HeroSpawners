@@ -5,10 +5,11 @@ import com.heroslender.herospawners.controllers.ConfigurationController;
 import com.heroslender.herospawners.controllers.StorageController;
 import com.heroslender.herospawners.listeners.HologramListener;
 import com.heroslender.herospawners.listeners.SilkSpawnersListener;
-import com.heroslender.herospawners.listeners.SpawnerListener;
 import com.heroslender.herospawners.listeners.SpawnerSpawnListener;
 import com.heroslender.herospawners.mobstacker.*;
-import com.heroslender.herospawners.services.*;
+import com.heroslender.herospawners.services.StorageService;
+import com.heroslender.herospawners.services.StorageServiceMySqlImpl;
+import com.heroslender.herospawners.services.StorageServiceSQLiteImpl;
 import com.heroslender.herospawners.spawners.commands.SpawnerCommand;
 import com.heroslender.herospawners.spawners.listeners.SpawnerPlaceListener;
 import com.heroslender.herospawners.utils.Metrics;
@@ -45,8 +46,7 @@ public class HeroSpawners extends JavaPlugin {
             storageService = new StorageServiceSQLiteImpl();
         storageController = new StorageController(storageService, getExecutor());
 
-        ConfigurationService configurationService = new ConfigurationServiceImpl();
-        configurationController = new ConfigurationController(configurationService);
+        configurationController = new ConfigurationController();
     }
 
     public void onEnable() {
