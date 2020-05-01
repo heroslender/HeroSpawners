@@ -11,7 +11,7 @@ import com.heroslender.herospawners.services.StorageService;
 import com.heroslender.herospawners.services.StorageServiceMySqlImpl;
 import com.heroslender.herospawners.services.StorageServiceSQLiteImpl;
 import com.heroslender.herospawners.spawners.commands.SpawnerCommand;
-import com.heroslender.herospawners.spawners.listeners.SpawnerPlaceListener;
+import com.heroslender.herospawners.spawners.listeners.SpawnerBlockListener;
 import com.heroslender.herospawners.utils.Metrics;
 import lombok.Getter;
 import lombok.val;
@@ -20,6 +20,8 @@ import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.filter.AbstractFilter;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.concurrent.Executor;
@@ -76,7 +78,7 @@ public class HeroSpawners extends JavaPlugin {
         else {
 //            getServer().getPluginManager().registerEvents(new SpawnerListener(configurationController, storageController), this);
             // TODO Temporary stuff for testing only
-            getServer().getPluginManager().registerEvents(new SpawnerPlaceListener(), this);
+            getServer().getPluginManager().registerEvents(new SpawnerBlockListener(configurationController, storageController), this);
             val spawnerCommand = new SpawnerCommand();
             getCommand("spawners").setExecutor(spawnerCommand);
             getCommand("spawners").setTabCompleter(spawnerCommand);
@@ -104,6 +106,16 @@ public class HeroSpawners extends JavaPlugin {
         getCommand("herospawners").setExecutor(new HeroSpawnersCommand());
 
         getLogger().info("Plugin carregado!");
+    }
+
+    public boolean shutdownCheck(final Cancellable event, final Player player) {
+        if (isShutingDown()) {
+            event.setCancelled(true);
+            player.sendMessage("§cNão é possivel colocar spawners quando o servidor esta a ligar/desligar.");
+            return true;
+        }
+
+        return false;
     }
 
     public void onDisable() {

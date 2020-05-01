@@ -86,6 +86,10 @@ public class ConfigurationController implements Controller {
         HeroSpawners.getInstance().saveConfig();
     }
 
+    public boolean hasStackLimit() {
+        return getStackLimit() <= 0;
+    }
+
     private FileConfiguration getConfig() {
         return HeroSpawners.getInstance().getConfig();
     }

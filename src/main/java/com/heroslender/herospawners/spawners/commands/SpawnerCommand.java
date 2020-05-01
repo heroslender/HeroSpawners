@@ -60,15 +60,15 @@ public class SpawnerCommand implements CommandExecutor, TabCompleter {
 
         return Arrays.stream(EntityType.values())
                 .filter(entityType -> entityType.name().startsWith(toComplete))
-                .map(this::getNameCapitalized)
+                .map(SpawnerCommand::getNameCapitalized)
                 .collect(Collectors.toList());
     }
 
-    private String getNameCapitalized(@NotNull final EntityType entityType) {
+    public static String getNameCapitalized(@NotNull final EntityType entityType) {
         return getNameCapitalized(entityType, '-');
     }
 
-    private String getNameCapitalized(@NotNull final EntityType entityType, final char join) {
+    public static String getNameCapitalized(@NotNull final EntityType entityType, final char join) {
         val buff = new StringBuilder();
 
         val parts = entityType.name().toLowerCase(Locale.ROOT).split("_");

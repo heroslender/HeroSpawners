@@ -1,7 +1,8 @@
 package com.heroslender.herospawners.spawners;
 
+import com.google.common.collect.Lists;
+import com.heroslender.herospawners.spawners.commands.SpawnerCommand;
 import lombok.val;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
@@ -78,26 +79,52 @@ public class SpawnerItemFactory {
 
     @Nullable
     public static ItemStack newItemStack(@NotNull final EntityType entityType) {
+        return newItemStack(entityType, 1);
+    }
+
+    @Nullable
+    public static ItemStack newItemStack(@NotNull final EntityType entityType, final int amount) {
         Objects.requireNonNull(entityType, "entityType is null");
 
         val itemStack = new ItemStack(Material.MOB_SPAWNER);
         val meta = itemStack.getItemMeta();
         if (!(meta instanceof BlockStateMeta)) {
-            Bukkit.broadcastMessage("Meta not BlockStateMeta, is " + meta.getClass().getName());
             return null;
         }
 
         val blockState = ((BlockStateMeta) meta).getBlockState();
         if (!(blockState instanceof CreatureSpawner)) {
-            Bukkit.broadcastMessage("State not CreatureSpawner, is " + blockState.getClass().getName());
             return null;
         }
 
         ((CreatureSpawner) blockState).setSpawnedType(entityType);
 
         ((BlockStateMeta) meta).setBlockState(blockState);
+
+        meta.setDisplayName("§aSpawner de §7" + SpawnerCommand.getNameCapitalized(entityType, ' '));
+        meta.setLore(Lists.newArrayList("§eStack: §7" + amount));
         itemStack.setItemMeta(meta);
 
         return itemStack;
+    }
+
+    public static int getItemStackAmount(@NotNull final ItemStack itemStack) {
+        int amount = 1;
+        if (!itemStack.hasItemMeta()) {
+            return amount;
+        }
+
+        val meta = itemStack.getItemMeta();
+        if (!meta.hasLore()) {
+            return amount;
+        }
+
+        try {
+            amount = Integer.parseInt(meta.getLore().get(0).substring(11));
+        } catch (NumberFormatException e) {
+            // invalid number
+        }
+
+        return amount;
     }
 }
