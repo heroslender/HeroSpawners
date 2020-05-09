@@ -14,11 +14,14 @@ import org.bukkit.Effect;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.CreatureSpawner;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 @RequiredArgsConstructor
 public class SpawnerBlockListener implements Listener {
@@ -167,6 +170,14 @@ public class SpawnerBlockListener implements Listener {
             return;
         }
 
+        val silkCheck = checkSilktouck(e.getPlayer());
+        if (!silkCheck && !config.isDestroySilktouch()) {
+            // The player doesn't have silk-touch and it's configured not to destroy the spawner
+            // So we do nothing here, and cancel the event
+            e.setCancelled(true);
+            return;
+        }
+
         val entityType = SpawnerItemFactory.getEntityType(e.getBlock());
         if (entityType == null) {
             e.getPlayer().sendMessage(ChatColor.RED + "Ocurreu um erro ao quebrar o spawner! " + ChatColor.GRAY + "#1");
@@ -176,7 +187,8 @@ public class SpawnerBlockListener implements Listener {
 
         val amount = e.getPlayer().isSneaking() ? spawner.getAmount() : 1;
 
-        if (e.getPlayer().getGameMode() != GameMode.CREATIVE) {
+        if (e.getPlayer().getGameMode() != GameMode.CREATIVE && silkCheck) {
+            // Give the broken spawners to the player if he's not in CREATIVE and passed the silktouch check
             ItemStack spawnerItemStack = SpawnerItemFactory.newItemStack(entityType, amount);
             if (spawnerItemStack == null) {
                 e.getPlayer().sendMessage(ChatColor.RED + "Ocurreu um erro ao quebrar o spawner! " + ChatColor.GRAY + "#2");
@@ -198,5 +210,23 @@ public class SpawnerBlockListener implements Listener {
             System.out.println("Delete spawner");
             storageController.deleteSpawner(spawner);
         }
+    }
+
+    private boolean checkSilktouck(@NotNull final Player player) {
+        if (!config.isRequireSilktouch()) {
+            return true;
+        }
+
+        val itemInHand = player.getItemInHand();
+        if (!itemInHand.hasItemMeta()) {
+            return false;
+        }
+
+        val meta = itemInHand.getItemMeta();
+        if (!meta.hasEnchants() || !meta.hasEnchant(Enchantment.SILK_TOUCH)) {
+            return false;
+        }
+
+        return config.getSilktouchLevel() <= 1 || meta.getEnchantLevel(Enchantment.SILK_TOUCH) >= config.getSilktouchLevel();
     }
 }
