@@ -4,8 +4,6 @@ import org.bukkit.Location;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntityType;
 
-import java.util.List;
-
 public interface ISpawner {
 
     /**
@@ -57,10 +55,4 @@ public interface ISpawner {
      * @return The entity properties
      */
     EntityProperties getEntityProperties();
-
-    /**
-     * Get line values for the hologram.
-     * @return The line values
-     */
-    List<String> getHologramText();
 }

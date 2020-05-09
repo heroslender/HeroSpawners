@@ -63,8 +63,15 @@ public class SilkSpawnersListener implements Listener {
         } else {
             event.setDrop(spawnerItemStack);
 
+            spawner.setAmount(0);
             storageController.deleteSpawner(spawner);
         }
+
+        event.getPlayer().sendMessage(
+                config.getMessageBreak()
+                        .replace("{quantidade}", Integer.toString(amount))
+                        .replace("{spawner_quantidade}", Integer.toString(spawner.getAmount()))
+        );
     }
 
     @EventHandler
@@ -122,12 +129,24 @@ public class SilkSpawnersListener implements Listener {
 
                     spawner.setAmount(spawner.getAmount() + quantidade);
                     block.getWorld().spigot().playEffect(block.getLocation(), Effect.WITCH_MAGIC, 1, 0, 1.0F, 1.0F, 1.0F, 1.0F, 200, 10);
+
+                    e.getPlayer().sendMessage(
+                            config.getMessagePlace()
+                                    .replace("{quantidade}", Integer.toString(quantidade))
+                                    .replace("{spawner_quantidade}", Integer.toString(spawner.getAmount()))
+                    );
                     return;
                 }
             }
 
             val spawner = new Spawner(e.getPlayer().getName(), e.getBlock().getLocation(), 1);
             storageController.saveSpawner(spawner);
+
+            e.getPlayer().sendMessage(
+                    config.getMessagePlace()
+                            .replace("{quantidade}", "1")
+                            .replace("{spawner_quantidade}", "1")
+            );
         }
     }
 }

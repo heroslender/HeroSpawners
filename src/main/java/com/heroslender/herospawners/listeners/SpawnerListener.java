@@ -46,12 +46,24 @@ public class SpawnerListener implements Listener {
                         spawner.setAmount(spawner.getAmount() + 1);
                         e.getBlock().setType(Material.AIR);
                         block.getWorld().spigot().playEffect(block.getLocation(), Effect.WITCH_MAGIC, 1, 0, 1.0F, 1.0F, 1.0F, 1.0F, 200, 10);
+
+                        e.getPlayer().sendMessage(
+                                config.getMessagePlace()
+                                        .replace("{quantidade}", "1")
+                                        .replace("{spawner_quantidade}", Integer.toString(spawner.getAmount()))
+                        );
                         return;
                     }
                 }
 
                 Spawner spawner = new Spawner(e.getPlayer().getName(), colocado.getLocation(), 1);
                 storageController.saveSpawner(spawner);
+
+                e.getPlayer().sendMessage(
+                        config.getMessagePlace()
+                                .replace("{quantidade}", "1")
+                                .replace("{spawner_quantidade}", "1")
+                );
             });
         }
     }
@@ -79,8 +91,15 @@ public class SpawnerListener implements Listener {
                     spawner.setAmount(spawner.getAmount() - 1);
                 }, 1L);
             } else {
+                spawner.setAmount(0);
                 storageController.deleteSpawner(spawner);
             }
+
+            e.getPlayer().sendMessage(
+                    config.getMessagePlace()
+                            .replace("{quantidade}", "1")
+                            .replace("{spawner_quantidade}", "0")
+            );
         }
     }
 

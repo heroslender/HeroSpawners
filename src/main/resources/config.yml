@@ -19,12 +19,6 @@ MySql:
 juntar:
   raio: 5
   maximo: 0
-holograma:
-  distancia: 5
-  texto:
-    - '&7%quantidade%x &e%tipo%'
-    - '&eDono: &7%dono%'
-    - '%skull%'
 mobs:
   CREEPER:
     name: Creeper

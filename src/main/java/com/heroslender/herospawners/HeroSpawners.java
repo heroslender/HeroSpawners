@@ -3,7 +3,6 @@ package com.heroslender.herospawners;
 import com.heroslender.herospawners.commands.HeroSpawnersCommand;
 import com.heroslender.herospawners.controllers.ConfigurationController;
 import com.heroslender.herospawners.controllers.StorageController;
-import com.heroslender.herospawners.listeners.HologramListener;
 import com.heroslender.herospawners.listeners.SilkSpawnersListener;
 import com.heroslender.herospawners.listeners.SpawnerListener;
 import com.heroslender.herospawners.listeners.SpawnerSpawnListener;
@@ -49,8 +48,6 @@ public class HeroSpawners extends JavaPlugin {
     public void onEnable() {
         configurationController.init();
         storageController.init();
-
-        getServer().getPluginManager().registerEvents(new HologramListener(configurationController), this);
 
         // StackMobs
         if (Bukkit.getServer().getPluginManager().getPlugin("MobStacker2") != null)

@@ -13,17 +13,15 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         HeroSpawners.getInstance().reloadConfig();
         final FileConfiguration configuration = HeroSpawners.getInstance().getConfig();
 
-        if (!configuration.contains("juntar.maximo"))
+        if (!configuration.isSet("juntar.maximo"))
             configuration.set("juntar.maximo", 0);
-        if (!configuration.contains("juntar.raio"))
+        if (!configuration.isSet("juntar.raio"))
             configuration.set("juntar.raio", 5);
 
-        if (!configuration.contains("holograma.distancia"))
-            configuration.set("holograma.distancia", 5);
-        if (!configuration.contains("holograma.texto"))
-            configuration.set("holograma.texto", "&7%quantidade%x &e%tipo%");
-        if (!configuration.contains("holograma.mostrar-cabeca"))
-            configuration.set("holograma.mostrar-cabeca", true);
+        if (!configuration.isSet("msg.colocar"))
+            configuration.set("msg.colocar", "Colocaste +{quantidade} spawners, ficando assim com {spawner_quantidade}!");
+        if (!configuration.isSet("msg.quebrar"))
+            configuration.set("msg.quebrar", "Quebraste {quantidade} spawners, ficando assim com {spawner_quantidade}!");
 
         for (EntityType e : EntityType.values()) {
             if (e.getEntityClass() != null

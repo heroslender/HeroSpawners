@@ -1,15 +1,14 @@
 package com.heroslender.herospawners.models;
 
-import com.google.common.collect.Lists;
 import com.heroslender.herospawners.HeroSpawners;
 import com.heroslender.herospawners.utils.Utilities;
-import lombok.*;
-import org.apache.commons.lang.StringUtils;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntityType;
-
-import java.util.List;
 
 @AllArgsConstructor
 @RequiredArgsConstructor
@@ -48,18 +47,6 @@ public class Spawner implements ISpawner {
     @Override
     public EntityProperties getEntityProperties() {
         return HeroSpawners.getInstance().getConfigurationController().getProperties(getType());
-    }
-
-    @Override
-    public List<String> getHologramText() {
-        List<String> hologramLines = Lists.newArrayList();
-        val values = new String[]{getOwner(), Integer.toString(getAmount()), getEntityProperties().getDisplayName()};
-
-        for (String line : HeroSpawners.getInstance().getConfigurationController().getHologramText()) {
-            hologramLines.add(StringUtils.replaceEach(line, placeholders, values));
-        }
-
-        return hologramLines;
     }
 
     @Override

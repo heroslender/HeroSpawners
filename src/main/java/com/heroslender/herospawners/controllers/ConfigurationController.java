@@ -9,7 +9,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 
-import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -19,27 +18,22 @@ import java.util.stream.Collectors;
 public class ConfigurationController implements Controller {
     private final ConfigurationService configurationService;
 
+    @Getter private String messagePlace;
+    @Getter private String messageBreak;
+
     @Getter private int stackRadious;
     @Getter private int stackLimit;
-    @Getter private List<String> hologramText;
-    @Getter private int hologramViewDistance;
     private Map<EntityType, EntityProperties> entityProperties;
 
     @Override
     public void init() {
         configurationService.init();
 
+        messagePlace = configurationService.getConfig().getString("msg.colocar").replace('&', '§');
+        messageBreak = configurationService.getConfig().getString("msg.quebrar").replace('&', '§');
+
         stackRadious = configurationService.getConfig().getInt("juntar.raio", 5);
         stackLimit = configurationService.getConfig().getInt("juntar.maximo", 0);
-
-        if (configurationService.getConfig().isList("holograma.texto")) {
-            hologramText = parseColors(configurationService.getConfig().getStringList("holograma.texto"));
-        } else {
-            hologramText = new ArrayList<>();
-            hologramText.add(parseColors(configurationService.getConfig().getString("holograma.texto", "&7%quantidade%x &e%tipo%")));
-        }
-
-        hologramViewDistance = configurationService.getConfig().getInt("holograma.distancia", 0);
 
         entityProperties = new EnumMap<>(EntityType.class);
         for (EntityType e : EntityType.values()) {
