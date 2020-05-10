@@ -24,6 +24,8 @@ public class ConfigurationController implements Controller {
     @Getter private int hologramViewDistance;
     private Map<EntityType, EntityProperties> entityProperties;
 
+    @Getter private boolean dropXP;
+
     @Getter private boolean requireSilktouch;
     @Getter private int silktouchLevel;
     @Getter private boolean destroySilktouch;
@@ -31,6 +33,8 @@ public class ConfigurationController implements Controller {
     @Override
     public void init() {
         loadDefaults();
+
+        dropXP = getConfig().getBoolean("spawner.dropXP", false);
 
         requireSilktouch = getConfig().getBoolean("spawner.SilkTouch.enable", false);
         silktouchLevel = getConfig().getInt("spawner.SilkTouch.minLevel", 1);
@@ -49,14 +53,13 @@ public class ConfigurationController implements Controller {
         hologramViewDistance = getConfig().getInt("holograma.distancia", 0);
 
         entityProperties = new EnumMap<>(EntityType.class);
+        String name, head;
         for (EntityType e : EntityType.values()) {
-            if (e.getEntityClass() != null
-                    && e.getName() != null
-                    && LivingEntity.class.isAssignableFrom(e.getEntityClass())) {
-                val entityProperty = new EntityProperties(
-                        parseColors(getConfig().getString("mobs." + e.name() + ".name", e.getName())),
-                        getConfig().getString("mobs." + e.name() + ".head", "MHF_" + e.getName())
-                );
+            if (e.getEntityClass() != null && e.getName() != null && LivingEntity.class.isAssignableFrom(e.getEntityClass())) {
+                name = parseColors(getConfig().getString("mobs." + e.name() + ".name", e.getName()));
+                head = getConfig().getString("mobs." + e.name() + ".head", "MHF_" + e.getName());
+
+                val entityProperty = new EntityProperties(name,head);
                 entityProperties.put(e, entityProperty);
             }
         }
@@ -65,39 +68,33 @@ public class ConfigurationController implements Controller {
     private void loadDefaults() {
         HeroSpawners.getInstance().saveDefaultConfig();
         HeroSpawners.getInstance().reloadConfig();
-        final FileConfiguration configuration = HeroSpawners.getInstance().getConfig();
 
-        if (!configuration.isSet("juntar.maximo"))
-            configuration.set("juntar.maximo", 0);
-        if (!configuration.isSet("juntar.raio"))
-            configuration.set("juntar.raio", 5);
+        setDefault("juntar.maximo", 0);
+        setDefault("juntar.raio", 5);
 
-        if (!configuration.isSet("spawner.SilkTouch.enable"))
-            configuration.set("spawner.SilkTouch.enable", true);
-        if (!configuration.isSet("spawner.SilkTouch.minLevel"))
-            configuration.set("spawner.SilkTouch.minLevel", 1);
-        if (!configuration.isSet("spawner.SilkTouch.detroySpawnerWithouSilktouch"))
-            configuration.set("spawner.SilkTouch.detroySpawnerWithouSilktouch", true);
+        setDefault("spawner.dropXP", false);
+        setDefault("spawner.SilkTouch.enable", true);
+        setDefault("spawner.SilkTouch.minLevel", 1);
+        setDefault("spawner.SilkTouch.detroySpawnerWithouSilktouch", true);
 
-        if (!configuration.isSet("holograma.distancia"))
-            configuration.set("holograma.distancia", 5);
-        if (!configuration.isSet("holograma.texto"))
-            configuration.set("holograma.texto", "&7%quantidade%x &e%tipo%");
-        if (!configuration.isSet("holograma.mostrar-cabeca"))
-            configuration.set("holograma.mostrar-cabeca", true);
+        setDefault("holograma.distancia", 5);
+        setDefault("holograma.texto", "&7%quantidade%x &e%tipo%");
+        setDefault("holograma.mostrar-cabeca", true);
 
         for (EntityType e : EntityType.values()) {
             if (e.getEntityClass() != null && LivingEntity.class.isAssignableFrom(e.getEntityClass())) {
-                if (!configuration.isSet("mobs." + e.name() + ".name")) {
-                    configuration.set("mobs." + e.name() + ".name", e.getName());
-                }
-                if (!configuration.isSet("mobs." + e.name() + ".head")) {
-                    configuration.set("mobs." + e.name() + ".head", "MHF_" + e.getName());
-                }
+                setDefault("mobs." + e.name() + ".name", e.getName());
+                setDefault("mobs." + e.name() + ".head", "MHF_" + e.getName());
             }
         }
 
         HeroSpawners.getInstance().saveConfig();
+    }
+
+    private void setDefault(String path, Object value) {
+        if (!getConfig().isSet(path)) {
+            getConfig().set(path, value);
+        }
     }
 
     public boolean hasStackLimit() {

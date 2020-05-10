@@ -15,6 +15,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -208,10 +209,18 @@ public class SpawnerBlockListener implements Listener {
         }
 
         spawner.setAmount(spawner.getAmount() - amount);
+
         if (spawner.getAmount() > 0) {
             e.setCancelled(true);
         } else {
             storageController.deleteSpawner(spawner);
+        }
+
+        if (config.isDropXP() && e.isCancelled()) {
+            e.getBlock().getWorld().spawn(e.getBlock().getLocation(), ExperienceOrb.class)
+                    .setExperience(e.getExpToDrop());
+        } else if (!config.isDropXP()) {
+            e.setExpToDrop(0);
         }
     }
 
