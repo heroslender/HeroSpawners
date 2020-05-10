@@ -94,20 +94,26 @@ public class SpawnerBlockListener implements Listener {
                             return;
                         }
 
-                        e.getPlayer().getInventory().addItem(spawnerItemStack)
-                                .values()
-                                .forEach(itemStack ->
-                                        spawner.getLocation().getWorld().dropItemNaturally(spawner.getLocation(), itemStack)
-                                );
-                    }
+                        if (itemInHand.getAmount() == 1) {
+                            e.getPlayer().setItemInHand(spawnerItemStack);
+                        } else {
+                            itemInHand.setAmount(itemInHand.getAmount() - 1);
 
-                    if (itemInHand.getAmount() == 1) {
-                        itemInHand.setType(Material.AIR);
+                            e.getPlayer().getInventory().addItem(spawnerItemStack)
+                                    .values()
+                                    .forEach(itemStack ->
+                                            spawner.getLocation().getWorld().dropItemNaturally(spawner.getLocation(), itemStack)
+                                    );
+                        }
                     } else {
-                        itemInHand.setAmount(itemInHand.getAmount() - 1);
-                    }
+                        if (itemInHand.getAmount() == 1) {
+                            itemInHand.setType(Material.AIR);
+                        } else {
+                            itemInHand.setAmount(itemInHand.getAmount() - 1);
+                        }
 
-                    e.getPlayer().setItemInHand(itemInHand);
+                        e.getPlayer().setItemInHand(itemInHand);
+                    }
                 }
 
                 e.setCancelled(true);
@@ -128,15 +134,21 @@ public class SpawnerBlockListener implements Listener {
                     : Math.min(config.getStackLimit(), itemAmount);
         }
 
-        if (e.getPlayer().getGameMode() != GameMode.CREATIVE) {
-            if (amountToStack != itemAmount) {
-                // placed only a part of the stack
-                ItemStack spawnerItemStack = SpawnerItemFactory.newItemStack(itemEntityType, amountToStack);
-                if (spawnerItemStack == null) {
-                    e.getPlayer().sendMessage(ChatColor.RED + "Ocurreu um erro ao colocar o spawner! " + ChatColor.GRAY + "#3");
-                    e.setCancelled(true);
-                    return;
-                }
+        if (e.getPlayer().getGameMode() != GameMode.CREATIVE && amountToStack != itemAmount) {
+            // placed only a part of the stack
+            ItemStack spawnerItemStack = SpawnerItemFactory.newItemStack(itemEntityType, itemAmount - amountToStack);
+            if (spawnerItemStack == null) {
+                e.getPlayer().sendMessage(ChatColor.RED + "Ocurreu um erro ao colocar o spawner! " + ChatColor.GRAY + "#3");
+                e.setCancelled(true);
+                return;
+            }
+
+
+            if (itemInHand.getAmount() == 1) {
+                e.getPlayer().setItemInHand(spawnerItemStack);
+            } else {
+                itemInHand.setAmount(itemInHand.getAmount() - 1);
+                e.getPlayer().setItemInHand(itemInHand);
 
                 e.getPlayer().getInventory().addItem(spawnerItemStack)
                         .values()
@@ -144,14 +156,6 @@ public class SpawnerBlockListener implements Listener {
                                 e.getPlayer().getWorld().dropItemNaturally(e.getPlayer().getLocation(), itemStack)
                         );
             }
-
-            if (itemInHand.getAmount() == 1) {
-                itemInHand.setType(Material.AIR);
-            } else {
-                itemInHand.setAmount(itemInHand.getAmount() - 1);
-            }
-
-            e.getPlayer().setItemInHand(itemInHand);
         }
 
         val spawner = new Spawner(e.getPlayer().getName(), e.getBlock().getLocation(), amountToStack);
@@ -207,7 +211,6 @@ public class SpawnerBlockListener implements Listener {
         if (spawner.getAmount() > 0) {
             e.setCancelled(true);
         } else {
-            System.out.println("Delete spawner");
             storageController.deleteSpawner(spawner);
         }
     }

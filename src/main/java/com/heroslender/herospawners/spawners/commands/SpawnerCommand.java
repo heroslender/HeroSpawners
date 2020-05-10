@@ -3,6 +3,7 @@ package com.heroslender.herospawners.spawners.commands;
 import com.heroslender.herospawners.HeroSpawners;
 import com.heroslender.herospawners.spawners.SpawnerItemFactory;
 import lombok.val;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -13,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -26,42 +28,75 @@ public class SpawnerCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        if (!(sender instanceof Player)) {
-            sender.sendMessage("Only players allowed!");
+        if (args.length < 1) {
+            return false;
+        }
+
+        Player player = Bukkit.getPlayer(args[0]);
+        if (player == null) {
+            sender.sendMessage("§cO jogador §7" + args[0] + " §cnão se encontra online!");
             return true;
         }
 
         EntityType type = EntityType.PIG;
-        if (args.length > 0) {
+        if (args.length > 1) {
             try {
-                type = EntityType.valueOf(args[0].replace('-', '_').toUpperCase(Locale.ROOT));
+                type = EntityType.valueOf(args[1].replace('-', '_').toUpperCase(Locale.ROOT));
             } catch (IllegalArgumentException e) {
-                sender.sendMessage(ChatColor.RED + "A entidade '§7" + args[0] + "§c' não existe.");
+                sender.sendMessage(ChatColor.RED + "A entidade '§7" + args[1] + "§c' não existe.");
                 return true;
             }
         } else {
             sender.sendMessage(ChatColor.YELLOW + "A entidade não foi especificada, utilizando PIG como padrão.");
         }
 
-        val item = SpawnerItemFactory.newItemStack(type);
+        int stackSize = 1;
+        if (args.length > 2) {
+            try {
+                stackSize = Integer.parseInt(args[2]);
+            } catch (NumberFormatException e) {
+                sender.sendMessage("§cO valor §7" + args[2] + " §cnão representa uma quantidade válida!");
+            }
+        }
+
+        val item = SpawnerItemFactory.newItemStack(type, stackSize);
         if (item == null) {
             sender.sendMessage(ChatColor.RED + "Ocurreu um erro ao inicializar o item.");
             return true;
         }
 
-        ((Player) sender).getInventory().addItem(item);
+        int multiplier = 1;
+        if (args.length > 3) {
+            try {
+                multiplier = Integer.parseInt(args[3]);
+            } catch (NumberFormatException e) {
+                sender.sendMessage("§cO valor §7" + args[3] + " §cnão representa uma quantidade válida!");
+            }
+        }
+        item.setAmount(multiplier);
+
+        player.getInventory().addItem(item);
         sender.sendMessage("§aRecebeste um spawner de §7" + getNameCapitalized(type, ' ') + "§a!");
         return true;
     }
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        val toComplete = String.join(" ", args).toUpperCase(Locale.ROOT);
+        val toComplete = args[args.length - 1].toUpperCase(Locale.ROOT);
 
-        return Arrays.stream(EntityType.values())
-                .filter(entityType -> entityType.name().startsWith(toComplete))
-                .map(SpawnerCommand::getNameCapitalized)
-                .collect(Collectors.toList());
+        if (args.length == 1) {
+            return Bukkit.getOnlinePlayers().stream()
+                    .filter(player -> player.getName().toUpperCase(Locale.ROOT).startsWith(toComplete))
+                    .map(Player::getName)
+                    .collect(Collectors.toList());
+        } else if (args.length == 2) {
+            return Arrays.stream(EntityType.values())
+                    .filter(entityType -> entityType.name().startsWith(toComplete))
+                    .map(SpawnerCommand::getNameCapitalized)
+                    .collect(Collectors.toList());
+        }
+
+        return Collections.emptyList();
     }
 
     public static String getNameCapitalized(@NotNull final EntityType entityType) {
