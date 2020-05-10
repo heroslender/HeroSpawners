@@ -8,7 +8,6 @@ import com.heroslender.herospawners.listeners.SpawnerListener;
 import com.heroslender.herospawners.listeners.SpawnerSpawnListener;
 import com.heroslender.herospawners.mobstacker.*;
 import com.heroslender.herospawners.services.*;
-import com.heroslender.herospawners.utils.Metrics;
 import lombok.Getter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LogEvent;
@@ -24,13 +23,12 @@ public class HeroSpawners extends JavaPlugin {
     @Getter private static HeroSpawners instance;
 
     @Getter private final Executor executor = ForkJoinPool.commonPool();
-    @Getter private final StorageController storageController;
-    @Getter private final ConfigurationController configurationController;
+    @Getter private StorageController storageController;
+    @Getter private ConfigurationController configurationController;
     @Getter private MobStackerSupport mobStackerSupport;
     @Getter private boolean shutingDown = true;
 
-    public HeroSpawners() {
-        super();
+    public void onEnable() {
         instance = this;
         saveDefaultConfig();
 
@@ -43,9 +41,7 @@ public class HeroSpawners extends JavaPlugin {
 
         ConfigurationService configurationService = new ConfigurationServiceImpl();
         configurationController = new ConfigurationController(configurationService);
-    }
 
-    public void onEnable() {
         configurationController.init();
         storageController.init();
 
@@ -70,9 +66,6 @@ public class HeroSpawners extends JavaPlugin {
         else {
             getServer().getPluginManager().registerEvents(new SpawnerListener(configurationController, storageController), this);
         }
-
-        // Metrics - https://bstats.org/plugin/bukkit/HeroSpawners
-        new Metrics(this).submitData();
 
         // Colocar o server como ligado(Prevenir dups em reinicios)
         getServer().getScheduler().scheduleSyncDelayedTask(this, () -> shutingDown = false);
