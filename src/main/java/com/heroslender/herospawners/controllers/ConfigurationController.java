@@ -2,6 +2,7 @@ package com.heroslender.herospawners.controllers;
 
 import com.heroslender.herospawners.HeroSpawners;
 import com.heroslender.herospawners.models.EntityProperties;
+import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -9,11 +10,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -26,6 +26,9 @@ public class ConfigurationController implements Controller {
 
     @Getter private boolean dropXP;
 
+    @Getter private ItemProperties itemProperties;
+
+
     @Getter private boolean requireSilktouch;
     @Getter private int silktouchLevel;
     @Getter private boolean destroySilktouch;
@@ -35,6 +38,11 @@ public class ConfigurationController implements Controller {
         loadDefaults();
 
         dropXP = getConfig().getBoolean("spawner.dropXP", false);
+
+        itemProperties = new ItemProperties();
+        itemProperties.name = parseColors(getConfig().getString("spawner.ItemStack.name", "&aSpawner de &7%tipo%"));
+        itemProperties.lore = parseColors(getConfig().getStringList("spawner.ItemStack.lore"));
+        itemProperties.loadProps();
 
         requireSilktouch = getConfig().getBoolean("spawner.SilkTouch.enable", false);
         silktouchLevel = getConfig().getInt("spawner.SilkTouch.minLevel", 1);
@@ -59,7 +67,7 @@ public class ConfigurationController implements Controller {
                 name = parseColors(getConfig().getString("mobs." + e.name() + ".name", e.getName()));
                 head = getConfig().getString("mobs." + e.name() + ".head", "MHF_" + e.getName());
 
-                val entityProperty = new EntityProperties(name,head);
+                val entityProperty = new EntityProperties(name, head);
                 entityProperties.put(e, entityProperty);
             }
         }
@@ -73,6 +81,8 @@ public class ConfigurationController implements Controller {
         setDefault("juntar.raio", 5);
 
         setDefault("spawner.dropXP", false);
+        setDefault("spawner.ItemStack.name", "&aSpawner de &7%tipo%");
+        setDefault("spawner.ItemStack.lore", Collections.singletonList("&eQuantidade: &7x%quantidade%"));
         setDefault("spawner.SilkTouch.enable", true);
         setDefault("spawner.SilkTouch.minLevel", 1);
         setDefault("spawner.SilkTouch.detroySpawnerWithouSilktouch", true);
@@ -115,9 +125,52 @@ public class ConfigurationController implements Controller {
 
     @Override
     public void stop() {
+        // Unused
     }
 
     public EntityProperties getProperties(final EntityType entityType) {
         return entityProperties.get(entityType);
+    }
+
+    @Data
+    public class ItemProperties {
+        private String name;
+        private List<String> lore;
+
+        private boolean amountInName;
+        private int amountBeginIndex = -1;
+        private int amountEndlength = -1;
+        private int amountLine = -1;
+
+        private void loadProps() {
+            if (hasAmount(name)) {
+                amountInName = true;
+                loadIndexes(name);
+            } else {
+                amountInName = false;
+                for (int i = 0; i < lore.size(); i++) {
+                    String line = lore.get(i);
+                    if (hasAmount(line)) {
+                        amountLine = i;
+                        loadIndexes(line);
+                        return;
+                    }
+                }
+
+                HeroSpawners.getInstance().getLogger().log(
+                        Level.SEVERE,
+                        "A variavel %quantidade% não se encontra presente no nome nem na lore do item."
+                );
+            }
+        }
+
+        private void loadIndexes(@NotNull final String text) {
+            amountBeginIndex = text.indexOf("%quantidade%");
+            amountEndlength = text.length() - (amountBeginIndex + "%quantidade%".length()) - 1;
+        }
+
+        private boolean hasAmount(@NotNull final String text) {
+            return text.contains("%quantidade%");
+        }
     }
 }

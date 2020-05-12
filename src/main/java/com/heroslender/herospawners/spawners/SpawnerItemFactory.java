@@ -1,7 +1,10 @@
 package com.heroslender.herospawners.spawners;
 
 import com.google.common.collect.Lists;
-import com.heroslender.herospawners.spawners.commands.SpawnerCommand;
+import com.heroslender.herospawners.HeroSpawners;
+import com.heroslender.herospawners.controllers.ConfigurationController;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.val;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -12,9 +15,13 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SpawnerItemFactory {
+
+    private static ConfigurationController configurationController = null;
 
     /**
      * Get the entityType attached to the given ItemStack.
@@ -101,8 +108,21 @@ public class SpawnerItemFactory {
 
         ((BlockStateMeta) meta).setBlockState(blockState);
 
-        meta.setDisplayName("§aSpawner de §7" + SpawnerCommand.getNameCapitalized(entityType, ' '));
-        meta.setLore(Lists.newArrayList("§eStack: §7" + amount));
+        val itemProps = getConfig().getItemProperties();
+        val entityProps = getConfig().getProperties(entityType);
+        val name = itemProps.getName()
+                .replace("%tipo%", entityProps.getDisplayName())
+                .replace("%quantidade%", Integer.toString(amount));
+        val lore = new ArrayList<String>();
+        for (String loreLine : itemProps.getLore()) {
+            lore.add(
+                    loreLine.replace("%tipo%", entityProps.getDisplayName())
+                            .replace("%quantidade%", Integer.toString(amount))
+            );
+        }
+
+        meta.setDisplayName(name);
+        meta.setLore(Lists.newArrayList(lore));
         itemStack.setItemMeta(meta);
 
         return itemStack;
@@ -115,16 +135,36 @@ public class SpawnerItemFactory {
         }
 
         val meta = itemStack.getItemMeta();
-        if (!meta.hasLore()) {
-            return amount;
-        }
-
+        val itemProps = getConfig().getItemProperties();
         try {
-            amount = Integer.parseInt(meta.getLore().get(0).substring(11));
+            String line;
+            if (itemProps.isAmountInName()) {
+                if (!meta.hasDisplayName()) {
+                    return amount;
+                }
+
+                line = meta.getDisplayName();
+            } else {
+                if (!meta.hasLore() || itemProps.getAmountLine() < 0 || meta.getLore().size() < itemProps.getAmountLine()) {
+                    return amount;
+                }
+
+                line = meta.getLore().get(itemProps.getAmountLine());
+            }
+
+            amount = Integer.parseInt(line.substring(itemProps.getAmountBeginIndex(), line.length() - itemProps.getAmountEndlength()));
         } catch (NumberFormatException e) {
             // invalid number
         }
 
         return amount;
+    }
+
+    private static synchronized ConfigurationController getConfig() {
+        if (configurationController == null) {
+            configurationController = HeroSpawners.getInstance().getConfigurationController();
+        }
+
+        return configurationController;
     }
 }
