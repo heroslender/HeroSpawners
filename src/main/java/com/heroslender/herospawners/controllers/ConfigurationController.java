@@ -18,6 +18,9 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class ConfigurationController implements Controller {
+    public static final String TYPE_PLACEHOLDER = "%tipo%";
+    public static final String AMOUNT_PLACEHOLDER = "%quantidade%";
+
     @Getter private int stackRadious;
     @Getter private int stackLimit;
     @Getter private List<String> hologramText;
@@ -40,7 +43,7 @@ public class ConfigurationController implements Controller {
         dropXP = getConfig().getBoolean("spawner.dropXP", false);
 
         itemProperties = new ItemProperties();
-        itemProperties.name = parseColors(getConfig().getString("spawner.ItemStack.name", "&aSpawner de &7%tipo%"));
+        itemProperties.name = parseColors(getConfig().getString("spawner.ItemStack.name", "&aSpawner de &7" + TYPE_PLACEHOLDER));
         itemProperties.lore = parseColors(getConfig().getStringList("spawner.ItemStack.lore"));
         itemProperties.loadProps();
 
@@ -55,7 +58,7 @@ public class ConfigurationController implements Controller {
             hologramText = parseColors(getConfig().getStringList("holograma.texto"));
         } else {
             hologramText = new ArrayList<>();
-            hologramText.add(parseColors(getConfig().getString("holograma.texto", "&7%quantidade%x &e%tipo%")));
+            hologramText.add(parseColors(getConfig().getString("holograma.texto", "&7%quantidade%x &e" + TYPE_PLACEHOLDER)));
         }
 
         hologramViewDistance = getConfig().getInt("holograma.distancia", 0);
@@ -81,14 +84,14 @@ public class ConfigurationController implements Controller {
         setDefault("juntar.raio", 5);
 
         setDefault("spawner.dropXP", false);
-        setDefault("spawner.ItemStack.name", "&aSpawner de &7%tipo%");
-        setDefault("spawner.ItemStack.lore", Collections.singletonList("&eQuantidade: &7x%quantidade%"));
+        setDefault("spawner.ItemStack.name", "&aSpawner de &7" + TYPE_PLACEHOLDER);
+        setDefault("spawner.ItemStack.lore", Collections.singletonList("&eQuantidade: &7x" + AMOUNT_PLACEHOLDER));
         setDefault("spawner.SilkTouch.enable", true);
         setDefault("spawner.SilkTouch.minLevel", 1);
         setDefault("spawner.SilkTouch.detroySpawnerWithouSilktouch", true);
 
         setDefault("holograma.distancia", 5);
-        setDefault("holograma.texto", "&7%quantidade%x &e%tipo%");
+        setDefault("holograma.texto", "&7" + AMOUNT_PLACEHOLDER + "x &e" + TYPE_PLACEHOLDER);
         setDefault("holograma.mostrar-cabeca", true);
 
         for (EntityType e : EntityType.values()) {
@@ -138,6 +141,7 @@ public class ConfigurationController implements Controller {
         private List<String> lore;
 
         private boolean amountInName;
+        private boolean deductEntityName;
         private int amountBeginIndex = -1;
         private int amountEndlength = -1;
         private int amountLine = -1;
@@ -159,18 +163,20 @@ public class ConfigurationController implements Controller {
 
                 HeroSpawners.getInstance().getLogger().log(
                         Level.SEVERE,
-                        "A variavel %quantidade% não se encontra presente no nome nem na lore do item."
+                        "A variavel {0} não se encontra presente no nome nem na lore do item.",
+                        AMOUNT_PLACEHOLDER
                 );
             }
         }
 
         private void loadIndexes(@NotNull final String text) {
-            amountBeginIndex = text.indexOf("%quantidade%");
-            amountEndlength = text.length() - (amountBeginIndex + "%quantidade%".length()) - 1;
+            deductEntityName = text.contains(TYPE_PLACEHOLDER);
+            amountBeginIndex = text.indexOf(AMOUNT_PLACEHOLDER);
+            amountEndlength = text.length() - (amountBeginIndex + AMOUNT_PLACEHOLDER.length());
         }
 
         private boolean hasAmount(@NotNull final String text) {
-            return text.contains("%quantidade%");
+            return text.contains(AMOUNT_PLACEHOLDER);
         }
     }
 }

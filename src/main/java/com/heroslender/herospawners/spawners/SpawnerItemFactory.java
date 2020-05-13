@@ -111,13 +111,13 @@ public class SpawnerItemFactory {
         val itemProps = getConfig().getItemProperties();
         val entityProps = getConfig().getProperties(entityType);
         val name = itemProps.getName()
-                .replace("%tipo%", entityProps.getDisplayName())
-                .replace("%quantidade%", Integer.toString(amount));
+                .replace(ConfigurationController.TYPE_PLACEHOLDER, entityProps.getDisplayName())
+                .replace(ConfigurationController.AMOUNT_PLACEHOLDER, Integer.toString(amount));
         val lore = new ArrayList<String>();
         for (String loreLine : itemProps.getLore()) {
             lore.add(
-                    loreLine.replace("%tipo%", entityProps.getDisplayName())
-                            .replace("%quantidade%", Integer.toString(amount))
+                    loreLine.replace(ConfigurationController.TYPE_PLACEHOLDER, entityProps.getDisplayName())
+                            .replace(ConfigurationController.AMOUNT_PLACEHOLDER, Integer.toString(amount))
             );
         }
 
@@ -129,6 +129,15 @@ public class SpawnerItemFactory {
     }
 
     public static int getItemStackAmount(@NotNull final ItemStack itemStack) {
+        val entityType = getEntityType(itemStack);
+        if (entityType == null) {
+            return 1;
+        }
+
+        return getItemStackAmount(itemStack, entityType);
+    }
+
+    public static int getItemStackAmount(@NotNull final ItemStack itemStack, @NotNull final EntityType entityType) {
         int amount = 1;
         if (!itemStack.hasItemMeta()) {
             return amount;
@@ -152,7 +161,18 @@ public class SpawnerItemFactory {
                 line = meta.getLore().get(itemProps.getAmountLine());
             }
 
-            amount = Integer.parseInt(line.substring(itemProps.getAmountBeginIndex(), line.length() - itemProps.getAmountEndlength()));
+            final int amountEndlength;
+            if (itemProps.isDeductEntityName()) {
+                String defaultLine = itemProps.isAmountInName() ? itemProps.getName() : itemProps.getLore().get(itemProps.getAmountLine());
+                val entityProps = getConfig().getProperties(entityType);
+                defaultLine = defaultLine.replace(ConfigurationController.TYPE_PLACEHOLDER, entityProps.getDisplayName());
+
+                amountEndlength = defaultLine.length() - (itemProps.getAmountBeginIndex() + ConfigurationController.AMOUNT_PLACEHOLDER.length());
+            } else {
+                amountEndlength = itemProps.getAmountEndlength();
+            }
+
+            amount = Integer.parseInt(line.substring(itemProps.getAmountBeginIndex(), line.length() - amountEndlength));
         } catch (NumberFormatException e) {
             // invalid number
         }
