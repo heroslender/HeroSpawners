@@ -43,7 +43,7 @@ juntar:
   maximo: 0
 # Configuração do sistema de spawners
 spawner:
-  # Ativar o sistema de spawners interno?
+  # Ativar o sistema de spawners interno? Se tiver o SilkSpawners no servidor, ele irá ter prioridade sobre este.
   enable: true
    # Dropar xp quando quebra spawner
   dropXP: false
@@ -57,7 +57,7 @@ spawner:
     # Lore do item
     lore:
     - '&eTipo: &7%tipo%'
-    - '&eQuantidade: &7%quantidade%asds'
+    - '&eQuantidade: &7%quantidade%'
   # Sistema de silktouch - Quebrar spawners requer silktouch
   SilkTouch:
     # Ativar o sistema?
