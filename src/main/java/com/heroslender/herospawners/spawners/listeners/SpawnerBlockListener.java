@@ -9,12 +9,11 @@ import com.heroslender.herospawners.spawners.SpawnerItemFactory;
 import com.heroslender.herospawners.utils.Utilities;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
-import org.bukkit.ChatColor;
-import org.bukkit.Effect;
-import org.bukkit.GameMode;
-import org.bukkit.Material;
+import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -23,11 +22,57 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @RequiredArgsConstructor
 public class SpawnerBlockListener implements Listener {
     private final ConfigurationController config;
     private final StorageController storageController;
+
+    private ISpawner getSpawnerIfMatch(@NotNull final Block block, @NotNull final EntityType entityType) {
+        if (block.getType() != Material.MOB_SPAWNER) {
+            return null;
+        }
+
+        val state = block.getState();
+        if (!(state instanceof CreatureSpawner) || ((CreatureSpawner) state).getSpawnedType() != entityType) {
+            return null;
+        }
+
+        return storageController.getSpawner(block.getLocation());
+    }
+
+    private int getAmountToStack(@NotNull final Player player, @Nullable final ISpawner spawner, final int amount) {
+        if (!player.isSneaking()) {
+            return 1;
+        } else if (config.hasStackLimit()) {
+            val spawnerAmount = spawner != null ? spawner.getAmount() : 0;
+            return Math.min(config.getStackLimit() - spawnerAmount, amount);
+        } else {
+            return amount;
+        }
+    }
+
+    private void giveItem(@NotNull final Player player, @NotNull final Location dropLocation, @NotNull final EntityType entityType, final int amount) {
+        ItemStack spawnerItemStack = SpawnerItemFactory.newItemStack(entityType, amount);
+        if (spawnerItemStack == null) {
+            player.sendMessage(ChatColor.RED + "Ocurreu um erro ao colocar o spawner! " + ChatColor.GRAY + "#3");
+            return;
+        }
+
+        val itemInHand = player.getItemInHand();
+        if (itemInHand.getAmount() == 1) {
+            player.setItemInHand(spawnerItemStack);
+        } else {
+            itemInHand.setAmount(itemInHand.getAmount() - 1);
+
+            player.getInventory().addItem(spawnerItemStack)
+                    .values()
+                    .forEach(itemStack ->
+                            dropLocation.getWorld().dropItemNaturally(dropLocation, itemStack)
+                    );
+        }
+    }
 
     @EventHandler(ignoreCancelled = false)
     private void onSpawnerPlace(final BlockPlaceEvent e) {
@@ -47,65 +92,21 @@ public class SpawnerBlockListener implements Listener {
         val itemAmount = SpawnerItemFactory.getItemStackAmount(itemInHand);
 
         for (val block : Utilities.getBlocks(e.getBlock(), config.getStackRadious())) {
-            if (block.getType() != Material.MOB_SPAWNER) {
-                continue;
-            }
-
-            val state = block.getState();
-            if (!(state instanceof CreatureSpawner)) {
-                e.getPlayer().sendMessage(ChatColor.RED + "Ocurreu um erro ao colocar o spawner! " + ChatColor.GRAY + "#1");
-                e.setCancelled(true);
-                return;
-            }
-
-            if (((CreatureSpawner) state).getSpawnedType() != itemEntityType) {
-                continue;
-            }
-
-            ISpawner spawner = storageController.getSpawner(block.getLocation());
+            ISpawner spawner = getSpawnerIfMatch(block, itemEntityType);
             if (spawner == null) {
                 continue;
             }
 
             if (spawner.getAmount() < config.getStackLimit() || config.getStackLimit() <= 0) {
-                int amountToStack = 1;
-
-                if (e.getPlayer().isSneaking()) {
-                    // Place the whole stack if sneaking
-                    amountToStack = config.hasStackLimit()
-                            // Has no limit
-                            ? itemAmount
-                            // Use the config limit
-                            : Math.min(config.getStackLimit() - spawner.getAmount(), itemAmount);
-                }
-
+                val amountToStack = getAmountToStack(e.getPlayer(), spawner, itemAmount);
                 if (amountToStack <= 0) {
-                    e.getPlayer().sendMessage(ChatColor.RED + "Ocurreu um erro ao colocar o spawner! " + ChatColor.GRAY + "#2");
-                    e.setCancelled(true);
-                    return;
+                    continue;
                 }
 
                 if (e.getPlayer().getGameMode() != GameMode.CREATIVE) {
                     if (amountToStack != itemAmount) {
                         // placed only a part of the stack
-                        ItemStack spawnerItemStack = SpawnerItemFactory.newItemStack(itemEntityType, itemAmount - amountToStack);
-                        if (spawnerItemStack == null) {
-                            e.getPlayer().sendMessage(ChatColor.RED + "Ocurreu um erro ao colocar o spawner! " + ChatColor.GRAY + "#3");
-                            e.setCancelled(true);
-                            return;
-                        }
-
-                        if (itemInHand.getAmount() == 1) {
-                            e.getPlayer().setItemInHand(spawnerItemStack);
-                        } else {
-                            itemInHand.setAmount(itemInHand.getAmount() - 1);
-
-                            e.getPlayer().getInventory().addItem(spawnerItemStack)
-                                    .values()
-                                    .forEach(itemStack ->
-                                            spawner.getLocation().getWorld().dropItemNaturally(spawner.getLocation(), itemStack)
-                                    );
-                        }
+                        giveItem(e.getPlayer(), spawner.getLocation(), itemEntityType, itemAmount - amountToStack);
                     } else {
                         if (itemInHand.getAmount() == 1) {
                             itemInHand.setType(Material.AIR);
@@ -124,39 +125,11 @@ public class SpawnerBlockListener implements Listener {
             }
         }
 
-        int amountToStack = 1;
-
-        if (e.getPlayer().isSneaking()) {
-            // Place the whole stack if sneaking
-            amountToStack = config.hasStackLimit()
-                    // Has no limit
-                    ? itemAmount
-                    // Use the config limit
-                    : Math.min(config.getStackLimit(), itemAmount);
-        }
+        val amountToStack = getAmountToStack(e.getPlayer(), null, itemAmount);
 
         if (e.getPlayer().getGameMode() != GameMode.CREATIVE && amountToStack != itemAmount) {
             // placed only a part of the stack
-            ItemStack spawnerItemStack = SpawnerItemFactory.newItemStack(itemEntityType, itemAmount - amountToStack);
-            if (spawnerItemStack == null) {
-                e.getPlayer().sendMessage(ChatColor.RED + "Ocurreu um erro ao colocar o spawner! " + ChatColor.GRAY + "#3");
-                e.setCancelled(true);
-                return;
-            }
-
-
-            if (itemInHand.getAmount() == 1) {
-                e.getPlayer().setItemInHand(spawnerItemStack);
-            } else {
-                itemInHand.setAmount(itemInHand.getAmount() - 1);
-                e.getPlayer().setItemInHand(itemInHand);
-
-                e.getPlayer().getInventory().addItem(spawnerItemStack)
-                        .values()
-                        .forEach(itemStack ->
-                                e.getPlayer().getWorld().dropItemNaturally(e.getPlayer().getLocation(), itemStack)
-                        );
-            }
+            giveItem(e.getPlayer(), e.getBlock().getLocation(), itemEntityType, itemAmount - amountToStack);
         }
 
         val spawner = new Spawner(e.getPlayer().getName(), e.getBlock().getLocation(), amountToStack);
@@ -216,10 +189,10 @@ public class SpawnerBlockListener implements Listener {
             storageController.deleteSpawner(spawner);
         }
 
-        if (config.isDropXP() && e.isCancelled()) {
+        if (config.isSpawnersDropXP() && e.isCancelled()) {
             e.getBlock().getWorld().spawn(e.getBlock().getLocation(), ExperienceOrb.class)
                     .setExperience(e.getExpToDrop());
-        } else if (!config.isDropXP()) {
+        } else if (!config.isSpawnersDropXP()) {
             e.setExpToDrop(0);
         }
     }

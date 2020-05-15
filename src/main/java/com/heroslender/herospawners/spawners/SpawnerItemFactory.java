@@ -85,11 +85,6 @@ public class SpawnerItemFactory {
     }
 
     @Nullable
-    public static ItemStack newItemStack(@NotNull final EntityType entityType) {
-        return newItemStack(entityType, 1);
-    }
-
-    @Nullable
     public static ItemStack newItemStack(@NotNull final EntityType entityType, final int amount) {
         Objects.requireNonNull(entityType, "entityType is null");
 

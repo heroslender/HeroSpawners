@@ -27,10 +27,11 @@ public class ConfigurationController implements Controller {
     @Getter private int hologramViewDistance;
     private Map<EntityType, EntityProperties> entityProperties;
 
-    @Getter private boolean dropXP;
+
+    @Getter private boolean spawnersEnabled;
+    @Getter private boolean spawnersDropXP;
 
     @Getter private ItemProperties itemProperties;
-
 
     @Getter private boolean requireSilktouch;
     @Getter private int silktouchLevel;
@@ -40,7 +41,8 @@ public class ConfigurationController implements Controller {
     public void init() {
         loadDefaults();
 
-        dropXP = getConfig().getBoolean("spawner.dropXP", false);
+        spawnersEnabled = getConfig().getBoolean("spawner.enable", false);
+        spawnersDropXP = getConfig().getBoolean("spawner.dropXP", false);
 
         itemProperties = new ItemProperties();
         itemProperties.name = parseColors(getConfig().getString("spawner.ItemStack.name", "&aSpawner de &7" + TYPE_PLACEHOLDER));
@@ -83,6 +85,7 @@ public class ConfigurationController implements Controller {
         setDefault("juntar.maximo", 0);
         setDefault("juntar.raio", 5);
 
+        setDefault("spawner.enable", true);
         setDefault("spawner.dropXP", false);
         setDefault("spawner.ItemStack.name", "&aSpawner de &7" + TYPE_PLACEHOLDER);
         setDefault("spawner.ItemStack.lore", Collections.singletonList("&eQuantidade: &7x" + AMOUNT_PLACEHOLDER));

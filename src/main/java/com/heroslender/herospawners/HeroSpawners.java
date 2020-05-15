@@ -5,6 +5,7 @@ import com.heroslender.herospawners.controllers.ConfigurationController;
 import com.heroslender.herospawners.controllers.StorageController;
 import com.heroslender.herospawners.listeners.HologramListener;
 import com.heroslender.herospawners.listeners.SilkSpawnersListener;
+import com.heroslender.herospawners.listeners.SpawnerListener;
 import com.heroslender.herospawners.listeners.SpawnerSpawnListener;
 import com.heroslender.herospawners.mobstacker.*;
 import com.heroslender.herospawners.services.StorageService;
@@ -51,6 +52,7 @@ public class HeroSpawners extends JavaPlugin {
         configurationController = new ConfigurationController();
     }
 
+    @Override
     public void onEnable() {
         configurationController.init();
         storageController.init();
@@ -74,14 +76,20 @@ public class HeroSpawners extends JavaPlugin {
         // listeners
         getServer().getPluginManager().registerEvents(new SpawnerSpawnListener(), this);
         if (getServer().getPluginManager().getPlugin("SilkSpawners") != null)
-            getServer().getPluginManager().registerEvents(new SilkSpawnersListener(configurationController, storageController), this);
-        else {
-//            getServer().getPluginManager().registerEvents(new SpawnerListener(configurationController, storageController), this);
-            // TODO Temporary stuff for testing only
-            getServer().getPluginManager().registerEvents(new SpawnerBlockListener(configurationController, storageController), this);
+            getServer().getPluginManager().registerEvents(
+                    new SilkSpawnersListener(configurationController, storageController),
+                    this
+            );
+        else if (getConfigurationController().isSpawnersEnabled()) {
+            getServer().getPluginManager().registerEvents(
+                    new SpawnerBlockListener(configurationController, storageController),
+                    this
+            );
             val spawnerCommand = new SpawnerCommand();
             getCommand("spawners").setExecutor(spawnerCommand);
             getCommand("spawners").setTabCompleter(spawnerCommand);
+        } else {
+            getServer().getPluginManager().registerEvents(new SpawnerListener(configurationController, storageController), this);
         }
 
         // Metrics - https://bstats.org/plugin/bukkit/HeroSpawners
@@ -118,6 +126,7 @@ public class HeroSpawners extends JavaPlugin {
         return false;
     }
 
+    @Override
     public void onDisable() {
         shutingDown = true;
         storageController.stop();
