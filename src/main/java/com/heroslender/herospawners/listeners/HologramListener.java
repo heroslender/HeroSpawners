@@ -7,7 +7,6 @@ import com.gmail.filoghost.holographicdisplays.api.line.TextLine;
 import com.heroslender.herospawners.HeroSpawners;
 import com.heroslender.herospawners.controllers.ConfigurationController;
 import com.heroslender.herospawners.models.ISpawner;
-import com.heroslender.herospawners.models.Spawner;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.bukkit.Location;
@@ -26,9 +25,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
+import static com.heroslender.herospawners.controllers.ConfigurationController.SKULL_PLACEHOLDER;
+
 @RequiredArgsConstructor
 public class HologramListener implements Listener {
-    private static final String SKULL_PLACEHOLDER = "%skull%";
     private static final Set<Material> transparentBlocks = Collections.singleton(Material.AIR);
 
     private final ConfigurationController config;
@@ -39,24 +39,23 @@ public class HologramListener implements Listener {
         this.config = config;
 
         val holoLines = config.getHologramText();
-        double hologramOffset = holoLines
-                .stream()
-                .mapToDouble(line -> {
-                    if (line.equalsIgnoreCase(SKULL_PLACEHOLDER)) {
-                        // Offset for items
-                        return 0.7;
-                    } else {
-                        // Offset for text lines
-                        return 0.23;
-                    }
-                }).sum();
-
-        if (holoLines.get(holoLines.size() - 1).equalsIgnoreCase(SKULL_PLACEHOLDER)) {
-            // Last line is an item, place hologram lower
-            hologramOffset -= 0.2;
+        double offset = 0D;
+        for (String line : holoLines) {
+            if (line.equalsIgnoreCase(SKULL_PLACEHOLDER)) {
+                // Offset for items
+                offset += 0.7;
+            } else {
+                // Offset for text lines
+                offset += 0.23;
+            }
         }
 
-        this.hologramOffset = hologramOffset;
+        if (config.trimHologram()) {
+            // Last line is an item, place hologram lower
+            offset -= 0.2;
+        }
+
+        this.hologramOffset = offset;
     }
 
     @EventHandler
@@ -85,13 +84,13 @@ public class HologramListener implements Listener {
         val loc = spawner.getLocation().add(0.5, 1.17 + hologramOffset, 0.5);
         val hologram = createHologramFor(player, loc);
 
-        val linhas = new ArrayList<HologramLine>();
-        for (String linha : spawner.getHologramText()) {
-            if (linha.equalsIgnoreCase(SKULL_PLACEHOLDER)) {
+        val lines = new ArrayList<HologramLine>();
+        for (String line : spawner.getHologramText()) {
+            if (line.equalsIgnoreCase(SKULL_PLACEHOLDER)) {
                 String spawnerSkullName = spawner.getEntityProperties().getSkullSkinName();
-                linhas.add(hologram.appendItemLine(getSkull(spawnerSkullName)));
+                lines.add(hologram.appendItemLine(getSkull(spawnerSkullName)));
             } else {
-                linhas.add(hologram.appendTextLine(linha));
+                lines.add(hologram.appendTextLine(line));
             }
         }
 
@@ -113,7 +112,7 @@ public class HologramListener implements Listener {
                 // Update the hologram if needed
                 val newLines = spawner.getHologramText();
                 for (int i = 0; i < newLines.size(); i++) {
-                    val currentLine = linhas.get(i);
+                    val currentLine = lines.get(i);
                     if (currentLine instanceof TextLine) {
                         TextLine textLine = (TextLine) currentLine;
                         String newValue = newLines.get(i);

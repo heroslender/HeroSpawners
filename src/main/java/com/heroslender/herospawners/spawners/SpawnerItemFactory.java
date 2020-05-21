@@ -6,6 +6,7 @@ import com.heroslender.herospawners.controllers.ConfigurationController;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
@@ -105,15 +106,13 @@ public class SpawnerItemFactory {
 
         val itemProps = getConfig().getItemProperties();
         val entityProps = getConfig().getProperties(entityType);
-        val name = itemProps.getName()
-                .replace(ConfigurationController.TYPE_PLACEHOLDER, entityProps.getDisplayName())
-                .replace(ConfigurationController.AMOUNT_PLACEHOLDER, Integer.toString(amount));
+
+        val placeholders = new String[]{ConfigurationController.TYPE_PLACEHOLDER, ConfigurationController.AMOUNT_PLACEHOLDER};
+        val replaces = new String[]{entityProps.getDisplayName(), Integer.toString(amount)};
+        val name = StringUtils.replaceEach(itemProps.getName(), placeholders, replaces);
         val lore = new ArrayList<String>();
         for (String loreLine : itemProps.getLore()) {
-            lore.add(
-                    loreLine.replace(ConfigurationController.TYPE_PLACEHOLDER, entityProps.getDisplayName())
-                            .replace(ConfigurationController.AMOUNT_PLACEHOLDER, Integer.toString(amount))
-            );
+            lore.add(StringUtils.replaceEach(loreLine, placeholders, replaces));
         }
 
         meta.setDisplayName(name);
@@ -160,7 +159,7 @@ public class SpawnerItemFactory {
             if (itemProps.isDeductEntityName()) {
                 String defaultLine = itemProps.isAmountInName() ? itemProps.getName() : itemProps.getLore().get(itemProps.getAmountLine());
                 val entityProps = getConfig().getProperties(entityType);
-                defaultLine = defaultLine.replace(ConfigurationController.TYPE_PLACEHOLDER, entityProps.getDisplayName());
+                defaultLine = StringUtils.replaceOnce(defaultLine, ConfigurationController.TYPE_PLACEHOLDER, entityProps.getDisplayName());
 
                 amountEndlength = defaultLine.length() - (itemProps.getAmountBeginIndex() + ConfigurationController.AMOUNT_PLACEHOLDER.length());
             } else {

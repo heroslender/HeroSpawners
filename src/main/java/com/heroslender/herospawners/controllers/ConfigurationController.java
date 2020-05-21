@@ -18,13 +18,17 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class ConfigurationController implements Controller {
+    public static final String SKULL_PLACEHOLDER = "%skull%";
     public static final String TYPE_PLACEHOLDER = "%tipo%";
     public static final String AMOUNT_PLACEHOLDER = "%quantidade%";
 
     @Getter private int stackRadious;
     @Getter private int stackLimit;
+
     @Getter private List<String> hologramText;
     @Getter private int hologramViewDistance;
+    private boolean trimHologram = false;
+
     private Map<EntityType, EntityProperties> entityProperties;
 
 
@@ -64,6 +68,7 @@ public class ConfigurationController implements Controller {
         }
 
         hologramViewDistance = getConfig().getInt("holograma.distancia", 0);
+        trimHologram = hologramText.get(hologramText.size() - 1).equalsIgnoreCase(SKULL_PLACEHOLDER);
 
         entityProperties = new EnumMap<>(EntityType.class);
         String name, head;
@@ -111,6 +116,10 @@ public class ConfigurationController implements Controller {
         if (!getConfig().isSet(path)) {
             getConfig().set(path, value);
         }
+    }
+
+    public boolean trimHologram() {
+        return trimHologram;
     }
 
     public boolean hasStackLimit() {
