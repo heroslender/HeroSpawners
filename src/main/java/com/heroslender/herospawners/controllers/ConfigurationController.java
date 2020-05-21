@@ -114,7 +114,7 @@ public class ConfigurationController implements Controller {
     }
 
     public boolean hasStackLimit() {
-        return getStackLimit() <= 0;
+        return getStackLimit() > 0;
     }
 
     private FileConfiguration getConfig() {
