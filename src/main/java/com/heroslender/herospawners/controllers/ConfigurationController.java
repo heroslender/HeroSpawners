@@ -71,7 +71,8 @@ public class ConfigurationController implements Controller {
         trimHologram = hologramText.get(hologramText.size() - 1).equalsIgnoreCase(SKULL_PLACEHOLDER);
 
         entityProperties = new EnumMap<>(EntityType.class);
-        String name, head;
+        String name;
+        String head;
         for (EntityType e : EntityType.values()) {
             if (e.getEntityClass() != null && e.getName() != null && LivingEntity.class.isAssignableFrom(e.getEntityClass())) {
                 name = parseColors(getConfig().getString("mobs." + e.name() + ".name", e.getName()));

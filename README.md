@@ -17,13 +17,13 @@ O HeroSpawners permite que os spawners do seu servidor agrupem, reduzindo assim 
 
 ## Comandos
 
-- `/herospawners reload` - Comando para recarregar a configuração do plugin.
-- `/spawners <player> [entity] [stack size] [multiplier]` - Comando para pegar spawners(Utilizavel apenas se tiver o 
+  - `/herospawners reload` - Comando para recarregar a configuração do plugin.
+  - `/spawners <player> [entity] [stack size] [multiplier]` - Comando para pegar spawners(Utilizavel apenas se tiver o 
 sistema de spawners ativo).
 
 ## Permissões
 
-- `herospawners.admin` - Permissão para usar o comando de recarregar a configuração.
+  - `herospawners.admin` - Permissão para usar o comando de recarregar a configuração.
 
 ## Configuração
 
