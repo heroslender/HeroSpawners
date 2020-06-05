@@ -11,14 +11,20 @@ import org.bukkit.entity.EntityType;
 
 import java.util.List;
 
+import static com.heroslender.herospawners.controllers.ConfigurationController.AMOUNT_PLACEHOLDER;
+import static com.heroslender.herospawners.controllers.ConfigurationController.TYPE_PLACEHOLDER;
+
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class Spawner implements ISpawner {
-    private static final String[] placeholders = new String[]{"%dono%", "%quantidade%", "%tipo%"};
+    private static final String[] placeholders = new String[]{"%dono%", AMOUNT_PLACEHOLDER, TYPE_PLACEHOLDER};
     @Getter private final String owner;
     private final Location location;
     @Getter @Setter private boolean updateRequired = false;
     @Getter private int amount;
+
+    // Lazy loaded field
+    private EntityProperties entityProperties = null;
 
     public Spawner(String owner, Location location, int amount) {
         this.owner = owner;
@@ -42,12 +48,16 @@ public class Spawner implements ISpawner {
 
     @Override
     public EntityType getType() {
-        return getState().getSpawnedType();
+        return  getState().getSpawnedType();
     }
 
     @Override
-    public EntityProperties getEntityProperties() {
-        return HeroSpawners.getInstance().getConfigurationController().getProperties(getType());
+    public synchronized EntityProperties getEntityProperties() {
+        if (this.entityProperties == null) {
+            this.entityProperties = HeroSpawners.getInstance().getConfigurationController().getProperties(getType());
+        }
+
+        return this.entityProperties;
     }
 
     @Override

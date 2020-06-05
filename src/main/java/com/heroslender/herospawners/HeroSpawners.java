@@ -8,14 +8,21 @@ import com.heroslender.herospawners.listeners.SilkSpawnersListener;
 import com.heroslender.herospawners.listeners.SpawnerListener;
 import com.heroslender.herospawners.listeners.SpawnerSpawnListener;
 import com.heroslender.herospawners.mobstacker.*;
-import com.heroslender.herospawners.services.*;
+import com.heroslender.herospawners.services.StorageService;
+import com.heroslender.herospawners.services.StorageServiceMySqlImpl;
+import com.heroslender.herospawners.services.StorageServiceSQLiteImpl;
+import com.heroslender.herospawners.spawners.commands.SpawnerCommand;
+import com.heroslender.herospawners.spawners.listeners.SpawnerBlockListener;
 import com.heroslender.herospawners.utils.Metrics;
 import lombok.Getter;
+import lombok.val;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.filter.AbstractFilter;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.concurrent.Executor;
@@ -42,10 +49,10 @@ public class HeroSpawners extends JavaPlugin {
             storageService = new StorageServiceSQLiteImpl();
         storageController = new StorageController(storageService, getExecutor());
 
-        ConfigurationService configurationService = new ConfigurationServiceImpl();
-        configurationController = new ConfigurationController(configurationService);
+        configurationController = new ConfigurationController();
     }
 
+    @Override
     public void onEnable() {
         configurationController.init();
         storageController.init();
@@ -69,8 +76,19 @@ public class HeroSpawners extends JavaPlugin {
         // listeners
         getServer().getPluginManager().registerEvents(new SpawnerSpawnListener(), this);
         if (getServer().getPluginManager().getPlugin("SilkSpawners") != null)
-            getServer().getPluginManager().registerEvents(new SilkSpawnersListener(configurationController, storageController), this);
-        else {
+            getServer().getPluginManager().registerEvents(
+                    new SilkSpawnersListener(configurationController, storageController),
+                    this
+            );
+        else if (getConfigurationController().isSpawnersEnabled()) {
+            getServer().getPluginManager().registerEvents(
+                    new SpawnerBlockListener(configurationController, storageController),
+                    this
+            );
+            val spawnerCommand = new SpawnerCommand();
+            getCommand("spawners").setExecutor(spawnerCommand);
+            getCommand("spawners").setTabCompleter(spawnerCommand);
+        } else {
             getServer().getPluginManager().registerEvents(new SpawnerListener(configurationController, storageController), this);
         }
 
@@ -98,6 +116,17 @@ public class HeroSpawners extends JavaPlugin {
         getLogger().info("Plugin carregado!");
     }
 
+    public boolean shutdownCheck(final Cancellable event, final Player player) {
+        if (isShutingDown()) {
+            event.setCancelled(true);
+            player.sendMessage("§cNão é possivel colocar spawners quando o servidor esta a ligar/desligar.");
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
     public void onDisable() {
         shutingDown = true;
         storageController.stop();

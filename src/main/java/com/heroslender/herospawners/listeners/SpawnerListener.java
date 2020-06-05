@@ -24,63 +24,58 @@ public class SpawnerListener implements Listener {
     private final ConfigurationController config;
     private final StorageController storageController;
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = false)
     public void onBlockPlace(final BlockPlaceEvent e) {
-        if (!e.isCancelled() && e.getBlock().getType() == Material.MOB_SPAWNER) {
-            if (HeroSpawners.getInstance().isShutingDown()) {
-                e.setCancelled(true);
-                e.getPlayer().sendMessage("§cNão é possivel colocar spawners quando o servidor esta a ligar/desligar.");
-                return;
+        if (e.getBlock().getType() != Material.MOB_SPAWNER
+                || HeroSpawners.getInstance().shutdownCheck(e, e.getPlayer())) {
+            return;
+        }
+
+        Bukkit.getScheduler().scheduleSyncDelayedTask(HeroSpawners.getInstance(), () -> {
+            CreatureSpawner colocado = (CreatureSpawner) e.getBlock().getState();
+            for (Block block : Utilities.getBlocks(e.getBlock(), config.getStackRadious())) {
+                if (block.getType() != Material.MOB_SPAWNER) continue;
+                CreatureSpawner cs = (CreatureSpawner) block.getState();
+                if (cs.getSpawnedType() != colocado.getSpawnedType()) continue;
+
+                ISpawner spawner = storageController.getSpawner(block.getLocation());
+                if (spawner == null) continue;
+                if (spawner.getAmount() < config.getStackLimit() || config.getStackLimit() == 0) {
+                    spawner.setAmount(spawner.getAmount() + 1);
+                    e.getBlock().setType(Material.AIR);
+                    block.getWorld().spigot().playEffect(block.getLocation(), Effect.WITCH_MAGIC, 1, 0, 1.0F, 1.0F, 1.0F, 1.0F, 200, 10);
+                    return;
+                }
             }
 
-            Bukkit.getScheduler().scheduleSyncDelayedTask(HeroSpawners.getInstance(), () -> {
-                CreatureSpawner colocado = (CreatureSpawner) e.getBlock().getState();
-                for (Block block : Utilities.getBlocks(e.getBlock(), config.getStackRadious())) {
-                    if (block.getType() != Material.MOB_SPAWNER) continue;
-                    CreatureSpawner cs = (CreatureSpawner) block.getState();
-                    if (cs.getSpawnedType() != colocado.getSpawnedType()) continue;
-
-                    ISpawner spawner = storageController.getSpawner(block.getLocation());
-                    if (spawner == null) continue;
-                    if (spawner.getAmount() < config.getStackLimit() || config.getStackLimit() == 0) {
-                        spawner.setAmount(spawner.getAmount() + 1);
-                        e.getBlock().setType(Material.AIR);
-                        block.getWorld().spigot().playEffect(block.getLocation(), Effect.WITCH_MAGIC, 1, 0, 1.0F, 1.0F, 1.0F, 1.0F, 200, 10);
-                        return;
-                    }
-                }
-
-                Spawner spawner = new Spawner(e.getPlayer().getName(), colocado.getLocation(), 1);
-                storageController.saveSpawner(spawner);
-            });
-        }
+            Spawner spawner = new Spawner(e.getPlayer().getName(), colocado.getLocation(), 1);
+            storageController.saveSpawner(spawner);
+        });
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     private void onSpawnerBreak(final BlockBreakEvent e) {
-        if ((!e.isCancelled()) && e.getBlock().getType() == Material.MOB_SPAWNER) {
-            ISpawner spawner = storageController.getSpawner(e.getBlock().getLocation());
-            if (spawner == null)
-                return;
+        if (e.getBlock().getType() != Material.MOB_SPAWNER
+                || HeroSpawners.getInstance().shutdownCheck(e, e.getPlayer())) {
+            return;
+        }
 
-            if (HeroSpawners.getInstance().isShutingDown()) {
-                e.setCancelled(true);
-                e.getPlayer().sendMessage("§cNão é possivel quebrar spawners quando o servidor esta a ligar/desligar.");
-                return;
-            }
+        ISpawner spawner = storageController.getSpawner(e.getBlock().getLocation());
+        if (spawner == null) {
+            return;
+        }
 
-            if (spawner.getAmount() > 1) {
-                final EntityType et = ((CreatureSpawner) e.getBlock().getState()).getSpawnedType();
+        if (spawner.getAmount() > 1) {
+            final EntityType et = ((CreatureSpawner) e.getBlock().getState()).getSpawnedType();
 
-                Bukkit.getScheduler().runTaskLater(HeroSpawners.getInstance(), () -> {
-                    e.getBlock().setType(Material.MOB_SPAWNER);
-                    ((CreatureSpawner) e.getBlock().getState()).setSpawnedType(et);
+            Bukkit.getScheduler().runTaskLater(HeroSpawners.getInstance(), () -> {
+                e.getBlock().setType(Material.MOB_SPAWNER);
+                ((CreatureSpawner) e.getBlock().getState()).setSpawnedType(et);
 
-                    spawner.setAmount(spawner.getAmount() - 1);
-                }, 1L);
-            } else {
-                storageController.deleteSpawner(spawner);
-            }
+                spawner.setAmount(spawner.getAmount() - 1);
+            }, 1L);
+        } else {
+            storageController.deleteSpawner(spawner);
         }
     }
 

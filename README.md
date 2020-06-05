@@ -17,17 +17,19 @@ O HeroSpawners permite que os spawners do seu servidor agrupem, reduzindo assim 
 
 ## Comandos
 
-- `/herospawners reload` - Comando para recarregar a configuração do plugin.
+  - `/herospawners reload` - Comando para recarregar a configuração do plugin.
+  - `/spawners <player> [entity] [stack size] [multiplier]` - Comando para pegar spawners(Utilizavel apenas se tiver o 
+sistema de spawners ativo).
 
 ## Permissões
 
-- `herospawners.admin` - Permissão para usar o comando de recarregar a configuração.
+  - `herospawners.admin` - Permissão para usar o comando de recarregar a configuração.
 
 ## Configuração
 
 ```yaml
 MySql:
-  // Usar MySql? Se sim alterar para true
+  # Usar MySql? Se sim alterar para true
   usar: false
   host: localhost
   port: 3306
@@ -35,124 +37,60 @@ MySql:
   user: root
   pass: ''
 juntar:
-  // Raio para procurar spawners para agrupar ao colocar
+  # Raio para procurar spawners para agrupar ao colocar
   raio: 5
-  // Limite de spawners por stack, 0 = infinito
+  # Limite de spawners por stack, 0 = infinito
   maximo: 0
+# Configuração do sistema de spawners
+spawner:
+  # Ativar o sistema de spawners interno? Se tiver o SilkSpawners no servidor, ele irá ter prioridade sobre este.
+  enable: true
+   # Dropar xp quando quebra spawner
+  dropXP: false
+  # Configuração do item dos spawners. Placeholders disponiveis:
+  #  > %tipo% -> Nome do mob
+  #  > %quantidade% -> Quantidade de spawners no stack
+  # PS: O placeholder da quantidade é obrigatório colocar, seja no nome ou seja na lore!
+  ItemStack:
+    # Nome do item
+    name: '&7Gerador de Monstros'
+    # Lore do item
+    lore:
+    - '&eTipo: &7%tipo%'
+    - '&eQuantidade: &7%quantidade%'
+  # Sistema de silktouch - Quebrar spawners requer silktouch
+  SilkTouch:
+    # Ativar o sistema?
+    enable: true
+    # Nivel minimo de silktouch, se usar SilkTouch II por exemplo, só trocar para 2
+    minLevel: 1
+    # O que acontece quando quebra spawner sem ter o SilkTouch requirido?
+    # Se colocar em true, quebra o spawner normal, mas não dropa o item
+    # Se colocar em false, não quebra spawner nem dropa o item
+    detroySpawnerWithouSilktouch: true
 holograma:
-  // Distância a que o holograma do spawner fica visivel
+  # Distância a que o holograma do spawner fica visivel
   distancia: 5
-  // Texto do holograma
-  // Placeholders disponiveis
-  //  > %quantidade% -> Quantidade de spawners no stack
-  //  > %tipo% -> Nome do mob que spawna
-  //  > %dono% -> Dono do spawner/quem o colocou
-  //  > %skull% -> Cabeça do mob, tem que ser uma linha dedicada
+  # Texto do holograma
+  # Placeholders disponiveis
+  #  > %quantidade% -> Quantidade de spawners no stack
+  #  > %tipo% -> Nome do mob que spawna
+  #  > %dono% -> Dono do spawner/quem o colocou
+  #  > %skull% -> Cabeça do mob, tem que ser uma linha dedicada
   texto:
     - '&7%quantidade%x &e%tipo%'
     - '&eDono: &7%dono%'
     - '%skull%'
-// Configuração de cada mob
+# Configuração de cada mob
 mobs:
   CREEPER:
-    // Nome a aparecer no holograma do spawner
+    # Nome a aparecer no holograma do spawner
     name: Creeper
-    // Nome da skin da cabeça a mostrar junto com o holograma
+    # Nome da skin da cabeça a mostrar junto com o holograma
     head: MHF_Creeper
-  SKELETON:
-    name: Esqueleto
-    head: MHF_Skeleton
-  SPIDER:
-    name: Aranha
-    head: MHF_Spider
-  GIANT:
-    name: Gigante
-    head: MHF_Giant
   ZOMBIE:
     name: Zombie
     head: MHF_Zombie
-  SLIME:
-    name: Slime
-    head: MHF_Slime
-  GHAST:
-    name: Ghast
-    head: MHF_Ghast
-  PIG_ZOMBIE:
-    name: PigZombie
-    head: MHF_PigZombie
-  ENDERMAN:
-    name: Enderman
-    head: MHF_Enderman
-  CAVE_SPIDER:
-    name: Aranha da Caverma
-    head: MHF_CaveSpider
-  SILVERFISH:
-    name: Silverfish
-    head: MHF_Silverfish
-  BLAZE:
-    name: Blaze
-    head: MHF_Blaze
-  MAGMA_CUBE:
-    name: Lava Slime
-    head: MHF_LavaSlime
-  ENDER_DRAGON:
-    name: Dragao
-    head: MHF_EnderDragon
-  WITHER:
-    name: Wither
-    head: MHF_WitherBoss
-  BAT:
-    name: Bat
-    head: MHF_Bat
-  WITCH:
-    name: Bruxa
-    head: MHF_Witch
-  ENDERMITE:
-    name: Endermite
-    head: MHF_Endermite
-  GUARDIAN:
-    name: Guardian
-    head: MHF_Guardian
-  PIG:
-    name: Porco
-    head: MHF_Pig
-  SHEEP:
-    name: Ovelha
-    head: MHF_Sheep
-  COW:
-    name: Vaca
-    head: MHF_Cow
-  CHICKEN:
-    name: Galinha
-    head: MHF_Chicken
-  SQUID:
-    name: Polvo
-    head: MHF_Squid
-  WOLF:
-    name: Lobo
-    head: MHF_Wolf
-  MUSHROOM_COW:
-    name: Cogu Vaca
-    head: MHF_MushroomCow
-  SNOWMAN:
-    name: SnowMan
-    head: MHF_SnowMan
-  OCELOT:
-    name: Ocelot
-    head: MHF_Ozelot
-  IRON_GOLEM:
-    name: Iron Golem
-    head: MHF_VillagerGolem
-  HORSE:
-    name: Cavalo
-    head: MHF_EntityHorse
-  RABBIT:
-    name: Coelho
-    head: MHF_Rabbit
-  VILLAGER:
-    name: Vilager
-    head: MHF_Villager
-
 ```
 
 ## API

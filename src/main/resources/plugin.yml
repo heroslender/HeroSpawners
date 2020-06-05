@@ -8,3 +8,6 @@ load: POSTWORLD
 commands:
   herospawners:
     description: Main command
+  spawners:
+    description: give spawners command
+    usage: "§cUso correto: §7/<command> <player> [entity] [stack size] [multiplier]"

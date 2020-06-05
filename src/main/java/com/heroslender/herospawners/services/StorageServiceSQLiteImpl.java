@@ -50,7 +50,7 @@ public class StorageServiceSQLiteImpl implements StorageServiceSql {
 
                     if (failed != 0) {
                         HeroSpawners.getInstance().getLogger()
-                                .log(Level.WARNING, "Nao foi possivel carregar {} spawners!", failed);
+                                .log(Level.WARNING, "Nao foi possivel carregar {0} spawners!", failed);
                     }
                 }
             }
