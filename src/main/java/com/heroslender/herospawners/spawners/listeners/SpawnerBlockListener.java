@@ -74,7 +74,7 @@ public class SpawnerBlockListener implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = false)
+    @EventHandler(ignoreCancelled = true)
     private void onSpawnerPlace(final BlockPlaceEvent e) {
         if (e.getBlock().getType() != Material.MOB_SPAWNER
                 || HeroSpawners.getInstance().shutdownCheck(e, e.getPlayer())) {
@@ -134,9 +134,14 @@ public class SpawnerBlockListener implements Listener {
 
         val spawner = new Spawner(e.getPlayer().getName(), e.getBlock().getLocation(), amountToStack);
         storageController.saveSpawner(spawner);
+
+        val state = e.getBlock().getState();
+        if ((state instanceof CreatureSpawner)) {
+            ((CreatureSpawner) state).setSpawnedType(itemEntityType);
+        }
     }
 
-    @EventHandler(ignoreCancelled = false)
+    @EventHandler(ignoreCancelled = true)
     private void onSpawnerBreak(final BlockBreakEvent e) {
         if (e.getBlock().getType() != Material.MOB_SPAWNER
                 || HeroSpawners.getInstance().shutdownCheck(e, e.getPlayer())) {
