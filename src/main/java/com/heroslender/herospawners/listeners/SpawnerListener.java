@@ -24,7 +24,7 @@ public class SpawnerListener implements Listener {
     private final ConfigurationController config;
     private final StorageController storageController;
 
-    @EventHandler(ignoreCancelled = false)
+    @EventHandler(ignoreCancelled = true)
     public void onBlockPlace(final BlockPlaceEvent e) {
         if (e.getBlock().getType() != Material.MOB_SPAWNER
                 || HeroSpawners.getInstance().shutdownCheck(e, e.getPlayer())) {
