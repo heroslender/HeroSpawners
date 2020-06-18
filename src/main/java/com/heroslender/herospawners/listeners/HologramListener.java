@@ -6,8 +6,8 @@ import com.gmail.filoghost.holographicdisplays.api.line.HologramLine;
 import com.gmail.filoghost.holographicdisplays.api.line.TextLine;
 import com.heroslender.herospawners.HeroSpawners;
 import com.heroslender.herospawners.controllers.ConfigurationController;
+import com.heroslender.herospawners.controllers.StorageController;
 import com.heroslender.herospawners.models.ISpawner;
-import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -26,15 +26,18 @@ import java.util.logging.Level;
 
 import static com.heroslender.herospawners.controllers.ConfigurationController.SKULL_PLACEHOLDER;
 
-@RequiredArgsConstructor
 public class HologramListener implements Listener {
     private static final Set<Material> transparentBlocks = Collections.singleton(Material.AIR);
+
     private final ConfigurationController config;
+    private final StorageController storageController;
+
     private final List<Player> viewers = new ArrayList<>();
     private final double hologramOffset;
 
-    public HologramListener(ConfigurationController config) {
+    public HologramListener(ConfigurationController config, StorageController storage) {
         this.config = config;
+        this.storageController = storage;
 
         val holoLines = config.getHologramText();
         double offset = 0D;
@@ -68,7 +71,7 @@ public class HologramListener implements Listener {
                 return;
             }
 
-            val spawner = HeroSpawners.getInstance().getStorageController().getSpawner(spawnerBlock.getLocation());
+            val spawner = storageController.getSpawner(spawnerBlock.getLocation());
             if (spawner == null) {
                 return;
             }

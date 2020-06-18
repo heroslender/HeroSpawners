@@ -60,7 +60,16 @@ public interface ISpawner {
 
     /**
      * Get line values for the hologram.
+     *
      * @return The line values
      */
     List<String> getHologramText();
+
+    /**
+     * Get information for the spawner.
+     * This is already formatted.
+     *
+     * @return The spawner information
+     */
+    String[] getInformationText();
 }

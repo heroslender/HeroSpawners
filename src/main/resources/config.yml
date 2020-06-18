@@ -19,12 +19,35 @@ MySql:
 juntar:
   raio: 5
   maximo: 0
+interact:
+  ativar: true
+  delay: 2000
+  texto:
+    - '&5Informações do spawner:'
+    - '&r'
+    - '&eDono: &7%dono%'
+    - '&eStack: &7%quantidade%'
+    - '&eMob: &7%tipo%'
+    - '&r'
 holograma:
-  distancia: 5
+  ativar: true
+  distancia: 3
   texto:
     - '&7%quantidade%x &e%tipo%'
     - '&eDono: &7%dono%'
     - '%skull%'
+spawner:
+  enable: true
+  dropXP: false
+  ItemStack:
+    name: '&7Gerador de Monstros'
+    lore:
+      - '&eTipo: &7%tipo%'
+      - '&eQuantidade: &7%quantidade%'
+  SilkTouch:
+    enable: true
+    minLevel: 1
+    detroySpawnerWithouSilktouch: true
 mobs:
   CREEPER:
     name: Creeper

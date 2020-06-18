@@ -25,6 +25,9 @@ public class ConfigurationController implements Controller {
     @Getter private int stackRadious;
     @Getter private int stackLimit;
 
+    @Getter private List<String> informationText;
+    @Getter private long informationDelay;
+
     @Getter private List<String> hologramText;
     @Getter private int hologramViewDistance;
     private boolean trimHologram = false;
@@ -67,6 +70,14 @@ public class ConfigurationController implements Controller {
             hologramText.add(parseColors(getConfig().getString("holograma.texto", "&7%quantidade%x &e" + TYPE_PLACEHOLDER)));
         }
 
+        if (getConfig().isList("interact.texto")) {
+            informationText = parseColors(getConfig().getStringList("interact.texto"));
+        } else {
+            informationText = new ArrayList<>();
+            informationText.add(parseColors(getConfig().getString("interact.texto", "&7%quantidade%x &e" + TYPE_PLACEHOLDER)));
+        }
+        informationDelay = getConfig().getLong("interact.delay", 5000);
+
         hologramViewDistance = getConfig().getInt("holograma.distancia", 0);
         trimHologram = hologramText.get(hologramText.size() - 1).equalsIgnoreCase(SKULL_PLACEHOLDER);
 
@@ -99,9 +110,14 @@ public class ConfigurationController implements Controller {
         setDefault("spawner.SilkTouch.minLevel", 1);
         setDefault("spawner.SilkTouch.detroySpawnerWithouSilktouch", true);
 
+        setDefault("holograma.ativar", true);
         setDefault("holograma.distancia", 5);
         setDefault("holograma.texto", "&7" + AMOUNT_PLACEHOLDER + "x &e" + TYPE_PLACEHOLDER);
         setDefault("holograma.mostrar-cabeca", true);
+
+        setDefault("interact.ativar", true);
+        setDefault("interact.delay", 5000);
+        setDefault("interact.texto", "&7" + AMOUNT_PLACEHOLDER + "x &e" + TYPE_PLACEHOLDER);
 
         for (EntityType e : EntityType.values()) {
             if (e.getEntityClass() != null && LivingEntity.class.isAssignableFrom(e.getEntityClass())) {

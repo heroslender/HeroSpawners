@@ -73,6 +73,19 @@ public class Spawner implements ISpawner {
     }
 
     @Override
+    public String[] getInformationText() {
+        final List<String> informationText = HeroSpawners.getInstance().getConfigurationController().getInformationText();
+        final String[] values = new String[]{getOwner(), Integer.toString(getAmount()), getEntityProperties().getDisplayName()};
+
+        String[] info = new String[informationText.size()];
+        for (int i = 0; i < informationText.size(); i++) {
+            info[i] = StringUtils.replaceEach(informationText.get(i), placeholders, values);
+        }
+
+        return info;
+    }
+
+    @Override
     public String toString() {
         return "Spawner(location=\"" + Utilities.loc2str(getLocation()) + "\", quantidade=\"" + getAmount() + "\")";
     }
