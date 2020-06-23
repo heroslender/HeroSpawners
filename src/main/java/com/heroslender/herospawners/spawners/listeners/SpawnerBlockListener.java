@@ -153,6 +153,11 @@ public class SpawnerBlockListener implements Listener {
             return;
         }
 
+        if (!spawner.getOwner().equals(e.getPlayer().getName()) && !e.getPlayer().hasPermission("herospawners.break.others")) {
+            e.getPlayer().sendMessage(ChatColor.RED + "Não tens permissão para quebrar os spawners de outros players!");
+            return;
+        }
+
         val silkCheck = checkSilktouck(e.getPlayer());
         if (!silkCheck && !config.isDestroySilktouch()) {
             // The player doesn't have silk-touch and it's configured not to destroy the spawner

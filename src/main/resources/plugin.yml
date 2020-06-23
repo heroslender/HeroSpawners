@@ -11,3 +11,13 @@ commands:
   spawners:
     description: give spawners command
     usage: "§cUso correto: §7/<command> <player> [entity] [stack size] [multiplier]"
+
+permissions:
+  herospawners.admin:
+    description: Admin permissions to the plugin
+    default: op
+    children:
+      herospawners.break.others: true
+  herospawners.break.others:
+    description: Permission to break spawners the player does not own but is allowed by the region plugin.
+    default: true

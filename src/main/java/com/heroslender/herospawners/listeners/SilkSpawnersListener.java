@@ -10,10 +10,7 @@ import de.dustplanet.silkspawners.events.SilkSpawnersSpawnerBreakEvent;
 import de.dustplanet.silkspawners.events.SilkSpawnersSpawnerPlaceEvent;
 import de.dustplanet.util.SilkUtil;
 import lombok.val;
-import org.bukkit.Bukkit;
-import org.bukkit.Effect;
-import org.bukkit.GameMode;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -35,25 +32,30 @@ public class SilkSpawnersListener implements Listener {
         su = SilkUtil.hookIntoSilkSpanwers();
     }
 
-    @EventHandler
-    public void onSpawnerBreak(SilkSpawnersSpawnerBreakEvent event) {
-        if (event.isCancelled()) return;
-
-        ISpawner spawner = storageController.getSpawner(event.getBlock().getLocation());
-        if (spawner == null)
-            return;
+    @EventHandler(ignoreCancelled = true)
+    public void onSpawnerBreak(SilkSpawnersSpawnerBreakEvent e) {
         if (HeroSpawners.getInstance().isShutingDown()) {
-            event.setCancelled(true);
-            event.getPlayer().sendMessage("§cNão é possivel quebrar spawners quando o servidor esta a ligar/desligar.");
+            e.setCancelled(true);
+            e.getPlayer().sendMessage("§cNão é possivel quebrar spawners quando o servidor esta a ligar/desligar.");
             return;
         }
 
-        int amount = event.getPlayer().isSneaking() ? Math.min(spawner.getAmount(), 64) : 1;
-        ItemStack spawnerItemStack = su.newSpawnerItem(event.getEntityID(), su.getCustomSpawnerName(su.eid2MobID.get(event.getEntityID())), amount, false);
+        ISpawner spawner = storageController.getSpawner(e.getBlock().getLocation());
+        if (spawner == null) {
+            return;
+        }
+
+        if (!spawner.getOwner().equals(e.getPlayer().getName()) && !e.getPlayer().hasPermission("herospawners.break.others")) {
+            e.getPlayer().sendMessage(ChatColor.RED + "Não tens permissão para quebrar os spawners de outros players!");
+            return;
+        }
+
+        int amount = e.getPlayer().isSneaking() ? Math.min(spawner.getAmount(), 64) : 1;
+        ItemStack spawnerItemStack = su.newSpawnerItem(e.getEntityID(), su.getCustomSpawnerName(su.eid2MobID.get(e.getEntityID())), amount, false);
 
         if (spawner.getAmount() > amount) {
-            event.setCancelled(true);
-            event.getPlayer().getInventory().addItem(spawnerItemStack)
+            e.setCancelled(true);
+            e.getPlayer().getInventory().addItem(spawnerItemStack)
                     .values()
                     .forEach(itemStack ->
                             spawner.getLocation().getWorld().dropItemNaturally(spawner.getLocation(), itemStack)
@@ -61,7 +63,7 @@ public class SilkSpawnersListener implements Listener {
 
             spawner.setAmount(spawner.getAmount() - amount);
         } else {
-            event.setDrop(spawnerItemStack);
+            e.setDrop(spawnerItemStack);
 
             storageController.deleteSpawner(spawner);
         }
@@ -102,7 +104,7 @@ public class SilkSpawnersListener implements Listener {
                                 quantidade = itemInHand.getAmount();
                             } else {
                                 val maxQuantAllowed = config.getStackLimit() - spawner.getAmount();
-                                quantidade = maxQuantAllowed > itemInHand.getAmount() ? itemInHand.getAmount() : maxQuantAllowed;
+                                quantidade = Math.min(maxQuantAllowed, itemInHand.getAmount());
                             }
                         }
                     }

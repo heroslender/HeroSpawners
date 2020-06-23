@@ -8,6 +8,7 @@ import com.heroslender.herospawners.models.Spawner;
 import com.heroslender.herospawners.utils.Utilities;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Effect;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -64,6 +65,12 @@ public class SpawnerListener implements Listener {
         if (spawner == null) {
             return;
         }
+
+        if (!spawner.getOwner().equals(e.getPlayer().getName()) && !e.getPlayer().hasPermission("herospawners.break.others")) {
+            e.getPlayer().sendMessage(ChatColor.RED + "Não tens permissão para quebrar os spawners de outros players!");
+            return;
+        }
+
 
         if (spawner.getAmount() > 1) {
             final EntityType et = ((CreatureSpawner) e.getBlock().getState()).getSpawnedType();
