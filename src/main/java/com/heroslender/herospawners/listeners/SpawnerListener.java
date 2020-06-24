@@ -68,6 +68,7 @@ public class SpawnerListener implements Listener {
 
         if (!spawner.getOwner().equals(e.getPlayer().getName()) && !e.getPlayer().hasPermission("herospawners.break.others")) {
             e.getPlayer().sendMessage(ChatColor.RED + "Não tens permissão para quebrar os spawners de outros players!");
+            e.setCancelled(true);
             return;
         }
 
