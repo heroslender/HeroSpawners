@@ -6,7 +6,7 @@
 
     <groupId>com.heroslender</groupId>
     <artifactId>HeroSpawners</artifactId>
-    <version>4.2.1</version>
+    <version>4.2.2</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -19,7 +19,7 @@
         </repository>
         <repository>
             <id>SilkSpawners-Repo</id>
-            <url>https://ci.dustplanet.de/plugin/repository/everything/</url>
+            <url>https://repo.dustplanet.de/artifactory/libs-release-local</url>
         </repository>
         <repository>
             <name>Holographic Displays Repo</name>
@@ -118,8 +118,8 @@
         </dependency>
         <dependency>
             <groupId>de.dustplanet</groupId>
-            <artifactId>SilkSpawners</artifactId>
-            <version>5.1.0</version>
+            <artifactId>silkspawners</artifactId>
+            <version>6.3.1</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>

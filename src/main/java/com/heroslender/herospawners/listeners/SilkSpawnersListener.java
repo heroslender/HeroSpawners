@@ -11,10 +11,11 @@ import de.dustplanet.silkspawners.events.SilkSpawnersSpawnerPlaceEvent;
 import de.dustplanet.util.SilkUtil;
 import lombok.val;
 import org.bukkit.*;
-import org.bukkit.block.CreatureSpawner;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.Objects;
 
 /**
  * Created by Heroslender.
@@ -51,8 +52,10 @@ public class SilkSpawnersListener implements Listener {
             return;
         }
 
+
         int amount = e.getPlayer().isSneaking() ? Math.min(spawner.getAmount(), 64) : 1;
-        ItemStack spawnerItemStack = su.newSpawnerItem(e.getEntityID(), su.getCustomSpawnerName(su.eid2MobID.get(e.getEntityID())), amount, false);
+        ItemStack spawnerItemStack = su.newSpawnerItem(e.getEntityID(), su.getCustomSpawnerName(e.getEntityID()), amount, false);
+        ;
 
         if (spawner.getAmount() > amount) {
             e.setCancelled(true);
@@ -80,11 +83,10 @@ public class SilkSpawnersListener implements Listener {
             }
 
             for (val block : Utilities.getBlocks(e.getBlock(), config.getStackRadious())) {
-                if (block.getType() != Material.MOB_SPAWNER) continue;
-
-                val cs = (CreatureSpawner) block.getState();
-                if (cs.getSpawnedType().getTypeId() != e.getEntityID()) continue;
-
+                if (block.getType() != Material.MOB_SPAWNER
+                        || !Objects.equals(su.getSpawnerEntityID(block), e.getEntityID())) {
+                    continue;
+                }
 
                 ISpawner spawner = storageController.getSpawner(block.getLocation());
                 if (spawner == null) continue;
@@ -95,12 +97,8 @@ public class SilkSpawnersListener implements Listener {
 
                     if (e.getPlayer().isSneaking() && itemInHand.getType() == Material.MOB_SPAWNER) {
                         // Colocar aos packs se tiver agachado
-                        short entityID = su.getStoredSpawnerItemEntityID(itemInHand);
-                        if (entityID == 0 || !this.su.knownEids.contains(entityID)) {
-                            entityID = this.su.getDefaultEntityID();
-                        }
-
-                        if (e.getEntityID() == entityID) {
+                        final String entityID = su.getStoredSpawnerItemEntityID(itemInHand);
+                        if (Objects.equals(entityID, e.getEntityID())) {
                             if (config.getStackLimit() <= 0) {
                                 quantidade = itemInHand.getAmount();
                             } else {
