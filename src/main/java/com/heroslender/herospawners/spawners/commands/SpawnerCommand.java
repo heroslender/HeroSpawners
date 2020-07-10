@@ -82,6 +82,10 @@ public class SpawnerCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        if (!sender.hasPermission("herospawners.admin")) {
+            return Collections.emptyList();
+        }
+
         val toComplete = args[args.length - 1].toUpperCase(Locale.ROOT);
 
         if (args.length == 1) {
