@@ -5,7 +5,6 @@ import com.heroslender.herospawners.models.ISpawner;
 import com.heroslender.herospawners.models.Spawner;
 import com.heroslender.herospawners.utils.Utilities;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.sqlite.SQLiteDataSource;
 
 import java.io.File;
@@ -41,7 +40,7 @@ public class StorageServiceSQLiteImpl implements StorageServiceSql {
                     int failed = 0;
                     while (rs.next()) {
                         Location location = Utilities.str2loc(rs.getString(SPAWNERS_LOC));
-                        if (location.getWorld() == null || location.getBlock().getType() != Material.MOB_SPAWNER) {
+                        if (location.getWorld() == null || location.getBlock().getType() != HeroSpawners.SPAWNER_TYPE) {
                             failed++;
                             continue;
                         }

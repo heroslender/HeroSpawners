@@ -5,7 +5,6 @@ import com.heroslender.herospawners.HeroSpawners;
 import com.heroslender.herospawners.controllers.ConfigurationController;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -24,7 +23,7 @@ public class InteractListener implements Listener {
     private void onInteract(PlayerInteractEvent e) {
         if ((e.getAction() != Action.LEFT_CLICK_BLOCK && e.getAction() != Action.RIGHT_CLICK_BLOCK)
                 || !e.hasBlock()
-                || e.getClickedBlock().getType() != Material.MOB_SPAWNER) {
+                || e.getClickedBlock().getType() != HeroSpawners.SPAWNER_TYPE) {
             return;
         }
 

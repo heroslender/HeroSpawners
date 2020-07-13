@@ -27,7 +27,7 @@ public class SpawnerListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockPlace(final BlockPlaceEvent e) {
-        if (e.getBlock().getType() != Material.MOB_SPAWNER
+        if (e.getBlock().getType() != HeroSpawners.SPAWNER_TYPE
                 || HeroSpawners.getInstance().shutdownCheck(e, e.getPlayer())) {
             return;
         }
@@ -35,7 +35,7 @@ public class SpawnerListener implements Listener {
         Bukkit.getScheduler().scheduleSyncDelayedTask(HeroSpawners.getInstance(), () -> {
             CreatureSpawner colocado = (CreatureSpawner) e.getBlock().getState();
             for (Block block : Utilities.getBlocks(e.getBlock(), config.getStackRadious())) {
-                if (block.getType() != Material.MOB_SPAWNER) continue;
+                if (block.getType() != HeroSpawners.SPAWNER_TYPE) continue;
                 CreatureSpawner cs = (CreatureSpawner) block.getState();
                 if (cs.getSpawnedType() != colocado.getSpawnedType()) continue;
 
@@ -44,7 +44,11 @@ public class SpawnerListener implements Listener {
                 if (spawner.getAmount() < config.getStackLimit() || config.getStackLimit() == 0) {
                     spawner.setAmount(spawner.getAmount() + 1);
                     e.getBlock().setType(Material.AIR);
-                    block.getWorld().spigot().playEffect(block.getLocation(), Effect.WITCH_MAGIC, 1, 0, 1.0F, 1.0F, 1.0F, 1.0F, 200, 10);
+                    try {
+                        block.getWorld().spigot().playEffect(block.getLocation(), Effect.WITCH_MAGIC, 1, 0, 1.0F, 1.0F, 1.0F, 1.0F, 200, 10);
+                    } catch (NoSuchFieldError error) {
+                        // ignored, since 1.13
+                    }
                     return;
                 }
             }
@@ -56,7 +60,7 @@ public class SpawnerListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     private void onSpawnerBreak(final BlockBreakEvent e) {
-        if (e.getBlock().getType() != Material.MOB_SPAWNER
+        if (e.getBlock().getType() != HeroSpawners.SPAWNER_TYPE
                 || HeroSpawners.getInstance().shutdownCheck(e, e.getPlayer())) {
             return;
         }
@@ -77,7 +81,7 @@ public class SpawnerListener implements Listener {
             final EntityType et = ((CreatureSpawner) e.getBlock().getState()).getSpawnedType();
 
             Bukkit.getScheduler().runTaskLater(HeroSpawners.getInstance(), () -> {
-                e.getBlock().setType(Material.MOB_SPAWNER);
+                e.getBlock().setType(HeroSpawners.SPAWNER_TYPE);
                 ((CreatureSpawner) e.getBlock().getState()).setSpawnedType(et);
 
                 spawner.setAmount(spawner.getAmount() - 1);
@@ -90,7 +94,7 @@ public class SpawnerListener implements Listener {
 
     @EventHandler
     private void onSpawnerExplode(BlockExplodeEvent e) {
-        if (e.getBlock().getType() == Material.MOB_SPAWNER)
+        if (e.getBlock().getType() == HeroSpawners.SPAWNER_TYPE)
             e.setCancelled(true);
     }
 }

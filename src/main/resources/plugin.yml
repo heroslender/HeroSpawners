@@ -1,5 +1,6 @@
 name: ${project.artifactId}
 main: com.heroslender.herospawners.${project.artifactId}
+api-version: '1.13'
 version: ${project.version}
 author: Heroslender
 softdepend: [HolographicDisplays, MobStacker2, SilkSpawners, ObyStack, Multiverse-Core, MultiWorld]

@@ -18,6 +18,7 @@ import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.filter.AbstractFilter;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
@@ -28,6 +29,8 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.logging.Level;
 
 public class HeroSpawners extends JavaPlugin {
+    public static final Material SPAWNER_TYPE;
+
     @Getter private static HeroSpawners instance;
 
     @Getter private final Executor executor = ForkJoinPool.commonPool();
@@ -35,6 +38,18 @@ public class HeroSpawners extends JavaPlugin {
     @Getter private final ConfigurationController configurationController;
     @Getter private MobStackerSupport mobStackerSupport;
     @Getter private boolean shutingDown = true;
+
+    static {
+        Material mat;
+        try {
+            mat = Material.valueOf("SPAWNER");
+            System.out.println(mat);
+        } catch (IllegalArgumentException e) {
+            mat = Material.MOB_SPAWNER;
+        }
+
+        SPAWNER_TYPE = mat;
+    }
 
     public HeroSpawners() {
         super();

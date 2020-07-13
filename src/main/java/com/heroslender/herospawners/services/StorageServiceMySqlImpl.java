@@ -7,7 +7,6 @@ import com.heroslender.herospawners.utils.Utilities;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.sql.Connection;
@@ -44,7 +43,7 @@ public class StorageServiceMySqlImpl implements StorageServiceSql {
                     int failed = 0;
                     while (rs.next()) {
                         Location location = Utilities.str2loc(rs.getString(SPAWNERS_LOC));
-                        if (location.getWorld() == null || location.getBlock().getType() != Material.MOB_SPAWNER) {
+                        if (location.getWorld() == null || location.getBlock().getType() != HeroSpawners.SPAWNER_TYPE) {
                             failed++;
                             continue;
                         }

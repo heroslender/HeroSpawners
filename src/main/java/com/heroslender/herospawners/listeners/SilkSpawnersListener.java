@@ -55,7 +55,6 @@ public class SilkSpawnersListener implements Listener {
 
         int amount = e.getPlayer().isSneaking() ? Math.min(spawner.getAmount(), 64) : 1;
         ItemStack spawnerItemStack = su.newSpawnerItem(e.getEntityID(), su.getCustomSpawnerName(e.getEntityID()), amount, false);
-        ;
 
         if (spawner.getAmount() > amount) {
             e.setCancelled(true);
@@ -75,7 +74,7 @@ public class SilkSpawnersListener implements Listener {
 
     @EventHandler
     public void onSpawnerPlace(final SilkSpawnersSpawnerPlaceEvent e) {
-        if (!e.isCancelled() && e.getBlock().getType() == Material.MOB_SPAWNER) {
+        if (!e.isCancelled() && e.getBlock().getType() == HeroSpawners.SPAWNER_TYPE) {
             if (HeroSpawners.getInstance().isShutingDown()) {
                 e.setCancelled(true);
                 e.getPlayer().sendMessage("§cNão é possivel colocar spawners quando o servidor esta a ligar/desligar.");
@@ -83,7 +82,7 @@ public class SilkSpawnersListener implements Listener {
             }
 
             for (val block : Utilities.getBlocks(e.getBlock(), config.getStackRadious())) {
-                if (block.getType() != Material.MOB_SPAWNER
+                if (block.getType() != HeroSpawners.SPAWNER_TYPE
                         || !Objects.equals(su.getSpawnerEntityID(block), e.getEntityID())) {
                     continue;
                 }
@@ -95,7 +94,7 @@ public class SilkSpawnersListener implements Listener {
                     int quantidade = 1;
                     val itemInHand = e.getPlayer().getItemInHand();
 
-                    if (e.getPlayer().isSneaking() && itemInHand.getType() == Material.MOB_SPAWNER) {
+                    if (e.getPlayer().isSneaking() && itemInHand.getType() == HeroSpawners.SPAWNER_TYPE) {
                         // Colocar aos packs se tiver agachado
                         final String entityID = su.getStoredSpawnerItemEntityID(itemInHand);
                         if (Objects.equals(entityID, e.getEntityID())) {
@@ -122,7 +121,11 @@ public class SilkSpawnersListener implements Listener {
                     }
 
                     spawner.setAmount(spawner.getAmount() + quantidade);
-                    block.getWorld().spigot().playEffect(block.getLocation(), Effect.WITCH_MAGIC, 1, 0, 1.0F, 1.0F, 1.0F, 1.0F, 200, 10);
+                    try {
+                        block.getWorld().spigot().playEffect(block.getLocation(), Effect.WITCH_MAGIC, 1, 0, 1.0F, 1.0F, 1.0F, 1.0F, 200, 10);
+                    } catch (NoSuchFieldError error) {
+                        // ignored, since 1.13
+                    }
                     return;
                 }
             }

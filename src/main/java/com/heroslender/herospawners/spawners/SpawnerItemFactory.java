@@ -7,7 +7,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
 import org.apache.commons.lang3.StringUtils;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntityType;
@@ -89,7 +88,7 @@ public class SpawnerItemFactory {
     public static ItemStack newItemStack(@NotNull final EntityType entityType, final int amount) {
         Objects.requireNonNull(entityType, "entityType is null");
 
-        val itemStack = new ItemStack(Material.MOB_SPAWNER);
+        val itemStack = new ItemStack(HeroSpawners.SPAWNER_TYPE);
         val meta = itemStack.getItemMeta();
         if (!(meta instanceof BlockStateMeta)) {
             return null;

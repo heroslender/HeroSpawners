@@ -100,7 +100,7 @@ public class HologramListener implements Listener {
             // BlockIterator has no more elements
         }
 
-        if (block != null && block.getType() != Material.MOB_SPAWNER) {
+        if (block != null && block.getType() != HeroSpawners.SPAWNER_TYPE) {
             return null;
         }
 
