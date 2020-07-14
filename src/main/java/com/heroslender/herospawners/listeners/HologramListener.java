@@ -28,6 +28,7 @@ import static com.heroslender.herospawners.controllers.ConfigurationController.S
 
 public class HologramListener implements Listener {
     private static final Set<Material> transparentBlocks = Collections.singleton(Material.AIR);
+    public static final Material SKULL_TYPE;
 
     private final ConfigurationController config;
     private final StorageController storageController;
@@ -160,8 +161,20 @@ public class HologramListener implements Listener {
         return hologram;
     }
 
+    static {
+        Material mat;
+        try {
+            mat = Material.valueOf("PLAYER_HEAD");
+            System.out.println(mat);
+        } catch (IllegalArgumentException e) {
+            mat = Material.SKULL_ITEM;
+        }
+
+        SKULL_TYPE = mat;
+    }
+
     private ItemStack getSkull(final String owner) {
-        ItemStack head = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+        ItemStack head = new ItemStack(SKULL_TYPE, 1, (short) 3);
         val skullMeta = (SkullMeta) head.getItemMeta();
         skullMeta.setOwner(owner);
         head.setItemMeta(skullMeta);
