@@ -9,6 +9,8 @@ import com.heroslender.herospawners.utils.Utilities;
 import de.dustplanet.silkspawners.events.SilkSpawnersSpawnerBreakEvent;
 import de.dustplanet.silkspawners.events.SilkSpawnersSpawnerPlaceEvent;
 import de.dustplanet.util.SilkUtil;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.val;
 import org.bukkit.*;
 import org.bukkit.event.EventHandler;
@@ -16,11 +18,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created by Heroslender.
  */
 public class SilkSpawnersListener implements Listener {
+    @Getter(AccessLevel.PRIVATE) private final Logger logger = HeroSpawners.getInstance().getLogger();
     private final ConfigurationController config;
     private final StorageController storageController;
     private final SilkUtil su;
@@ -65,10 +70,22 @@ public class SilkSpawnersListener implements Listener {
                     );
 
             spawner.setAmount(spawner.getAmount() - amount);
+
+            getLogger().log(
+                    Level.FINEST,
+                    "{0} broken {1} from {2}",
+                    new Object[]{e.getPlayer().getName(), amount, spawner}
+            );
         } else {
             e.setDrop(spawnerItemStack);
 
             storageController.deleteSpawner(spawner);
+
+            getLogger().log(
+                    Level.FINEST,
+                    "{0} broken all {1} from {2}",
+                    new Object[]{e.getPlayer().getName(), amount, spawner}
+            );
         }
     }
 
@@ -121,6 +138,13 @@ public class SilkSpawnersListener implements Listener {
                     }
 
                     spawner.setAmount(spawner.getAmount() + quantidade);
+
+                    getLogger().log(
+                            Level.FINEST,
+                            "{0} stacked +{1} on {2}",
+                            new Object[]{e.getPlayer().getName(), quantidade, spawner}
+                    );
+
                     try {
                         block.getWorld().spigot().playEffect(block.getLocation(), Effect.WITCH_MAGIC, 1, 0, 1.0F, 1.0F, 1.0F, 1.0F, 200, 10);
                     } catch (NoSuchFieldError error) {
@@ -132,6 +156,12 @@ public class SilkSpawnersListener implements Listener {
 
             val spawner = new Spawner(e.getPlayer().getName(), e.getBlock().getLocation(), 1);
             storageController.saveSpawner(spawner);
+
+            getLogger().log(
+                    Level.FINEST,
+                    "{0} created stack on {1}",
+                    new Object[]{e.getPlayer().getName(), spawner}
+            );
         }
     }
 }
