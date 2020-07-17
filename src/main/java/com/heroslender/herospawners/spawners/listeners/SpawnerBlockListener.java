@@ -223,10 +223,11 @@ public class SpawnerBlockListener implements Listener {
         }
 
         val meta = itemInHand.getItemMeta();
-        if (!meta.hasEnchants() || !meta.hasEnchant(Enchantment.SILK_TOUCH)) {
+        val silkLevel = meta.getEnchantLevel(Enchantment.SILK_TOUCH);
+        if (!meta.hasEnchants() || silkLevel == 0) {
             return false;
         }
 
-        return config.getSilktouchLevel() <= 1 || meta.getEnchantLevel(Enchantment.SILK_TOUCH) >= config.getSilktouchLevel();
+        return silkLevel >= config.getSilktouchLevel();
     }
 }
