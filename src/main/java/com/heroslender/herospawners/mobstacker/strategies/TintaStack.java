@@ -1,5 +1,6 @@
-package com.heroslender.herospawners.mobstacker;
+package com.heroslender.herospawners.mobstacker.strategies;
 
+import com.heroslender.herospawners.mobstacker.MobStackerStrategy;
 import com.heroslender.herospawners.models.ISpawner;
 import me.tintastack.api.MobsAPI;
 import org.bukkit.Bukkit;
@@ -8,7 +9,7 @@ import org.bukkit.entity.Entity;
 /**
  * Created by Heroslender.
  */
-public class TintaStack implements MobStackerSupport {
+public class TintaStack implements MobStackerStrategy {
 
     public TintaStack() {
         Bukkit.getLogger().info("[herospawners] TintaStack foi encontrado!");

@@ -1,6 +1,7 @@
-package com.heroslender.herospawners.mobstacker;
+package com.heroslender.herospawners.mobstacker.strategies;
 
 import com.heroslender.herospawners.HeroSpawners;
+import com.heroslender.herospawners.mobstacker.MobStackerStrategy;
 import com.heroslender.herospawners.models.ISpawner;
 import com.kiwifisher.mobstacker2.io.Settings;
 import com.kiwifisher.mobstacker2.metadata.MetaTags;
@@ -14,7 +15,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 /**
  * Created by Heroslender.
  */
-public class MobStacker2 implements MobStackerSupport {
+public class MobStacker2 implements MobStackerStrategy {
 
     public MobStacker2() {
         Bukkit.getLogger().info("[herospawners] MobStacker foi encontrado!");

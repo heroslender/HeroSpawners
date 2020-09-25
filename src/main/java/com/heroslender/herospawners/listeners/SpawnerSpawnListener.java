@@ -10,11 +10,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 public class SpawnerSpawnListener implements Listener {
-    private final Map<Location, Long> preventMultiple = new HashMap<>();
+    private final Map<Location, Long> preventMultiple = new WeakHashMap<>();
 
     @EventHandler
     public void onSpawnerSpawn(SpawnerSpawnEvent e) {
@@ -31,7 +31,7 @@ public class SpawnerSpawnListener implements Listener {
         }
         preventMultiple.put(location, System.currentTimeMillis());
 
-        int stackSize = (int) Math.round((0.5D + Utilities.getRandom().nextDouble()) * spawner.getAmount());
+        final int stackSize = (int) Math.round((0.5D + Utilities.getRandom().nextDouble()) * spawner.getAmount());
 
         SpawnerSpawnStackEvent spawnerSpawnStackEvent = new SpawnerSpawnStackEvent(
                 spawner,
@@ -41,8 +41,13 @@ public class SpawnerSpawnListener implements Listener {
         Bukkit.getPluginManager().callEvent(spawnerSpawnStackEvent);
 
         if (!spawnerSpawnStackEvent.isCancelled()) {
-            e.setCancelled(HeroSpawners.getInstance().getMobStackerSupport().createOrAddStack(spawner, e.getEntity(),
-                    stackSize));
+            final boolean willCancel = HeroSpawners.getInstance().getMobStacker().createOrAddStack(
+                    spawner,
+                    e.getEntity(),
+                    stackSize
+            );
+
+            e.setCancelled(willCancel);
         }
     }
 }

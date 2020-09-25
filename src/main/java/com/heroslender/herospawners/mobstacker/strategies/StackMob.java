@@ -1,5 +1,6 @@
-package com.heroslender.herospawners.mobstacker;
+package com.heroslender.herospawners.mobstacker.strategies;
 
+import com.heroslender.herospawners.mobstacker.MobStackerStrategy;
 import com.heroslender.herospawners.models.ISpawner;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -8,7 +9,7 @@ import uk.antiperson.stackmob.api.EntityManager;
 /**
  * Created by Heroslender.
  */
-public class StackMob implements MobStackerSupport {
+public class StackMob implements MobStackerStrategy {
     EntityManager em;
 
     public StackMob() {

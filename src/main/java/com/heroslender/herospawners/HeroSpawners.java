@@ -5,6 +5,7 @@ import com.heroslender.herospawners.controllers.ConfigurationController;
 import com.heroslender.herospawners.controllers.StorageController;
 import com.heroslender.herospawners.listeners.*;
 import com.heroslender.herospawners.mobstacker.*;
+import com.heroslender.herospawners.mobstacker.strategies.*;
 import com.heroslender.herospawners.services.StorageService;
 import com.heroslender.herospawners.services.StorageServiceMySqlImpl;
 import com.heroslender.herospawners.services.StorageServiceSQLiteImpl;
@@ -36,7 +37,7 @@ public class HeroSpawners extends JavaPlugin {
     @Getter private final Executor executor = ForkJoinPool.commonPool();
     @Getter private final StorageController storageController;
     @Getter private final ConfigurationController configurationController;
-    @Getter private MobStackerSupport mobStackerSupport;
+    @Getter private MobStackerStrategy mobStacker;
     @Getter private boolean shutingDown = true;
 
     static {
@@ -92,18 +93,7 @@ public class HeroSpawners extends JavaPlugin {
         }
 
         // StackMobs
-        if (Bukkit.getServer().getPluginManager().getPlugin("MobStacker2") != null)
-            mobStackerSupport = new MobStacker2();
-        else if (Bukkit.getServer().getPluginManager().getPlugin("StackMob") != null)
-            mobStackerSupport = new StackMob();
-        else if (Bukkit.getServer().getPluginManager().getPlugin("TintaStack") != null)
-            mobStackerSupport = new TintaStack();
-        else if (Bukkit.getServer().getPluginManager().getPlugin("JH_StackMobs") != null)
-            mobStackerSupport = new JhMobStacker();
-        else if (Bukkit.getServer().getPluginManager().getPlugin("ObyStack") != null)
-            mobStackerSupport = new ObyStack();
-        else
-            mobStackerSupport = new SemMobStacker();
+        this.mobStacker = computeMobStackerStrategy();
 
         // listeners
         getServer().getPluginManager().registerEvents(new SpawnerSpawnListener(), this);
@@ -146,6 +136,23 @@ public class HeroSpawners extends JavaPlugin {
         getCommand("herospawners").setExecutor(new HeroSpawnersCommand());
 
         getLogger().info("Plugin carregado!");
+    }
+
+    private MobStackerStrategy computeMobStackerStrategy() {
+        final MobStackerStrategy strategy;
+
+        if (Bukkit.getServer().getPluginManager().getPlugin("MobStacker2") != null)
+            strategy = new MobStacker2();
+        else if (Bukkit.getServer().getPluginManager().getPlugin("StackMob") != null)
+            strategy = new StackMob();
+        else if (Bukkit.getServer().getPluginManager().getPlugin("TintaStack") != null)
+            strategy = new TintaStack();
+        else if (Bukkit.getServer().getPluginManager().getPlugin("JH_StackMobs") != null)
+            strategy = new JhStackMobs();
+        else
+            strategy = new NoMobStacker();
+
+        return strategy;
     }
 
     public boolean shutdownCheck(final Cancellable event, final Player player) {

@@ -1,5 +1,6 @@
-package com.heroslender.herospawners.mobstacker;
+package com.heroslender.herospawners.mobstacker.strategies;
 
+import com.heroslender.herospawners.mobstacker.MobStackerStrategy;
 import com.heroslender.herospawners.models.ISpawner;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -7,9 +8,9 @@ import org.bukkit.entity.Entity;
 /**
  * Created by Heroslender.
  */
-public class SemMobStacker implements MobStackerSupport {
+public class NoMobStacker implements MobStackerStrategy {
 
-    public SemMobStacker() {
+    public NoMobStacker() {
         Bukkit.getLogger().info("[herospawners] Nao foi encontrado um plugin de MobStacker, a usar o metodo padrao.");
     }
 

@@ -95,7 +95,6 @@ public class SpawnerListener implements Listener {
             return;
         }
 
-
         if (spawner.getAmount() > 1) {
             final EntityType et = ((CreatureSpawner) e.getBlock().getState()).getSpawnedType();
 

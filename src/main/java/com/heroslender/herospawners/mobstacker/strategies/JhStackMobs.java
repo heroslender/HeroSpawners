@@ -1,7 +1,8 @@
-package com.heroslender.herospawners.mobstacker;
+package com.heroslender.herospawners.mobstacker.strategies;
 
 import JH_StackMobs.API;
 import JH_StackMobs.Main;
+import com.heroslender.herospawners.mobstacker.MobStackerStrategy;
 import com.heroslender.herospawners.models.ISpawner;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -10,9 +11,9 @@ import org.bukkit.entity.Slime;
 import ultils.IaRemover;
 import ultils.StackAll;
 
-public class JhMobStacker implements MobStackerSupport {
+public class JhStackMobs implements MobStackerStrategy {
 
-    public JhMobStacker() {
+    public JhStackMobs() {
         Bukkit.getLogger().info("[herospawners] JH_StackMobs foi encontrado!");
     }
 

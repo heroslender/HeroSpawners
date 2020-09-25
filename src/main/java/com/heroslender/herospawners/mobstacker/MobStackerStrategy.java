@@ -6,7 +6,7 @@ import org.bukkit.entity.Entity;
 /**
  * Created by Heroslender.
  */
-public interface MobStackerSupport {
+public interface MobStackerStrategy {
 
      boolean createOrAddStack(ISpawner spawner, Entity entity, int quantidade);
 }
