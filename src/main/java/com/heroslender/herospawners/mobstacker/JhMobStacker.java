@@ -13,7 +13,7 @@ import ultils.StackAll;
 public class JhMobStacker implements MobStackerSupport {
 
     public JhMobStacker() {
-        Bukkit.getLogger().info("[herospawners] Jh-MobStacker foi encontrado!");
+        Bukkit.getLogger().info("[herospawners] JH_StackMobs foi encontrado!");
     }
 
     @Override
