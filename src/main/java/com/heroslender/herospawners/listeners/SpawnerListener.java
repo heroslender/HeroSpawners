@@ -48,6 +48,7 @@ public class SpawnerListener implements Listener {
                 ISpawner spawner = storageController.getSpawner(block.getLocation());
                 if (spawner == null) continue;
                 if (spawner.getAmount() < config.getStackLimit() || config.getStackLimit() == 0) {
+
                     spawner.setAmount(spawner.getAmount() + 1);
 
                     getLogger().log(
@@ -65,6 +66,9 @@ public class SpawnerListener implements Listener {
                     return;
                 }
             }
+
+            // Reset the spawn delay
+            ((CreatureSpawner) e.getBlock().getState()).setDelay(200 + Utilities.getRandom().nextInt(600));
 
             Spawner spawner = new Spawner(e.getPlayer().getName(), colocado.getLocation(), 1);
             storageController.saveSpawner(spawner);
@@ -96,11 +100,14 @@ public class SpawnerListener implements Listener {
         }
 
         if (spawner.getAmount() > 1) {
-            final EntityType et = ((CreatureSpawner) e.getBlock().getState()).getSpawnedType();
+            CreatureSpawner creatureSpawner = (CreatureSpawner) e.getBlock().getState();
+            final EntityType et = (creatureSpawner).getSpawnedType();
 
             Bukkit.getScheduler().runTaskLater(HeroSpawners.getInstance(), () -> {
                 e.getBlock().setType(HeroSpawners.SPAWNER_TYPE);
-                ((CreatureSpawner) e.getBlock().getState()).setSpawnedType(et);
+                creatureSpawner.setSpawnedType(et);
+                // Reset the spawn delay
+                creatureSpawner.setDelay(200 + Utilities.getRandom().nextInt(600));
 
                 spawner.setAmount(spawner.getAmount() - 1);
 

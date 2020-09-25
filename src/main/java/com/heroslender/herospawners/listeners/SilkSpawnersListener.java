@@ -13,6 +13,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.val;
 import org.bukkit.*;
+import org.bukkit.block.CreatureSpawner;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
@@ -153,6 +154,8 @@ public class SilkSpawnersListener implements Listener {
                     return;
                 }
             }
+            // Reset the spawn delay
+            ((CreatureSpawner) e.getBlock().getState()).setDelay(200 + Utilities.getRandom().nextInt(600));
 
             val spawner = new Spawner(e.getPlayer().getName(), e.getBlock().getLocation(), 1);
             storageController.saveSpawner(spawner);

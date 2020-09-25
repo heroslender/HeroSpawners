@@ -148,6 +148,8 @@ public class SpawnerBlockListener implements Listener {
             // placed only a part of the stack
             giveItem(e.getPlayer(), e.getBlock().getLocation(), itemEntityType, itemAmount - amountToStack);
         }
+        // Reset the spawn delay
+        ((CreatureSpawner) e.getBlock().getState()).setDelay(200 + Utilities.getRandom().nextInt(600));
 
         val spawner = new Spawner(e.getPlayer().getName(), e.getBlock().getLocation(), amountToStack);
         storageController.saveSpawner(spawner);
