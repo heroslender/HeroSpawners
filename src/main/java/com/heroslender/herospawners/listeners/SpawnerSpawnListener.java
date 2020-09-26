@@ -21,7 +21,7 @@ public class SpawnerSpawnListener implements Listener {
         if (e.isCancelled())
             return;
         final Location location = e.getSpawner().getLocation();
-        ISpawner spawner = HeroSpawners.getInstance().getStorageController().getSpawner(location);
+        ISpawner spawner = HeroSpawners.getInstance().getSpawnerController().getSpawner(location);
         if (spawner == null) return;
 
         final Long lastSpawn = preventMultiple.get(location);

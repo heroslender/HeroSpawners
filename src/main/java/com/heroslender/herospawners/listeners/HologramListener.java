@@ -6,7 +6,7 @@ import com.gmail.filoghost.holographicdisplays.api.line.HologramLine;
 import com.gmail.filoghost.holographicdisplays.api.line.TextLine;
 import com.heroslender.herospawners.HeroSpawners;
 import com.heroslender.herospawners.controllers.ConfigurationController;
-import com.heroslender.herospawners.controllers.StorageController;
+import com.heroslender.herospawners.controllers.SpawnerController;
 import com.heroslender.herospawners.models.ISpawner;
 import lombok.val;
 import org.bukkit.Location;
@@ -31,14 +31,14 @@ public class HologramListener implements Listener {
     public static final Material SKULL_TYPE;
 
     private final ConfigurationController config;
-    private final StorageController storageController;
+    private final SpawnerController spawnerController;
 
     private final List<Player> viewers = new ArrayList<>();
     private final double hologramOffset;
 
-    public HologramListener(ConfigurationController config, StorageController storage) {
+    public HologramListener(ConfigurationController config, SpawnerController storage) {
         this.config = config;
-        this.storageController = storage;
+        this.spawnerController = storage;
 
         val holoLines = config.getHologramText();
         double offset = 0D;
@@ -72,7 +72,7 @@ public class HologramListener implements Listener {
                 return;
             }
 
-            val spawner = storageController.getSpawner(spawnerBlock.getLocation());
+            val spawner = spawnerController.getSpawner(spawnerBlock.getLocation());
             if (spawner == null) {
                 return;
             }

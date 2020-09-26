@@ -2,16 +2,18 @@ package com.heroslender.herospawners.spawners.listeners;
 
 import com.heroslender.herospawners.HeroSpawners;
 import com.heroslender.herospawners.controllers.ConfigurationController;
-import com.heroslender.herospawners.controllers.StorageController;
+import com.heroslender.herospawners.controllers.SpawnerController;
 import com.heroslender.herospawners.models.ISpawner;
-import com.heroslender.herospawners.models.Spawner;
 import com.heroslender.herospawners.spawners.SpawnerItemFactory;
 import com.heroslender.herospawners.utils.Utilities;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
-import org.bukkit.*;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.enchantments.Enchantment;
@@ -26,14 +28,13 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @RequiredArgsConstructor
 public class SpawnerBlockListener implements Listener {
     @Getter(AccessLevel.PRIVATE) private final Logger logger = HeroSpawners.getInstance().getLogger();
     private final ConfigurationController config;
-    private final StorageController storageController;
+    private final SpawnerController spawnerController;
 
     private ISpawner getSpawnerIfMatch(@NotNull final Block block, @NotNull final EntityType entityType) {
         if (block.getType() != HeroSpawners.SPAWNER_TYPE) {
@@ -45,7 +46,7 @@ public class SpawnerBlockListener implements Listener {
             return null;
         }
 
-        return storageController.getSpawner(block.getLocation());
+        return spawnerController.getSpawner(block.getLocation());
     }
 
     private int getAmountToStack(@NotNull final Player player, @Nullable final ISpawner spawner, final int amount) {
@@ -125,19 +126,8 @@ public class SpawnerBlockListener implements Listener {
                 }
 
                 e.setCancelled(true);
-                spawner.setAmount(spawner.getAmount() + amountToStack);
 
-                getLogger().log(
-                        Level.FINEST,
-                        "{0} stacked +{1} on {2}",
-                        new Object[]{e.getPlayer().getName(), amountToStack, spawner}
-                );
-
-                try {
-                    block.getWorld().spigot().playEffect(block.getLocation(), Effect.WITCH_MAGIC, 1, 0, 1.0F, 1.0F, 1.0F, 1.0F, 200, 10);
-                } catch (NoSuchFieldError error) {
-                    // ignored, since 1.13
-                }
+                spawnerController.updateSpawner(e.getPlayer(), spawner, spawner.getAmount() + amountToStack);
                 return;
             }
         }
@@ -148,22 +138,12 @@ public class SpawnerBlockListener implements Listener {
             // placed only a part of the stack
             giveItem(e.getPlayer(), e.getBlock().getLocation(), itemEntityType, itemAmount - amountToStack);
         }
-        // Reset the spawn delay
-        ((CreatureSpawner) e.getBlock().getState()).setDelay(200 + Utilities.getRandom().nextInt(600));
 
-        val spawner = new Spawner(e.getPlayer().getName(), e.getBlock().getLocation(), amountToStack);
-        storageController.saveSpawner(spawner);
+        final CreatureSpawner creatureSpawner = (CreatureSpawner) e.getBlock().getState();
+        spawnerController.saveSpawner(e.getPlayer(), creatureSpawner, amountToStack);
 
-        getLogger().log(
-                Level.FINEST,
-                "{0} created stack on {1}",
-                new Object[]{e.getPlayer().getName(), spawner}
-        );
-
-        val state = e.getBlock().getState();
-        if ((state instanceof CreatureSpawner)) {
-            ((CreatureSpawner) state).setSpawnedType(itemEntityType);
-        }
+        // For some reason we need to do this manually. ¯\_(ツ)_/¯
+        creatureSpawner.setSpawnedType(itemEntityType);
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -173,7 +153,7 @@ public class SpawnerBlockListener implements Listener {
             return;
         }
 
-        val spawner = storageController.getSpawner(e.getBlock().getLocation());
+        val spawner = spawnerController.getSpawner(e.getBlock().getLocation());
         if (spawner == null) {
             return;
         }
@@ -217,24 +197,10 @@ public class SpawnerBlockListener implements Listener {
                     );
         }
 
-        spawner.setAmount(spawner.getAmount() - amount);
+        spawnerController.updateSpawner(e.getPlayer(), spawner, spawner.getAmount() - amount);
 
         if (spawner.getAmount() > 0) {
             e.setCancelled(true);
-
-            getLogger().log(
-                    Level.FINEST,
-                    "{0} broken {1} from {2}",
-                    new Object[]{e.getPlayer().getName(), amount, spawner}
-            );
-        } else {
-            storageController.deleteSpawner(spawner);
-
-            getLogger().log(
-                    Level.FINEST,
-                    "{0} broken all {1} from {2}",
-                    new Object[]{e.getPlayer().getName(), amount, spawner}
-            );
         }
 
         //noinspection IsCancelled

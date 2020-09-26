@@ -2,9 +2,8 @@ package com.heroslender.herospawners.listeners;
 
 import com.heroslender.herospawners.HeroSpawners;
 import com.heroslender.herospawners.controllers.ConfigurationController;
-import com.heroslender.herospawners.controllers.StorageController;
+import com.heroslender.herospawners.controllers.SpawnerController;
 import com.heroslender.herospawners.models.ISpawner;
-import com.heroslender.herospawners.models.Spawner;
 import com.heroslender.herospawners.utils.Utilities;
 import de.dustplanet.silkspawners.events.SilkSpawnersSpawnerBreakEvent;
 import de.dustplanet.silkspawners.events.SilkSpawnersSpawnerPlaceEvent;
@@ -12,14 +11,16 @@ import de.dustplanet.util.SilkUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.val;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Objects;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -28,14 +29,14 @@ import java.util.logging.Logger;
 public class SilkSpawnersListener implements Listener {
     @Getter(AccessLevel.PRIVATE) private final Logger logger = HeroSpawners.getInstance().getLogger();
     private final ConfigurationController config;
-    private final StorageController storageController;
+    private final SpawnerController spawnerController;
     private final SilkUtil su;
 
-    public SilkSpawnersListener(ConfigurationController configurationController, StorageController storageController) {
+    public SilkSpawnersListener(ConfigurationController configurationController, SpawnerController spawnerController) {
         Bukkit.getLogger().info("[herospawners] SilkSpawners foi encontrado!");
 
         this.config = configurationController;
-        this.storageController = storageController;
+        this.spawnerController = spawnerController;
         su = SilkUtil.hookIntoSilkSpanwers();
     }
 
@@ -47,7 +48,7 @@ public class SilkSpawnersListener implements Listener {
             return;
         }
 
-        ISpawner spawner = storageController.getSpawner(e.getBlock().getLocation());
+        ISpawner spawner = spawnerController.getSpawner(e.getBlock().getLocation());
         if (spawner == null) {
             return;
         }
@@ -58,35 +59,20 @@ public class SilkSpawnersListener implements Listener {
             return;
         }
 
-
         int amount = e.getPlayer().isSneaking() ? Math.min(spawner.getAmount(), 64) : 1;
         ItemStack spawnerItemStack = su.newSpawnerItem(e.getEntityID(), su.getCustomSpawnerName(e.getEntityID()), amount, false);
 
-        if (spawner.getAmount() > amount) {
+        spawnerController.updateSpawner(e.getPlayer(), spawner, spawner.getAmount() - amount);
+
+        if (spawner.getAmount() >= 1) {
             e.setCancelled(true);
             e.getPlayer().getInventory().addItem(spawnerItemStack)
                     .values()
                     .forEach(itemStack ->
                             spawner.getLocation().getWorld().dropItemNaturally(spawner.getLocation(), itemStack)
                     );
-
-            spawner.setAmount(spawner.getAmount() - amount);
-
-            getLogger().log(
-                    Level.FINEST,
-                    "{0} broken {1} from {2}",
-                    new Object[]{e.getPlayer().getName(), amount, spawner}
-            );
         } else {
             e.setDrop(spawnerItemStack);
-
-            storageController.deleteSpawner(spawner);
-
-            getLogger().log(
-                    Level.FINEST,
-                    "{0} broken all {1} from {2}",
-                    new Object[]{e.getPlayer().getName(), amount, spawner}
-            );
         }
     }
 
@@ -105,8 +91,10 @@ public class SilkSpawnersListener implements Listener {
                     continue;
                 }
 
-                ISpawner spawner = storageController.getSpawner(block.getLocation());
-                if (spawner == null) continue;
+                ISpawner spawner = spawnerController.getSpawner(block.getLocation());
+                if (spawner == null) {
+                    continue;
+                }
 
                 if (spawner.getAmount() < config.getStackLimit() || config.getStackLimit() <= 0) {
                     int quantidade = 1;
@@ -138,33 +126,12 @@ public class SilkSpawnersListener implements Listener {
                         e.getPlayer().setItemInHand(itemInHand);
                     }
 
-                    spawner.setAmount(spawner.getAmount() + quantidade);
-
-                    getLogger().log(
-                            Level.FINEST,
-                            "{0} stacked +{1} on {2}",
-                            new Object[]{e.getPlayer().getName(), quantidade, spawner}
-                    );
-
-                    try {
-                        block.getWorld().spigot().playEffect(block.getLocation(), Effect.WITCH_MAGIC, 1, 0, 1.0F, 1.0F, 1.0F, 1.0F, 200, 10);
-                    } catch (NoSuchFieldError error) {
-                        // ignored, since 1.13
-                    }
+                    spawnerController.updateSpawner(e.getPlayer(), spawner, spawner.getAmount() + quantidade);
                     return;
                 }
             }
-            // Reset the spawn delay
-            ((CreatureSpawner) e.getBlock().getState()).setDelay(200 + Utilities.getRandom().nextInt(600));
 
-            val spawner = new Spawner(e.getPlayer().getName(), e.getBlock().getLocation(), 1);
-            storageController.saveSpawner(spawner);
-
-            getLogger().log(
-                    Level.FINEST,
-                    "{0} created stack on {1}",
-                    new Object[]{e.getPlayer().getName(), spawner}
-            );
+            spawnerController.saveSpawner(e.getPlayer(), ((CreatureSpawner) e.getBlock().getState()), 1);
         }
     }
 }

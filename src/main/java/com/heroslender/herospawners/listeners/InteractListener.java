@@ -34,7 +34,7 @@ public class InteractListener implements Listener {
             return;
         }
 
-        val spawner = HeroSpawners.getInstance().getStorageController().getSpawner(e.getClickedBlock().getLocation());
+        val spawner = HeroSpawners.getInstance().getSpawnerController().getSpawner(e.getClickedBlock().getLocation());
         if (spawner == null) {
             return;
         }

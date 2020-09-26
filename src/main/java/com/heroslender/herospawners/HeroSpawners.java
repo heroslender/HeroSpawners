@@ -2,7 +2,7 @@ package com.heroslender.herospawners;
 
 import com.heroslender.herospawners.commands.HeroSpawnersCommand;
 import com.heroslender.herospawners.controllers.ConfigurationController;
-import com.heroslender.herospawners.controllers.StorageController;
+import com.heroslender.herospawners.controllers.SpawnerController;
 import com.heroslender.herospawners.listeners.*;
 import com.heroslender.herospawners.mobstacker.*;
 import com.heroslender.herospawners.mobstacker.strategies.*;
@@ -35,7 +35,7 @@ public class HeroSpawners extends JavaPlugin {
     @Getter private static HeroSpawners instance;
 
     @Getter private final Executor executor = ForkJoinPool.commonPool();
-    @Getter private final StorageController storageController;
+    @Getter private final SpawnerController spawnerController;
     @Getter private final ConfigurationController configurationController;
     @Getter private MobStackerStrategy mobStacker;
     @Getter private boolean shutingDown = true;
@@ -62,7 +62,7 @@ public class HeroSpawners extends JavaPlugin {
             storageService = new StorageServiceMySqlImpl();
         else
             storageService = new StorageServiceSQLiteImpl();
-        storageController = new StorageController(storageService, getExecutor());
+        spawnerController = new SpawnerController(storageService, getExecutor());
 
         configurationController = new ConfigurationController();
     }
@@ -70,12 +70,12 @@ public class HeroSpawners extends JavaPlugin {
     @Override
     public void onEnable() {
         configurationController.init();
-        storageController.init();
+        spawnerController.init();
 
         if (getConfig().getBoolean("holograma.ativar", true)) {
             if (getServer().getPluginManager().isPluginEnabled("HolographicDisplays")) {
                 final HologramListener hologramListener =
-                        new HologramListener(getConfigurationController(), getStorageController());
+                        new HologramListener(getConfigurationController(), getSpawnerController());
                 getServer().getPluginManager().registerEvents(hologramListener, this);
                 getLogger().log(Level.INFO, "HolographicDisplays encontrado! Ativando hologramas nos spawners.");
             } else {
@@ -99,19 +99,19 @@ public class HeroSpawners extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new SpawnerSpawnListener(), this);
         if (getServer().getPluginManager().getPlugin("SilkSpawners") != null) {
             getServer().getPluginManager().registerEvents(
-                    new SilkSpawnersListener(configurationController, storageController),
+                    new SilkSpawnersListener(configurationController, spawnerController),
                     this
             );
         } else if (getConfigurationController().isSpawnersEnabled()) {
             getServer().getPluginManager().registerEvents(
-                    new SpawnerBlockListener(configurationController, storageController),
+                    new SpawnerBlockListener(configurationController, spawnerController),
                     this
             );
             val spawnerCommand = new SpawnerCommand();
             getCommand("spawners").setExecutor(spawnerCommand);
             getCommand("spawners").setTabCompleter(spawnerCommand);
         } else {
-            getServer().getPluginManager().registerEvents(new SpawnerListener(configurationController, storageController), this);
+            getServer().getPluginManager().registerEvents(new SpawnerListener(configurationController, spawnerController), this);
         }
 
         // Metrics - https://bstats.org/plugin/bukkit/HeroSpawners
@@ -171,7 +171,7 @@ public class HeroSpawners extends JavaPlugin {
 
         HandlerList.unregisterAll(this);
 
-        storageController.stop();
+        spawnerController.stop();
         configurationController.stop();
     }
 }
