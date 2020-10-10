@@ -6,7 +6,7 @@
 
     <groupId>com.heroslender</groupId>
     <artifactId>HeroSpawners</artifactId>
-    <version>4.2.6</version>
+    <version>4.2.7</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -107,7 +107,7 @@
             <artifactId>JH_StackMobs</artifactId>
             <version>1.1.6</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/Libs/JH_StackMobs.jar</systemPath>
+            <systemPath>${project.basedir}/Libs/JH_StackMobs_2.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.gmail.filoghost.holographicdisplays</groupId>
