@@ -3,6 +3,7 @@ package com.heroslender.herospawners.api.events;
 import com.heroslender.herospawners.models.ISpawner;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.Cancellable;
 
@@ -19,9 +20,9 @@ public class SpawnerSpawnStackEvent extends EventWrapper implements Cancellable 
     @Getter private final ISpawner spawner;
 
     /**
-     * The type of the spawned entity
+     * The entity spawned
      */
-    @Getter private final EntityType entityType;
+    @Getter private final Entity entity;
 
     /**
      * The size of the entity stack
@@ -32,6 +33,16 @@ public class SpawnerSpawnStackEvent extends EventWrapper implements Cancellable 
 
     public boolean isCancelled() {
         return canceled;
+    }
+
+    /**
+     * The type of the spawned entity
+     *
+     * @deprecated To be removed on v5
+     */
+    @Deprecated
+    public EntityType getEntityType() {
+        return getEntity().getType();
     }
 
     public void setCancelled(boolean cancel) {

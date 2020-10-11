@@ -16,10 +16,8 @@ import java.util.WeakHashMap;
 public class SpawnerSpawnListener implements Listener {
     private final Map<Location, Long> preventMultiple = new WeakHashMap<>();
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onSpawnerSpawn(SpawnerSpawnEvent e) {
-        if (e.isCancelled())
-            return;
         final Location location = e.getSpawner().getLocation();
         ISpawner spawner = HeroSpawners.getInstance().getSpawnerController().getSpawner(location);
         if (spawner == null) return;
@@ -35,7 +33,7 @@ public class SpawnerSpawnListener implements Listener {
 
         SpawnerSpawnStackEvent spawnerSpawnStackEvent = new SpawnerSpawnStackEvent(
                 spawner,
-                e.getEntityType(),
+                e.getEntity(),
                 stackSize
         );
         Bukkit.getPluginManager().callEvent(spawnerSpawnStackEvent);
