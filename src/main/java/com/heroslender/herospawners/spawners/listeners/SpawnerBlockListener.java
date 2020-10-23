@@ -155,6 +155,35 @@ public class SpawnerBlockListener implements Listener {
 
         val spawner = spawnerController.getSpawner(e.getBlock().getLocation());
         if (spawner == null) {
+            if (config.isVanillaEnabled() && e.getPlayer().getGameMode() != GameMode.CREATIVE) {
+                val silkCheck = checkSilktouck(e.getPlayer());
+                if (!silkCheck && !config.isDestroySilktouch()) {
+                    // The player doesn't have silk-touch and it's configured not to destroy the spawner
+                    // So we do nothing here, and cancel the event
+                    e.setCancelled(true);
+                    return;
+                }
+
+                EntityType entityType = ((CreatureSpawner) e.getBlock().getState()).getSpawnedType();
+
+                ItemStack spawnerItemStack = SpawnerItemFactory.newItemStack(entityType, 1);
+                if (spawnerItemStack == null) {
+                    e.getPlayer().sendMessage(ChatColor.RED + "Ocurreu um erro ao quebrar o spawner! " + ChatColor.GRAY + "#2");
+                    e.setCancelled(true);
+                    return;
+                }
+
+                e.getPlayer().getInventory().addItem(spawnerItemStack)
+                        .values()
+                        .forEach(itemStack ->
+                                spawner.getLocation().getWorld().dropItemNaturally(spawner.getLocation(), itemStack)
+                        );
+
+                if (!config.isSpawnersDropXP()) {
+                    e.setExpToDrop(0);
+                }
+            }
+
             return;
         }
 

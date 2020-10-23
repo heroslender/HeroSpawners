@@ -39,6 +39,7 @@ holograma:
 spawner:
   enable: true
   dropXP: false
+  allow-break-vanilla-spawners: false
   ItemStack:
     name: '&7Gerador de Monstros'
     lore:

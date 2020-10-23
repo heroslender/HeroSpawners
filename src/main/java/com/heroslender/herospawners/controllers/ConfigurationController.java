@@ -44,9 +44,13 @@ public class ConfigurationController implements Controller {
     @Getter private int silktouchLevel;
     @Getter private boolean destroySilktouch;
 
+    @Getter private boolean vanillaEnabled;
+
     @Override
     public void init() {
         loadDefaults();
+
+        vanillaEnabled = getConfig().getBoolean("spawner.allow-break-vanilla-spawners", false);
 
         spawnersEnabled = getConfig().getBoolean("spawner.enable", false);
         spawnersDropXP = getConfig().getBoolean("spawner.dropXP", false);
@@ -104,6 +108,7 @@ public class ConfigurationController implements Controller {
 
         setDefault("spawner.enable", true);
         setDefault("spawner.dropXP", false);
+        setDefault("spawner.allow-break-vanilla-spawners", false);
         setDefault("spawner.ItemStack.name", "&aSpawner de &7" + TYPE_PLACEHOLDER);
         setDefault("spawner.ItemStack.lore", Collections.singletonList("&eQuantidade: &7x" + AMOUNT_PLACEHOLDER));
         setDefault("spawner.SilkTouch.enable", true);
