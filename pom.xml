@@ -6,7 +6,7 @@
 
     <groupId>com.heroslender</groupId>
     <artifactId>HeroSpawners</artifactId>
-    <version>4.3.0</version>
+    <version>4.3.1</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -97,10 +97,17 @@
         </dependency>
         <dependency>
             <groupId>JH_StackMobs</groupId>
-            <artifactId>JH_StackMobs</artifactId>
+            <artifactId>JH_StackMobs-Old</artifactId>
             <version>1.1.6</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/Libs/JH_StackMobs.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>JH_StackMobs</groupId>
+            <artifactId>JH_StackMobs</artifactId>
+            <version>1.1.8</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/Libs/JH_StackMobs_1.1.8.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.gmail.filoghost.holographicdisplays</groupId>
