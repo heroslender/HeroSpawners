@@ -118,7 +118,6 @@ public class ConfigurationController implements Controller {
         setDefault("holograma.ativar", true);
         setDefault("holograma.distancia", 5);
         setDefault("holograma.texto", "&7" + AMOUNT_PLACEHOLDER + "x &e" + TYPE_PLACEHOLDER);
-        setDefault("holograma.mostrar-cabeca", true);
 
         setDefault("interact.ativar", true);
         setDefault("interact.delay", 5000);
