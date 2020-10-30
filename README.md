@@ -41,12 +41,52 @@ juntar:
   raio: 5
   # Limite de spawners por stack, 0 = infinito
   maximo: 0
+# Sistema de Informações do Spawner no Chat
+# Manda no chat as informações do spawner quando o player clica nele
+interact:
+  # Ativar o sistema?
+  ativar: true
+  # Delay que o player tem que esperar para poder usar esta
+  # funcionalidade novamente.
+  delay: 2000
+  # Texto que aparece no chat
+  # Placeholders disponiveis
+  #  > %quantidade% -> Quantidade de spawners no stack
+  #  > %tipo% -> Nome do mob que spawna
+  #  > %dono% -> Dono do spawner/quem o colocou
+  texto:
+    - '&5Informações do spawner:'
+    - '&r'
+    - '&eDono: &7%dono%'
+    - '&eStack: &7%quantidade%'
+    - '&eMob: &7%tipo%'
+    - '&r'
+# Sistema de Holograma
+# Cria um holograma com as informações do spawner quando o player
+# mira no spawner.
+holograma:
+  # Ativar o sistema de holograma do plugin?
+  ativar: true
+  # Distância a que o holograma do spawner fica visivel
+  distancia: 5
+  # Texto do holograma
+  # Placeholders disponiveis:
+  #  > %quantidade% -> Quantidade de spawners no stack
+  #  > %tipo% -> Nome do mob que spawna
+  #  > %dono% -> Dono do spawner/quem o colocou
+  #  > %skull% -> Cabeça do mob, tem que ser uma linha dedicada
+  texto:
+    - '&7%quantidade%x &e%tipo%'
+    - '&eDono: &7%dono%'
+    - '%skull%'
 # Configuração do sistema de spawners
 spawner:
   # Ativar o sistema de spawners interno? Se tiver o SilkSpawners no servidor, ele irá ter prioridade sobre este.
   enable: true
    # Dropar xp quando quebra spawner
   dropXP: false
+  # Permitir que players quebrem spawners encontrados pelo mapa survival
+  allow-break-vanilla-spawners: false
   # Configuração do item dos spawners. Placeholders disponiveis:
   #  > %tipo% -> Nome do mob
   #  > %quantidade% -> Quantidade de spawners no stack
@@ -68,19 +108,6 @@ spawner:
     # Se colocar em true, quebra o spawner normal, mas não dropa o item
     # Se colocar em false, não quebra spawner nem dropa o item
     detroySpawnerWithouSilktouch: true
-holograma:
-  # Distância a que o holograma do spawner fica visivel
-  distancia: 5
-  # Texto do holograma
-  # Placeholders disponiveis
-  #  > %quantidade% -> Quantidade de spawners no stack
-  #  > %tipo% -> Nome do mob que spawna
-  #  > %dono% -> Dono do spawner/quem o colocou
-  #  > %skull% -> Cabeça do mob, tem que ser uma linha dedicada
-  texto:
-    - '&7%quantidade%x &e%tipo%'
-    - '&eDono: &7%dono%'
-    - '%skull%'
 # Configuração de cada mob
 mobs:
   CREEPER:
