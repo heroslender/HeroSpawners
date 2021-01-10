@@ -30,6 +30,9 @@ public class ConfigurationController implements Controller {
 
     @Getter private List<String> hologramText;
     @Getter private int hologramViewDistance;
+    @Getter private double hologramOffsetX;
+    @Getter private double hologramOffsetY;
+    @Getter private double hologramOffsetZ;
     private boolean trimHologram = false;
 
     private Map<EntityType, EntityProperties> entityProperties;
@@ -67,12 +70,17 @@ public class ConfigurationController implements Controller {
         stackRadious = getConfig().getInt("juntar.raio", 5);
         stackLimit = getConfig().getInt("juntar.maximo", 0);
 
+        hologramViewDistance = getConfig().getInt("holograma.distancia", 0);
         if (getConfig().isList("holograma.texto")) {
             hologramText = parseColors(getConfig().getStringList("holograma.texto"));
         } else {
             hologramText = new ArrayList<>();
             hologramText.add(parseColors(getConfig().getString("holograma.texto", "&7%quantidade%x &e" + TYPE_PLACEHOLDER)));
         }
+        hologramOffsetX = getConfig().getDouble("holograma.offset.x", 0.5);
+        hologramOffsetY = getConfig().getDouble("holograma.offset.y", 1.17);
+        hologramOffsetZ = getConfig().getDouble("holograma.offset.z", 0.5);
+
 
         if (getConfig().isList("interact.texto")) {
             informationText = parseColors(getConfig().getStringList("interact.texto"));
@@ -82,7 +90,6 @@ public class ConfigurationController implements Controller {
         }
         informationDelay = getConfig().getLong("interact.delay", 5000);
 
-        hologramViewDistance = getConfig().getInt("holograma.distancia", 0);
         trimHologram = hologramText.get(hologramText.size() - 1).equalsIgnoreCase(SKULL_PLACEHOLDER);
 
         entityProperties = new EnumMap<>(EntityType.class);
@@ -118,6 +125,9 @@ public class ConfigurationController implements Controller {
         setDefault("holograma.ativar", true);
         setDefault("holograma.distancia", 5);
         setDefault("holograma.texto", "&7" + AMOUNT_PLACEHOLDER + "x &e" + TYPE_PLACEHOLDER);
+        setDefault("holograma.offset.x", 0.5);
+        setDefault("holograma.offset.y", 1.17);
+        setDefault("holograma.offset.z", 0.5);
 
         setDefault("interact.ativar", true);
         setDefault("interact.delay", 5000);

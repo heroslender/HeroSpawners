@@ -27,12 +27,23 @@ import java.util.logging.Level;
 import static com.heroslender.herospawners.controllers.ConfigurationController.SKULL_PLACEHOLDER;
 
 public class HologramListener implements Listener {
-    private static final Set<Material> transparentBlocks = Collections.singleton(Material.AIR);
     public static final Material SKULL_TYPE;
+    private static final Set<Material> transparentBlocks = Collections.singleton(Material.AIR);
+
+    static {
+        Material mat;
+        try {
+            mat = Material.valueOf("PLAYER_HEAD");
+            System.out.println(mat);
+        } catch (IllegalArgumentException e) {
+            mat = Material.SKULL_ITEM;
+        }
+
+        SKULL_TYPE = mat;
+    }
 
     private final ConfigurationController config;
     private final SpawnerController spawnerController;
-
     private final List<Player> viewers = new ArrayList<>();
     private final double hologramOffset;
 
@@ -109,7 +120,11 @@ public class HologramListener implements Listener {
     }
 
     private void setSpawnerHologram(final Player player, final ISpawner spawner) {
-        val loc = spawner.getLocation().add(0.5, 1.17 + hologramOffset, 0.5);
+        val loc = spawner.getLocation().add(
+                config.getHologramOffsetX(),
+                config.getHologramOffsetY() + hologramOffset,
+                config.getHologramOffsetZ()
+        );
         val hologram = createHologramFor(player, loc);
 
         val lines = new ArrayList<HologramLine>();
@@ -159,18 +174,6 @@ public class HologramListener implements Listener {
         hologram.getVisibilityManager().setVisibleByDefault(false);
         hologram.getVisibilityManager().showTo(player);
         return hologram;
-    }
-
-    static {
-        Material mat;
-        try {
-            mat = Material.valueOf("PLAYER_HEAD");
-            System.out.println(mat);
-        } catch (IllegalArgumentException e) {
-            mat = Material.SKULL_ITEM;
-        }
-
-        SKULL_TYPE = mat;
     }
 
     private ItemStack getSkull(final String owner) {

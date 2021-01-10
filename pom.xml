@@ -6,7 +6,7 @@
 
     <groupId>com.heroslender</groupId>
     <artifactId>HeroSpawners</artifactId>
-    <version>4.3.1</version>
+    <version>4.3.2</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -74,6 +74,13 @@
             <version>19.0.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>me.leo.stack</groupId>
+            <artifactId>ObyStac2k</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/Libs/5d37b611d4298.slime-tools.jar</systemPath>
+        </dependency>
         <dependency>
             <groupId>uk.antiperson.stackmob</groupId>
             <artifactId>StackMob</artifactId>
