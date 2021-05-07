@@ -27,7 +27,16 @@ public class Utilities {
 
     public static Location str2loc(String str) {
         String[] str2loc = str.split("\\|");
-        return new Location(Bukkit.getServer().getWorld(str2loc[0]), Double.parseDouble(str2loc[1]), Double.parseDouble(str2loc[2]), Double.parseDouble(str2loc[3]));
+        return str2loc(str2loc);
+    }
+
+    public static Location str2loc(String[] str) {
+        return new Location(
+                Bukkit.getServer().getWorld(str[0]),
+                Double.parseDouble(str[1]),
+                Double.parseDouble(str[2]),
+                Double.parseDouble(str[3])
+        );
     }
 
     public static String loc2str(Location loc) {

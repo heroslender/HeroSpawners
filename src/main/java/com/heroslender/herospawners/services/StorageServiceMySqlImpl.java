@@ -60,6 +60,36 @@ public class StorageServiceMySqlImpl implements StorageServiceSql {
     }
 
     @Override
+    public synchronized Map<Location, ISpawner> getSpawners(String world) {
+        Map<Location, ISpawner> spawners = new HashMap<>();
+        try (Connection c = hikariDataSource.getConnection()) {
+            try (PreparedStatement ps = c.prepareStatement("SELECT * FROM " + SPAWNERS + ";")) {
+                try (ResultSet rs = ps.executeQuery()) {
+                    int failed = 0;
+                    while (rs.next()) {
+                        String[] split = rs.getString(SPAWNERS_LOC).split("\\|");
+                        if (!world.equals(split[0])) {
+                            continue;
+                        }
+
+                        Location location = Utilities.str2loc(split);
+                        if (location.getWorld() == null || location.getBlock().getType() != HeroSpawners.SPAWNER_TYPE) {
+                            failed++;
+                            continue;
+                        }
+                        spawners.put(location, new Spawner(rs.getString(SPAWNERS_OWNER), location, rs.getInt(SPAWNERS_QUANT)));
+                    }
+                    if (failed != 0)
+                        log(Level.WARNING, "Nao foi possivel carregar " + failed + " spawners!");
+                }
+            }
+        } catch (Exception e) {
+            log("Ocurreu um erro ao pegar os spawners todos.", e);
+        }
+        return spawners;
+    }
+
+    @Override
     public synchronized void save(final ISpawner spawner) {
         try (Connection c = hikariDataSource.getConnection()) {
             try (PreparedStatement ps = c.prepareStatement("INSERT INTO " + SPAWNERS +

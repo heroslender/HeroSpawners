@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -44,6 +45,23 @@ public class SpawnerController implements Controller {
         Bukkit.getScheduler().runTaskTimerAsynchronously(HeroSpawners.getInstance(), this::save, UPDATE_DELAY, UPDATE_DELAY);
 
         cachedSpawners.putAll(spawners);
+    }
+
+    public void load(World world) {
+        HeroSpawners.getInstance().getLogger().log(
+                Level.INFO,
+                "[Storage] Carregando spawners no mundo {0}...",
+                world.getName()
+        );
+
+        Map<Location, ISpawner> spawners = storageService.getSpawners(world.getName());
+        cachedSpawners.putAll(spawners);
+
+        HeroSpawners.getInstance().getLogger().log(
+                Level.INFO,
+                "[Storage] Foram carregados {0} spawners no mundo {1} da base de dados.",
+                new Object[]{spawners.size(), world.getName()}
+        );
     }
 
     public void save() {
@@ -112,7 +130,7 @@ public class SpawnerController implements Controller {
                     "{0} stacked +{1} on {2}",
                     new Object[]{who, newAmount - prevAmount, spawner}
             );
-        } else if(newAmount <= 0) {
+        } else if (newAmount <= 0) {
             deleteSpawner(spawner);
 
             getLogger().log(

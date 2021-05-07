@@ -4,7 +4,7 @@ import com.heroslender.herospawners.commands.HeroSpawnersCommand;
 import com.heroslender.herospawners.controllers.ConfigurationController;
 import com.heroslender.herospawners.controllers.SpawnerController;
 import com.heroslender.herospawners.listeners.*;
-import com.heroslender.herospawners.mobstacker.*;
+import com.heroslender.herospawners.mobstacker.MobStackerStrategy;
 import com.heroslender.herospawners.mobstacker.strategies.*;
 import com.heroslender.herospawners.services.StorageService;
 import com.heroslender.herospawners.services.StorageServiceMySqlImpl;
@@ -135,6 +135,8 @@ public class HeroSpawners extends JavaPlugin {
 
         getCommand("herospawners").setExecutor(new HeroSpawnersCommand());
 
+        getServer().getPluginManager().registerEvents(new WorldListener(spawnerController), this);
+
         getLogger().info("Plugin carregado!");
     }
 
@@ -147,7 +149,7 @@ public class HeroSpawners extends JavaPlugin {
             strategy = new StackMob();
         else if (Bukkit.getServer().getPluginManager().getPlugin("TintaStack") != null)
             strategy = new TintaStack();
-        else if (Bukkit.getServer().getPluginManager().getPlugin("JH_StackMobs") != null){
+        else if (Bukkit.getServer().getPluginManager().getPlugin("JH_StackMobs") != null) {
             MobStackerStrategy jh;
             try {
                 Class.forName("ultils.StackAll");
