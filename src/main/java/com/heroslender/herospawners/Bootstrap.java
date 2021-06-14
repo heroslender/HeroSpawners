@@ -4,6 +4,7 @@ import com.heroslender.herospawners.commands.HeroSpawnersCommand;
 import com.heroslender.herospawners.listeners.*;
 import com.heroslender.herospawners.spawners.commands.SpawnerCommand;
 import com.heroslender.herospawners.spawners.listeners.SpawnerBlockListener;
+import com.heroslender.herospawners.tasks.HologramUpdateTask;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -11,6 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.Listener;
 
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,11 +37,29 @@ public class Bootstrap {
 
         getLogger().log(Level.INFO, "HolographicDisplays encontrado! Ativando hologramas nos spawners.");
 
-        final HologramListener hologramListener = new HologramListener(
-            heroSpawners.getConfigurationController(),
-            heroSpawners.getSpawnerController()
-        );
-        Bukkit.getPluginManager().registerEvents(hologramListener, heroSpawners);
+        switch (getConfig().getString("holograma.metodo", "TIMER").toUpperCase(Locale.ROOT)) {
+            case "TIMER":
+                if (!getConfig().isSet("holograma.delay")) {
+                    getConfig().set("holograma.delay", 20);
+                    heroSpawners.saveConfig();
+                }
+
+                final int delay = getConfig().getInt("holograma.delay", 20);
+                final Runnable task = new HologramUpdateTask(
+                    heroSpawners.getConfigurationController(),
+                    heroSpawners.getSpawnerController()
+                );
+
+                Bukkit.getScheduler().runTaskTimer(heroSpawners, task, delay, delay);
+                break;
+            case "MOVE_EVENT":
+                final HologramListener hologramListener = new HologramListener(
+                    heroSpawners.getConfigurationController(),
+                    heroSpawners.getSpawnerController()
+                );
+                Bukkit.getPluginManager().registerEvents(hologramListener, heroSpawners);
+                break;
+        }
     }
 
     public void setupSpawnerInfoOnInteract() {
