@@ -1,19 +1,14 @@
 package com.heroslender.herospawners;
 
-import com.heroslender.herospawners.commands.HeroSpawnersCommand;
 import com.heroslender.herospawners.controllers.ConfigurationController;
 import com.heroslender.herospawners.controllers.SpawnerController;
-import com.heroslender.herospawners.listeners.*;
 import com.heroslender.herospawners.mobstacker.MobStackerStrategy;
 import com.heroslender.herospawners.mobstacker.strategies.*;
 import com.heroslender.herospawners.services.StorageService;
 import com.heroslender.herospawners.services.StorageServiceMySqlImpl;
 import com.heroslender.herospawners.services.StorageServiceSQLiteImpl;
-import com.heroslender.herospawners.spawners.commands.SpawnerCommand;
-import com.heroslender.herospawners.spawners.listeners.SpawnerBlockListener;
 import com.heroslender.herospawners.utils.Metrics;
 import lombok.Getter;
-import lombok.val;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.Logger;
@@ -27,7 +22,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
-import java.util.logging.Level;
 
 public class HeroSpawners extends JavaPlugin {
     public static final Material SPAWNER_TYPE;
@@ -72,53 +66,11 @@ public class HeroSpawners extends JavaPlugin {
         configurationController.init();
         spawnerController.init();
 
-        if (getConfig().getBoolean("holograma.ativar", true)) {
-            if (getServer().getPluginManager().isPluginEnabled("HolographicDisplays")) {
-                final HologramListener hologramListener =
-                        new HologramListener(getConfigurationController(), getSpawnerController());
-                getServer().getPluginManager().registerEvents(hologramListener, this);
-                getLogger().log(Level.INFO, "HolographicDisplays encontrado! Ativando hologramas nos spawners.");
-            } else {
-                getLogger().log(Level.WARNING, "HolographicDisplays não foi encontrado! Desativado hologramas nos spawners.");
-            }
-        } else {
-            getLogger().log(Level.INFO, "Hologramas nos spawners desativado!");
-        }
-
-        if (getConfig().getBoolean("interact.ativar", true)) {
-            getServer().getPluginManager().registerEvents(new InteractListener(getConfigurationController()), this);
-            getLogger().log(Level.INFO, "Mostrar infos ao clicar no spawner ativado!");
-        } else {
-            getLogger().log(Level.INFO, "Mostrar infos ao clicar no spawner desativado!");
-        }
-
-        // StackMobs
         this.mobStacker = computeMobStackerStrategy();
 
-        // listeners
-        getServer().getPluginManager().registerEvents(new SpawnerSpawnListener(), this);
-        if (getServer().getPluginManager().getPlugin("SilkSpawners") != null) {
-            getServer().getPluginManager().registerEvents(
-                    new SilkSpawnersListener(configurationController, spawnerController),
-                    this
-            );
-        } else if (getConfigurationController().isSpawnersEnabled()) {
-            getServer().getPluginManager().registerEvents(
-                    new SpawnerBlockListener(configurationController, spawnerController),
-                    this
-            );
-            val spawnerCommand = new SpawnerCommand();
-            getCommand("spawners").setExecutor(spawnerCommand);
-            getCommand("spawners").setTabCompleter(spawnerCommand);
-        } else {
-            getServer().getPluginManager().registerEvents(new SpawnerListener(configurationController, spawnerController), this);
-        }
-
-        // Metrics - https://bstats.org/plugin/bukkit/HeroSpawners
-        new Metrics(this).submitData();
-
-        // Colocar o server como ligado(Prevenir dups em reinicios)
-        getServer().getScheduler().scheduleSyncDelayedTask(this, () -> shutingDown = false);
+        final Bootstrap bootstrap = new Bootstrap(getConfig(), this);
+        bootstrap.setupSpawnerSpawnListener();
+        bootstrap.setupSpawnerBlockListener();
 
         ((Logger) LogManager.getRootLogger()).addFilter(new AbstractFilter() {
             @Override
@@ -133,9 +85,15 @@ public class HeroSpawners extends JavaPlugin {
             }
         });
 
-        getCommand("herospawners").setExecutor(new HeroSpawnersCommand());
+        bootstrap.setupCommands();
+        bootstrap.setupHolograms();
+        bootstrap.setupSpawnerInfoOnInteract();
 
-        getServer().getPluginManager().registerEvents(new WorldListener(spawnerController), this);
+        // Metrics - https://bstats.org/plugin/bukkit/HeroSpawners
+        new Metrics(this).submitData();
+
+        // Colocar o server como ligado(Prevenir dups em reinicios)
+        Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> shutingDown = false);
 
         getLogger().info("Plugin carregado!");
     }
@@ -143,13 +101,13 @@ public class HeroSpawners extends JavaPlugin {
     private MobStackerStrategy computeMobStackerStrategy() {
         final MobStackerStrategy strategy;
 
-        if (Bukkit.getServer().getPluginManager().getPlugin("MobStacker2") != null)
+        if (Bukkit.getPluginManager().getPlugin("MobStacker2") != null)
             strategy = new MobStacker2();
-        else if (Bukkit.getServer().getPluginManager().getPlugin("StackMob") != null)
+        else if (Bukkit.getPluginManager().getPlugin("StackMob") != null)
             strategy = new StackMob();
-        else if (Bukkit.getServer().getPluginManager().getPlugin("TintaStack") != null)
+        else if (Bukkit.getPluginManager().getPlugin("TintaStack") != null)
             strategy = new TintaStack();
-        else if (Bukkit.getServer().getPluginManager().getPlugin("JH_StackMobs") != null) {
+        else if (Bukkit.getPluginManager().getPlugin("JH_StackMobs") != null) {
             MobStackerStrategy jh;
             try {
                 Class.forName("ultils.StackAll");
