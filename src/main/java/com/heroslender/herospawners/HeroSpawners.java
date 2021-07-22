@@ -103,8 +103,16 @@ public class HeroSpawners extends JavaPlugin {
 
         if (Bukkit.getPluginManager().getPlugin("MobStacker2") != null)
             strategy = new MobStacker2();
-        else if (Bukkit.getPluginManager().getPlugin("StackMob") != null)
-            strategy = new StackMob();
+        else if (Bukkit.getPluginManager().getPlugin("StackMob") != null){
+            MobStackerStrategy strat;
+            try {
+                Class.forName("uk.antiperson.stackmob.api.EntityManager");
+                strat = new StackMob2();
+            } catch (ClassNotFoundException e) {
+                strat = new StackMob();
+            }
+            strategy = strat;
+        }
         else if (Bukkit.getPluginManager().getPlugin("TintaStack") != null)
             strategy = new TintaStack();
         else if (Bukkit.getPluginManager().getPlugin("JH_StackMobs") != null) {

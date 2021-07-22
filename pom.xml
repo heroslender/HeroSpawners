@@ -6,7 +6,7 @@
 
     <groupId>com.heroslender</groupId>
     <artifactId>HeroSpawners</artifactId>
-    <version>4.4.0</version>
+    <version>4.4.1</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -24,6 +24,10 @@
         <repository>
             <name>Holographic Displays Repo</name>
             <id>codemc-repo</id>
+            <url>https://repo.codemc.org/repository/maven-public/</url>
+        </repository>
+        <repository>
+            <id>CodeMC</id>
             <url>https://repo.codemc.org/repository/maven-public/</url>
         </repository>
     </repositories>
@@ -84,6 +88,11 @@
         <dependency>
             <groupId>uk.antiperson.stackmob</groupId>
             <artifactId>StackMob</artifactId>
+            <version>5.5.3</version>
+        </dependency>
+        <dependency>
+            <groupId>uk.antiperson.stackmob</groupId>
+            <artifactId>StackMob-2</artifactId>
             <version>2.0.8</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/Libs/StackMob-2.0.8-SNAPSHOT.jar</systemPath>
