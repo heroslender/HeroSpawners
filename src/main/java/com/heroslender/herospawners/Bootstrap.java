@@ -1,6 +1,8 @@
 package com.heroslender.herospawners;
 
 import com.heroslender.herospawners.commands.HeroSpawnersCommand;
+import com.heroslender.herospawners.hologram.DecentHologramsHologramImpl;
+import com.heroslender.herospawners.hologram.HolographicDisplaysHologramImpl;
 import com.heroslender.herospawners.listeners.*;
 import com.heroslender.herospawners.spawners.commands.SpawnerCommand;
 import com.heroslender.herospawners.spawners.listeners.SpawnerBlockListener;
@@ -27,15 +29,17 @@ public class Bootstrap {
             return;
         }
 
-        if (!Bukkit.getPluginManager().isPluginEnabled("HolographicDisplays")) {
-            getLogger().log(
-                Level.WARNING,
-                "HolographicDisplays não foi encontrado! Desativado hologramas nos spawners."
-            );
+        if (Bukkit.getPluginManager().isPluginEnabled("HolographicDisplays")) {
+            heroSpawners.hologramFactory = HolographicDisplaysHologramImpl.FACTORY;
+            getLogger().info("HolographicDisplays detetado! Ativando hologramas nos spawners.");
+        } else if (Bukkit.getPluginManager().isPluginEnabled("DecentHolograms")) {
+            heroSpawners.hologramFactory = DecentHologramsHologramImpl.FACTORY;
+            getLogger().info("DecentHolograms detetado! Ativando hologramas nos spawners.");
+        } else {
+            heroSpawners.hologramFactory = null;
+            getLogger().warning("Nenhum plugin de holograma suportado foi detetado! Desativado hologramas nos spawners.");
             return;
         }
-
-        getLogger().log(Level.INFO, "HolographicDisplays encontrado! Ativando hologramas nos spawners.");
 
         switch (getConfig().getString("holograma.metodo", "TIMER").toUpperCase(Locale.ROOT)) {
             case "TIMER":

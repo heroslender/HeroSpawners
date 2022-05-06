@@ -1,12 +1,10 @@
 package com.heroslender.herospawners.utils;
 
-import com.gmail.filoghost.holographicdisplays.api.Hologram;
-import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
-import com.gmail.filoghost.holographicdisplays.api.line.HologramLine;
-import com.gmail.filoghost.holographicdisplays.api.line.TextLine;
 import com.heroslender.herospawners.HeroSpawners;
 import com.heroslender.herospawners.controllers.ConfigurationController;
 import com.heroslender.herospawners.controllers.SpawnerController;
+import com.heroslender.herospawners.hologram.DecentHologramsHologramImpl;
+import com.heroslender.herospawners.hologram.Hologram;
 import com.heroslender.herospawners.models.ISpawner;
 import lombok.val;
 import org.bukkit.Location;
@@ -123,13 +121,16 @@ public class HologramFacade {
         );
         val hologram = createHologramFor(player, loc);
 
-        val lines = new ArrayList<HologramLine>();
         for (String line : spawner.getHologramText()) {
             if (line.equalsIgnoreCase(SKULL_PLACEHOLDER)) {
                 String spawnerSkullName = spawner.getEntityProperties().getSkullSkinName();
-                lines.add(hologram.appendItemLine(getSkull(spawnerSkullName)));
+                if (hologram instanceof DecentHologramsHologramImpl) {
+                    hologram.addLine("#ICON: PLAYER_HEAD (" + spawnerSkullName + ")");
+                } else {
+                    hologram.addLine(getSkull(spawnerSkullName));
+                }
             } else {
-                lines.add(hologram.appendTextLine(line));
+                hologram.addLine(line);
             }
         }
 
@@ -143,7 +144,7 @@ public class HologramFacade {
                     || spawner.getAmount() < 0
                     || !spawner.getLocation().equals(player.getTargetBlock(transparentBlocks, config.getHologramViewDistance()).getLocation())) {
                     cancel();
-                    hologram.delete();
+                    hologram.remove();
                     viewers.remove(player);
                     return;
                 }
@@ -151,14 +152,9 @@ public class HologramFacade {
                 // Update the hologram if needed
                 val newLines = spawner.getHologramText();
                 for (int i = 0; i < newLines.size(); i++) {
-                    val currentLine = lines.get(i);
-                    if (currentLine instanceof TextLine) {
-                        TextLine textLine = (TextLine) currentLine;
-                        String newValue = newLines.get(i);
-
-                        if (!textLine.getText().equals(newValue)) {
-                            textLine.setText(newValue);
-                        }
+                    val newLine = newLines.get(i);
+                    if (!newLine.equalsIgnoreCase(SKULL_PLACEHOLDER)) {
+                        hologram.setLine(i, newLine);
                     }
                 }
             }
@@ -166,10 +162,9 @@ public class HologramFacade {
     }
 
     private Hologram createHologramFor(final Player player, final Location location) {
-        val hologram = HologramsAPI.createHologram(HeroSpawners.getInstance(), location);
-        hologram.getVisibilityManager().setVisibleByDefault(false);
-        hologram.getVisibilityManager().showTo(player);
-        return hologram;
+        return HeroSpawners.getInstance()
+            .getHologramFactory()
+            .createPrivateHologram(player.getName(), player, location, Collections.emptyList());
     }
 
     private ItemStack getSkull(final String owner) {

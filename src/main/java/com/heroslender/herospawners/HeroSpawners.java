@@ -2,6 +2,7 @@ package com.heroslender.herospawners;
 
 import com.heroslender.herospawners.controllers.ConfigurationController;
 import com.heroslender.herospawners.controllers.SpawnerController;
+import com.heroslender.herospawners.hologram.HologramFactory;
 import com.heroslender.herospawners.mobstacker.MobStackerStrategy;
 import com.heroslender.herospawners.mobstacker.strategies.*;
 import com.heroslender.herospawners.services.StorageService;
@@ -22,6 +23,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
+import java.util.logging.Level;
 
 public class HeroSpawners extends JavaPlugin {
     public static final Material SPAWNER_TYPE;
@@ -32,6 +34,7 @@ public class HeroSpawners extends JavaPlugin {
     @Getter private final SpawnerController spawnerController;
     @Getter private final ConfigurationController configurationController;
     @Getter private MobStackerStrategy mobStacker;
+    @Getter HologramFactory hologramFactory;
     @Getter private boolean shutingDown = true;
 
     static {
@@ -89,8 +92,12 @@ public class HeroSpawners extends JavaPlugin {
         bootstrap.setupHolograms();
         bootstrap.setupSpawnerInfoOnInteract();
 
-        // Metrics - https://bstats.org/plugin/bukkit/HeroSpawners
-        new Metrics(this).submitData();
+        try {
+            // Metrics - https://bstats.org/plugin/bukkit/HeroSpawners
+            new Metrics(this).submitData();
+        } catch (Exception e) {
+            getLogger().log(Level.SEVERE, "Falha ao enviar dados para o servidor de estatisticas", e);
+        }
 
         // Colocar o server como ligado(Prevenir dups em reinicios)
         Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> shutingDown = false);
@@ -103,7 +110,7 @@ public class HeroSpawners extends JavaPlugin {
 
         if (Bukkit.getPluginManager().getPlugin("MobStacker2") != null)
             strategy = new MobStacker2();
-        else if (Bukkit.getPluginManager().getPlugin("StackMob") != null){
+        else if (Bukkit.getPluginManager().getPlugin("StackMob") != null) {
             MobStackerStrategy strat;
             try {
                 Class.forName("uk.antiperson.stackmob.api.EntityManager");
@@ -112,8 +119,7 @@ public class HeroSpawners extends JavaPlugin {
                 strat = new StackMob();
             }
             strategy = strat;
-        }
-        else if (Bukkit.getPluginManager().getPlugin("TintaStack") != null)
+        } else if (Bukkit.getPluginManager().getPlugin("TintaStack") != null)
             strategy = new TintaStack();
         else if (Bukkit.getPluginManager().getPlugin("JH_StackMobs") != null) {
             MobStackerStrategy jh;
