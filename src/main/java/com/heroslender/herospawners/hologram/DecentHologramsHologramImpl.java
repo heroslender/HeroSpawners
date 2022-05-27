@@ -1,6 +1,8 @@
 package com.heroslender.herospawners.hologram;
 
 import eu.decentsoftware.holograms.api.DHAPI;
+import eu.decentsoftware.holograms.api.holograms.HologramLine;
+import eu.decentsoftware.holograms.api.holograms.HologramPage;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -21,11 +23,24 @@ public class DecentHologramsHologramImpl implements Hologram {
 
         @Override
         public Hologram createPrivateHologram(String id, Player viewer, Location location, List<String> lines) {
-            eu.decentsoftware.holograms.api.holograms.Hologram hologram =
-                DHAPI.createHologram(id, location, false, lines);
+            if (eu.decentsoftware.holograms.api.holograms.Hologram.getCachedHologramNames().contains(id)) {
+                throw new IllegalArgumentException(String.format("Hologram with that name already exists! (%s)", id));
+            }
 
-            hologram.hideAll();
-            hologram.show(viewer, hologram.getPlayerPage(viewer));
+            eu.decentsoftware.holograms.api.holograms.Hologram hologram = new eu.decentsoftware.holograms.api.holograms.Hologram(id, location, false) {
+                @Override
+                public boolean canShow(Player player) {
+                    return player.equals(viewer);
+                }
+            };
+
+            HologramPage page = hologram.getPage(0);
+            for (String line : lines) {
+                HologramLine hologramLine = new HologramLine(page, page.getNextLineLocation(), line);
+                page.addLine(hologramLine);
+            }
+
+            hologram.showAll();
 
             return new DecentHologramsHologramImpl(hologram);
         }
@@ -64,7 +79,7 @@ public class DecentHologramsHologramImpl implements Hologram {
 
     @Override
     public int size() {
-        return hologram.size();
+        return hologram.getPage(0).size();
     }
 
     @Override
