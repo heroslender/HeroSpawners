@@ -88,6 +88,12 @@ public class SpawnerBlockListener implements Listener {
             return;
         }
 
+        if (!e.getPlayer().hasPermission("herospawners.place")) {
+            e.getPlayer().sendMessage(ChatColor.RED + "Você não tem permissão para colocar spawners!");
+            e.setCancelled(true);
+            return;
+        }
+
         val itemInHand = e.getItemInHand();
         val itemEntityType = SpawnerItemFactory.getEntityType(itemInHand);
         if (itemEntityType == null) {
@@ -96,6 +102,15 @@ public class SpawnerBlockListener implements Listener {
             e.setCancelled(true);
             return;
         }
+
+        if (!e.getPlayer().hasPermission("herospawners.place." + itemEntityType.name().toLowerCase())
+            && !e.getPlayer().hasPermission("herospawners.place.*")) {
+            String entityName = HeroSpawners.getInstance().getConfigurationController().getProperties(itemEntityType).getDisplayName();
+            e.getPlayer().sendMessage(ChatColor.RED + "Você não tem permissão para colocar spawners de " + entityName + "!");
+            e.setCancelled(true);
+            return;
+        }
+
         val itemAmount = SpawnerItemFactory.getItemStackAmount(itemInHand);
 
         for (val block : Utilities.getBlocks(e.getBlock(), config.getStackRadious())) {
@@ -153,6 +168,27 @@ public class SpawnerBlockListener implements Listener {
             return;
         }
 
+        if (!e.getPlayer().hasPermission("herospawners.break")) {
+            e.getPlayer().sendMessage(ChatColor.RED + "Você não tem permissão para quebrar spawners!");
+            e.setCancelled(true);
+            return;
+        }
+
+        val entityType = SpawnerItemFactory.getEntityType(e.getBlock());
+        if (entityType == null) {
+            e.getPlayer().sendMessage(ChatColor.RED + "Ocurreu um erro ao quebrar o spawner! " + ChatColor.GRAY + "#1");
+            e.setCancelled(true);
+            return;
+        }
+
+        if (!e.getPlayer().hasPermission("herospawners.break." + entityType.name().toLowerCase())
+            && !e.getPlayer().hasPermission("herospawners.break.*")) {
+            String entityName = HeroSpawners.getInstance().getConfigurationController().getProperties(entityType).getDisplayName();
+            e.getPlayer().sendMessage(ChatColor.RED + "Você não tem permissão para quebrar spawners de " + entityName + "!");
+            e.setCancelled(true);
+            return;
+        }
+
         val spawner = spawnerController.getSpawner(e.getBlock().getLocation());
         if (spawner == null) {
             if (config.isVanillaEnabled() && e.getPlayer().getGameMode() != GameMode.CREATIVE) {
@@ -163,8 +199,6 @@ public class SpawnerBlockListener implements Listener {
                     e.setCancelled(true);
                     return;
                 }
-
-                EntityType entityType = ((CreatureSpawner) e.getBlock().getState()).getSpawnedType();
 
                 ItemStack spawnerItemStack = SpawnerItemFactory.newItemStack(entityType, 1);
                 if (spawnerItemStack == null) {
@@ -197,13 +231,6 @@ public class SpawnerBlockListener implements Listener {
         if (!silkCheck && !config.isDestroySilktouch()) {
             // The player doesn't have silk-touch and it's configured not to destroy the spawner
             // So we do nothing here, and cancel the event
-            e.setCancelled(true);
-            return;
-        }
-
-        val entityType = SpawnerItemFactory.getEntityType(e.getBlock());
-        if (entityType == null) {
-            e.getPlayer().sendMessage(ChatColor.RED + "Ocurreu um erro ao quebrar o spawner! " + ChatColor.GRAY + "#1");
             e.setCancelled(true);
             return;
         }

@@ -35,8 +35,24 @@ public class SpawnerListener implements Listener {
             return;
         }
 
+        if (!e.getPlayer().hasPermission("herospawners.place")) {
+            e.getPlayer().sendMessage(ChatColor.RED + "Você não tem permissão para colocar spawners!");
+            e.setCancelled(true);
+            return;
+        }
+
         Bukkit.getScheduler().scheduleSyncDelayedTask(HeroSpawners.getInstance(), () -> {
             CreatureSpawner creatureSpawner = (CreatureSpawner) e.getBlock().getState();
+            EntityType entityType = creatureSpawner.getSpawnedType();
+
+            if (!e.getPlayer().hasPermission("herospawners.place." + entityType.name().toLowerCase())
+                && !e.getPlayer().hasPermission("herospawners.place.*")) {
+                String entityName = HeroSpawners.getInstance().getConfigurationController().getProperties(entityType).getDisplayName();
+                e.getPlayer().sendMessage(ChatColor.RED + "Você não tem permissão para colocar spawners de " + entityName + "!");
+                e.setCancelled(true);
+                return;
+            }
+
             for (Block block : Utilities.getBlocks(e.getBlock(), config.getStackRadious())) {
                 if (block.getType() != HeroSpawners.SPAWNER_TYPE) {
                     continue;
@@ -71,8 +87,22 @@ public class SpawnerListener implements Listener {
             return;
         }
 
+        if (!e.getPlayer().hasPermission("herospawners.break")) {
+            e.getPlayer().sendMessage(ChatColor.RED + "Você não tem permissão para quebrar spawners!");
+            e.setCancelled(true);
+            return;
+        }
+
         ISpawner spawner = spawnerController.getSpawner(e.getBlock().getLocation());
         if (spawner == null) {
+            return;
+        }
+
+        if (!e.getPlayer().hasPermission("herospawners.break." + spawner.getType().name().toLowerCase())
+            && !e.getPlayer().hasPermission("herospawners.break.*")) {
+            String entityName = spawner.getEntityProperties().getDisplayName();
+            e.getPlayer().sendMessage(ChatColor.RED + "Você não tem permissão para quebrar spawners de " + entityName + "!");
+            e.setCancelled(true);
             return;
         }
 
