@@ -31,6 +31,8 @@ public class JhStackMobs2 implements MobStackerStrategy {
             if (Main.getInstace().removeIa()) {
                 IaRemover.remove(entity);
             }
+        } else {
+            return true;
         }
         return false;
     }
