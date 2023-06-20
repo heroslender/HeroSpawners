@@ -29,20 +29,22 @@ public class SpawnerSpawnListener implements Listener {
         }
         preventMultiple.put(location, System.currentTimeMillis());
 
-        final int stackSize = (int) Math.round((0.5D + Utilities.getRandom().nextDouble()) * spawner.getAmount());
+        final int stackSize = HeroSpawners.getInstance().getConfigurationController().isSpawnRandom() ?
+            (int) Math.round((0.5D + Utilities.getRandom().nextDouble()) * spawner.getAmount())
+            : spawner.getAmount();
 
         SpawnerSpawnStackEvent spawnerSpawnStackEvent = new SpawnerSpawnStackEvent(
-                spawner,
-                e.getEntity(),
-                stackSize
+            spawner,
+            e.getEntity(),
+            stackSize
         );
         Bukkit.getPluginManager().callEvent(spawnerSpawnStackEvent);
 
         if (!spawnerSpawnStackEvent.isCancelled()) {
             final boolean willCancel = HeroSpawners.getInstance().getMobStacker().createOrAddStack(
-                    spawner,
-                    e.getEntity(),
-                    stackSize
+                spawner,
+                e.getEntity(),
+                stackSize
             );
 
             e.setCancelled(willCancel);

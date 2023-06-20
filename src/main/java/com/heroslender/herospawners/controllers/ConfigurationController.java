@@ -22,6 +22,8 @@ public class ConfigurationController implements Controller {
     public static final String TYPE_PLACEHOLDER = "%tipo%";
     public static final String AMOUNT_PLACEHOLDER = "%quantidade%";
 
+    @Getter private boolean spawnRandom;
+
     @Getter private int stackRadious;
     @Getter private int stackLimit;
 
@@ -54,6 +56,8 @@ public class ConfigurationController implements Controller {
         loadDefaults();
 
         vanillaEnabled = getConfig().getBoolean("spawner.allow-break-vanilla-spawners", false);
+
+        spawnRandom = getConfig().getBoolean("spawn-random", true);
 
         spawnersEnabled = getConfig().getBoolean("spawner.enable", false);
         spawnersDropXP = getConfig().getBoolean("spawner.dropXP", false);
@@ -109,6 +113,8 @@ public class ConfigurationController implements Controller {
     private void loadDefaults() {
         HeroSpawners.getInstance().saveDefaultConfig();
         HeroSpawners.getInstance().reloadConfig();
+
+        setDefault("spawn-random", true);
 
         setDefault("juntar.maximo", 0);
         setDefault("juntar.raio", 5);

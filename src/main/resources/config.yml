@@ -16,6 +16,7 @@ MySql:
   database: herospawners
   user: root
   pass: ''
+spawn-random: true
 juntar:
   raio: 5
   maximo: 0
