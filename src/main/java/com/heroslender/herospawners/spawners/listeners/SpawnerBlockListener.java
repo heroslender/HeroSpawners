@@ -6,6 +6,8 @@ import com.heroslender.herospawners.controllers.SpawnerController;
 import com.heroslender.herospawners.models.ISpawner;
 import com.heroslender.herospawners.spawners.SpawnerItemFactory;
 import com.heroslender.herospawners.utils.Utilities;
+import com.intellectualcrafters.plot.PS;
+import com.intellectualcrafters.plot.object.Plot;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -191,6 +193,25 @@ public class SpawnerBlockListener implements Listener {
             e.getPlayer().sendMessage(ChatColor.RED + "Não tens permissão para quebrar os spawners de outros players!");
             e.setCancelled(true);
             return;
+        }
+
+        if (config.isRequirePlotTrust()
+            && !e.getPlayer().hasPermission("herospawners.admin")
+            && PS.get().hasPlotArea(spawner.getLocation().getWorld().getName())) {
+            org.bukkit.Location loc = spawner.getLocation();
+            com.intellectualcrafters.plot.object.Location plotLoc = new com.intellectualcrafters.plot.object.Location(
+                loc.getWorld().getName(),
+                loc.getBlockX(),
+                loc.getBlockY(),
+                loc.getBlockZ()
+            );
+
+            Plot plot = plotLoc.getOwnedPlot();
+            if (plot != null && !plot.getTrusted().contains(e.getPlayer().getUniqueId())) {
+                e.getPlayer().sendMessage(ChatColor.RED + "Não tens permissão para quebrar os spawners desse plot! Apenas jogadores com trust.");
+                e.setCancelled(true);
+                return;
+            }
         }
 
         val silkCheck = checkSilktouck(e.getPlayer());

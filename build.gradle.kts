@@ -9,6 +9,10 @@ plugins {
     `maven-publish`
 }
 
+group = "com.heroslender"
+version = "4.6.2"
+description = "HeroSpawners"
+
 repositories {
     mavenLocal()
     mavenCentral()
@@ -26,13 +30,13 @@ dependencies {
     implementation("com.zaxxer:HikariCP:3.4.5")
     implementation("org.apache.logging.log4j:log4j-core:2.17.1")
     compileOnly("org.xerial:sqlite-jdbc:3.28.0")
-    compileOnly("org.spigotmc:spigot:1.8.8-R0.1-SNAPSHOT")
     compileOnly("org.projectlombok:lombok:1.18.12")
     compileOnly("org.jetbrains:annotations:19.0.0")
     compileOnly("com.github.decentsoftware-eu:decentholograms:2.3.1")
     compileOnly("uk.antiperson.stackmob:StackMob:5.5.4")
     compileOnly("com.gmail.filoghost.holographicdisplays:holographicdisplays-api:2.4.0")
     compileOnly("de.dustplanet:silkspawners:7.4.0") {
+        exclude(group = "org.spigotmc")
         exclude(group = "com.sk89q")
         exclude(group = "com.massivecraft.massivecore")
         exclude(group = "com.massivecraft.factions")
@@ -40,11 +44,9 @@ dependencies {
     }
 
     compileOnly(fileTree("Libs"))
-}
 
-group = "com.heroslender"
-version = "4.6.1"
-description = "HeroSpawners"
+    compileOnly("org.spigotmc:spigot:1.8.8-R0.1-SNAPSHOT")
+}
 
 java {
     withJavadocJar()

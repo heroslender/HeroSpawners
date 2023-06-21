@@ -5,6 +5,9 @@ import com.heroslender.herospawners.controllers.ConfigurationController;
 import com.heroslender.herospawners.controllers.SpawnerController;
 import com.heroslender.herospawners.models.ISpawner;
 import com.heroslender.herospawners.utils.Utilities;
+import com.intellectualcrafters.plot.PS;
+import com.intellectualcrafters.plot.object.Location;
+import com.intellectualcrafters.plot.object.Plot;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +34,7 @@ public class SpawnerListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onBlockPlace(final BlockPlaceEvent e) {
         if (e.getBlock().getType() != HeroSpawners.SPAWNER_TYPE
-                || HeroSpawners.getInstance().shutdownCheck(e, e.getPlayer())) {
+            || HeroSpawners.getInstance().shutdownCheck(e, e.getPlayer())) {
             return;
         }
 
@@ -67,7 +70,7 @@ public class SpawnerListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     private void onSpawnerBreak(final BlockBreakEvent e) {
         if (e.getBlock().getType() != HeroSpawners.SPAWNER_TYPE
-                || HeroSpawners.getInstance().shutdownCheck(e, e.getPlayer())) {
+            || HeroSpawners.getInstance().shutdownCheck(e, e.getPlayer())) {
             return;
         }
 
@@ -80,6 +83,25 @@ public class SpawnerListener implements Listener {
             e.getPlayer().sendMessage(ChatColor.RED + "Não tens permissão para quebrar os spawners de outros players!");
             e.setCancelled(true);
             return;
+        }
+
+        if (config.isRequirePlotTrust()
+            && !e.getPlayer().hasPermission("herospawners.admin")
+            && PS.get().hasPlotArea(spawner.getLocation().getWorld().getName())) {
+            org.bukkit.Location loc = spawner.getLocation();
+            Location plotLoc = new Location(
+                loc.getWorld().getName(),
+                loc.getBlockX(),
+                loc.getBlockY(),
+                loc.getBlockZ()
+            );
+
+            Plot plot = plotLoc.getOwnedPlot();
+            if (plot != null && !plot.getTrusted().contains(e.getPlayer().getUniqueId())) {
+                e.getPlayer().sendMessage(ChatColor.RED + "Não tens permissão para quebrar os spawners desse plot! Apenas jogadores com trust.");
+                e.setCancelled(true);
+                return;
+            }
         }
 
         spawnerController.updateSpawner(e.getPlayer(), spawner, spawner.getAmount() - 1);
