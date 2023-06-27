@@ -1,13 +1,16 @@
 package com.heroslender.herospawners;
 
-import com.heroslender.herospawners.controllers.ConfigurationController;
-import com.heroslender.herospawners.controllers.SpawnerController;
-import com.heroslender.herospawners.hologram.HologramFactory;
-import com.heroslender.herospawners.mobstacker.MobStackerStrategy;
-import com.heroslender.herospawners.mobstacker.strategies.*;
-import com.heroslender.herospawners.services.StorageService;
-import com.heroslender.herospawners.services.StorageServiceMySqlImpl;
-import com.heroslender.herospawners.services.StorageServiceSQLiteImpl;
+import com.heroslender.herospawners.commands.HeroSpawnersCommand;
+import com.heroslender.herospawners.feature.chatinfo.ChatInfoFeature;
+import com.heroslender.herospawners.feature.hologram.HologramFeature;
+import com.heroslender.herospawners.feature.mobstacker.MobstackerFeature;
+import com.heroslender.herospawners.feature.spawner.SpawnerFeature;
+import com.heroslender.herospawners.internal.HeroPlugin;
+import com.heroslender.herospawners.service.ConfigurationService;
+import com.heroslender.herospawners.service.SpawnerService;
+import com.heroslender.herospawners.service.storage.StorageService;
+import com.heroslender.herospawners.service.storage.StorageServiceMySqlImpl;
+import com.heroslender.herospawners.service.storage.StorageServiceSQLiteImpl;
 import com.heroslender.herospawners.utils.Metrics;
 import lombok.Getter;
 import org.apache.logging.log4j.LogManager;
@@ -18,36 +21,29 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
-import org.bukkit.event.HandlerList;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.world.WorldLoadEvent;
 
-import java.util.concurrent.Executor;
-import java.util.concurrent.ForkJoinPool;
 import java.util.logging.Level;
 
-public class HeroSpawners extends JavaPlugin {
+public class HeroSpawners extends HeroPlugin {
     public static final Material SPAWNER_TYPE;
 
     @Getter private static HeroSpawners instance;
-
-    @Getter private final Executor executor = ForkJoinPool.commonPool();
-    @Getter private final SpawnerController spawnerController;
-    @Getter private final ConfigurationController configurationController;
-    @Getter private MobStackerStrategy mobStacker;
-    @Getter HologramFactory hologramFactory;
-    @Getter private boolean shutingDown = true;
 
     static {
         Material mat;
         try {
             mat = Material.valueOf("SPAWNER");
-            System.out.println(mat);
         } catch (IllegalArgumentException e) {
             mat = Material.MOB_SPAWNER;
         }
 
         SPAWNER_TYPE = mat;
     }
+
+    @Getter private boolean shutingDown = true;
 
     public HeroSpawners() {
         super();
@@ -59,80 +55,58 @@ public class HeroSpawners extends JavaPlugin {
             storageService = new StorageServiceMySqlImpl();
         else
             storageService = new StorageServiceSQLiteImpl();
-        spawnerController = new SpawnerController(storageService, getExecutor());
 
-        configurationController = new ConfigurationController();
+
+        provideService(ConfigurationService.class, new ConfigurationService(this));
+        provideService(StorageService.class, storageService);
+        provideService(SpawnerService.class, new SpawnerService(storageService));
+
+        provideService(HologramFeature.class, new HologramFeature(this));
+        provideService(ChatInfoFeature.class, new ChatInfoFeature(this));
+        provideService(SpawnerFeature.class, new SpawnerFeature(this));
+        provideService(MobstackerFeature.class, new MobstackerFeature(this));
     }
 
     @Override
-    public void onEnable() {
-        configurationController.init();
-        spawnerController.init();
-
-        this.mobStacker = computeMobStackerStrategy();
-
-        final Bootstrap bootstrap = new Bootstrap(getConfig(), this);
-        bootstrap.setupSpawnerSpawnListener();
-        bootstrap.setupSpawnerBlockListener();
+    public void enable() {
+        getCommand("herospawners").setExecutor(new HeroSpawnersCommand());
 
         ((Logger) LogManager.getRootLogger()).addFilter(new AbstractFilter() {
             @Override
             public Result filter(LogEvent event) {
                 if (event != null
-                        && event.getMessage() != null
-                        && event.getMessage().getFormattedMessage() != null
-                        && event.getMessage().getFormattedMessage().contains("Skipping BlockEntity with id")) {
+                    && event.getMessage() != null
+                    && event.getMessage().getFormattedMessage() != null
+                    && event.getMessage().getFormattedMessage().contains("Skipping BlockEntity with id")) {
                     return Result.DENY;
                 }
                 return Result.NEUTRAL;
             }
         });
 
-        bootstrap.setupCommands();
-        bootstrap.setupHolograms();
-        bootstrap.setupSpawnerInfoOnInteract();
-
-        try {
-            // Metrics - https://bstats.org/plugin/bukkit/HeroSpawners
+        try { // Metrics - https://bstats.org/plugin/bukkit/HeroSpawners
             new Metrics(this).submitData();
         } catch (Exception e) {
             getLogger().log(Level.SEVERE, "Falha ao enviar dados para o servidor de estatisticas", e);
         }
 
-        // Colocar o server como ligado(Prevenir dups em reinicios)
-        Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> shutingDown = false);
+        registerListener(new Listener() {
+            @EventHandler
+            public void onWorldLoad(WorldLoadEvent e) {
+                getSpawnerService().load(e.getWorld());
+            }
+        });
 
         getLogger().info("Plugin carregado!");
-    }
 
-    private MobStackerStrategy computeMobStackerStrategy() {
-        final MobStackerStrategy strategy;
-
-        if (Bukkit.getPluginManager().getPlugin("MobStacker2") != null)
-            strategy = new MobStacker2();
-        else if (Bukkit.getPluginManager().getPlugin("StackMob") != null) {
-            MobStackerStrategy strat;
-            try {
-                Class.forName("uk.antiperson.stackmob.api.EntityManager");
-                strat = new StackMob2();
-            } catch (ClassNotFoundException e) {
-                strat = new StackMob();
-            }
-            strategy = strat;
-        } else if (Bukkit.getPluginManager().getPlugin("TintaStack") != null)
-            strategy = new TintaStack();
-        else if (Bukkit.getPluginManager().getPlugin("JH_StackMobs") != null) {
-            strategy = new JhStackMobs();
-        } else
-            strategy = new NoMobStacker();
-
-        return strategy;
+        // Colocar o server como ligado(Prevenir dups em reinicios)
+        Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> shutingDown = false);
     }
 
     public boolean shutdownCheck(final Cancellable event, final Player player) {
         if (isShutingDown()) {
             event.setCancelled(true);
-            player.sendMessage("§cNão é possivel colocar spawners quando o servidor esta a ligar/desligar.");
+            player.sendMessage("§cNão é possivel utilizar spawners quando o servidor esta a ligar/desligar.");
             return true;
         }
 
@@ -140,13 +114,16 @@ public class HeroSpawners extends JavaPlugin {
     }
 
     @Override
-    public void onDisable() {
+    public void disable() {
         shutingDown = true;
+    }
 
-        HandlerList.unregisterAll(this);
+    public ConfigurationService getConfigurationController() {
+        return getService(ConfigurationService.class);
+    }
 
-        spawnerController.stop();
-        configurationController.stop();
+    public SpawnerService getSpawnerService() {
+        return getService(SpawnerService.class);
     }
 }
 

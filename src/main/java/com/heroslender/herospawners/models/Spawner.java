@@ -11,8 +11,8 @@ import org.bukkit.entity.EntityType;
 
 import java.util.List;
 
-import static com.heroslender.herospawners.controllers.ConfigurationController.AMOUNT_PLACEHOLDER;
-import static com.heroslender.herospawners.controllers.ConfigurationController.TYPE_PLACEHOLDER;
+import static com.heroslender.herospawners.service.ConfigurationService.AMOUNT_PLACEHOLDER;
+import static com.heroslender.herospawners.service.ConfigurationService.TYPE_PLACEHOLDER;
 
 @AllArgsConstructor
 @RequiredArgsConstructor

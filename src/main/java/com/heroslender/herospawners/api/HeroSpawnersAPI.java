@@ -7,6 +7,6 @@ import org.bukkit.Location;
 public class HeroSpawnersAPI {
 
     public static ISpawner getSpawner(Location location){
-        return HeroSpawners.getInstance().getSpawnerController().getSpawner(location);
+        return HeroSpawners.getInstance().getSpawnerService().getSpawner(location);
     }
 }

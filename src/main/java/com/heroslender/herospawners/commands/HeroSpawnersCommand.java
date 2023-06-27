@@ -14,8 +14,7 @@ public class HeroSpawnersCommand implements CommandExecutor {
             return true;
         }
 
-        HeroSpawners.getInstance().getConfigurationController().stop();
-        HeroSpawners.getInstance().getConfigurationController().init();
+        HeroSpawners.getInstance().reload();
 
         sender.sendMessage(ChatColor.GREEN + "HeroSpawners - " + ChatColor.YELLOW + "Configuração recarregada!");
         return true;
